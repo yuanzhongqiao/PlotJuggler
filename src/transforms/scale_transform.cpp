@@ -66,7 +66,7 @@ bool ScaleTransform::xmlLoadState(const QDomElement &parent_element)
   return true;
 }
 
-nonstd::optional<PlotData::Point> ScaleTransform::calculateNextPoint(size_t index)
+std::optional<PlotData::Point> ScaleTransform::calculateNextPoint(size_t index)
 {
   double off_x = ui->lineEditTimeOffset->text().toDouble();
   double off_y = ui->lineEditValueOffset->text().toDouble();

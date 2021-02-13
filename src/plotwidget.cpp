@@ -48,9 +48,11 @@ QColor PlotWidget::getColorHint(PlotData* data)
 {
   QSettings settings;
   bool remember_color = settings.value("Preferences::remember_color", true).toBool();
-  if (data && remember_color && data->getColorHint() != Qt::black)
+
+  auto colorHint = data->attribute("color_hint");
+  if (data && remember_color && colorHint && !colorHint->empty())
   {
-    return data->getColorHint();
+    return QColor(colorHint->c_str());
   }
   QColor color;
   bool use_plot_color_index = settings.value("Preferences::use_plot_color_index", false).toBool();
@@ -92,7 +94,7 @@ QColor PlotWidget::getColorHint(PlotData* data)
   }
   if (data)
   {
-    data->setColorHint(color);
+    data->setAttribute( "color_hint", color.name().toStdString() );
   }
 
   return color;

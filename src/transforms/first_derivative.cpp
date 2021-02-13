@@ -42,7 +42,7 @@ FirstDerivative::~FirstDerivative()
   delete _widget;
 }
 
-nonstd::optional<PlotData::Point>
+std::optional<PlotData::Point>
 FirstDerivative::calculateNextPoint(size_t index)
 {
   if( index == 0)

@@ -32,7 +32,7 @@ RangeOpt QwtTimeseries::getVisualizationRangeY(Range range_X)
   return Range{ min_y, max_y };
 }
 
-nonstd::optional<QPointF> QwtTimeseries::sampleFromTime(double t)
+std::optional<QPointF> QwtTimeseries::sampleFromTime(double t)
 {
   int index = _ts_data->getIndexFromX(t);
   if (index < 0)
@@ -149,7 +149,7 @@ RangeOpt QwtSeriesWrapper::getVisualizationRangeX()
   }
 }
 
-const PlotDataBase<double> *QwtSeriesWrapper::plotData() const
+const PlotDataBase<double,double> *QwtSeriesWrapper::plotData() const
 {
   return _data;
 }

@@ -27,7 +27,7 @@ public:
   void on_buttonCompute_clicked();
 
 private:
-  nonstd::optional<PlotData::Point>
+  std::optional<PlotData::Point>
   calculateNextPoint(size_t index) override;
 
   QWidget *_widget;

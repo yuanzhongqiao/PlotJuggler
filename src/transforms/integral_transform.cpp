@@ -42,7 +42,7 @@ IntegralTransform::~IntegralTransform()
   delete _widget;
 }
 
-nonstd::optional<PlotData::Point>
+std::optional<PlotData::Point>
 IntegralTransform::calculateNextPoint(size_t index)
 {
   if( index == 0)

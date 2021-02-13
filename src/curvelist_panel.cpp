@@ -158,7 +158,7 @@ void CurveListPanel::refreshValues()
     return num_text + " ";
   };
 
-  auto GetValue = [&](const std::string& name) -> nonstd::optional<double> {
+  auto GetValue = [&](const std::string& name) -> std::optional<double> {
     auto it = _numeric_data->find(name);
     if (it != _numeric_data->end())
     {

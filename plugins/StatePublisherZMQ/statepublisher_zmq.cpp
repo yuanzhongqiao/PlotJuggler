@@ -110,7 +110,7 @@ void StatePublisherZMQ::updateState(PlotDataMap* datamap, double current_time)
     for (it = datamap->begin(); it != datamap->end(); it++)
     {
       const QString& name = it->first;
-      PlotDataPtr plotdata = it->second;
+      PlotDataPtr Timeseries = it->second;
       _current_data[name] = plotdata->getY(current_time);
     }
   }

@@ -4,6 +4,7 @@
 #include "nlohmann/json.hpp"
 #include "PlotJuggler/messageparser_base.h"
 #include <QCheckBox>
+#include <QDebug>
 
 using namespace PJ;
 

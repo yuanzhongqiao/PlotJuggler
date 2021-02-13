@@ -1124,7 +1124,8 @@ void MainWindow::deleteAllData()
 
 template <typename T>
 void importPlotDataMapHelper(std::unordered_map<std::string, T>& source,
-                             std::unordered_map<std::string, T>& destination, bool delete_older)
+                             std::unordered_map<std::string, T>& destination,
+                             bool delete_older)
 {
   for (auto& it : source)
   {
@@ -1143,14 +1144,14 @@ void importPlotDataMapHelper(std::unordered_map<std::string, T>& source,
     if (delete_older)
     {
       double max_range_x = destination_plot.maximumRangeX();
-      destination_plot.swapData(source_plot);
+      destination_plot = std::move(source_plot);
       destination_plot.setMaximumRangeX(max_range_x);  // just in case
     }
     else
     {
       for (size_t i = 0; i < source_plot.size(); i++)
       {
-        destination_plot.pushBack(source_plot.at(i));
+        destination_plot.pushBack( source_plot.at(i) );
       }
     }
     source_plot.clear();
@@ -1201,6 +1202,7 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
   }
 
   importPlotDataMapHelper(new_data.numeric, _mapped_plot_data.numeric, remove_old);
+  importPlotDataMapHelper(new_data.strings, _mapped_plot_data.strings, remove_old);
   importPlotDataMapHelper(new_data.user_defined, _mapped_plot_data.user_defined, remove_old);
 
   if (curvelist_modified)

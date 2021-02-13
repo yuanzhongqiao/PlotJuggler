@@ -24,6 +24,7 @@ DataStreamSample::DataStreamSample()
     _parameters.insert({str, param});
     dataMap().addNumeric(str);
   }
+  dataMap().addStringSeries("color");
 }
 
 bool DataStreamSample::start(QStringList*)
@@ -63,6 +64,7 @@ bool DataStreamSample::xmlLoadState(const QDomElement& parent_element)
 
 void DataStreamSample::pushSingleCycle()
 {
+  static int count = 0;
   std::lock_guard<std::mutex> lock(mutex());
 
   using namespace std::chrono;
@@ -70,15 +72,22 @@ void DataStreamSample::pushSingleCycle()
   const double offset = duration_cast<duration<double>>(initial_time.time_since_epoch()).count();
 
   auto now = high_resolution_clock::now();
+  std::string colors[]= { "RED", "BLUE", "GREEN" };
+
+  const double stamp = duration_cast<duration<double>>(now - initial_time).count();
+
   for (auto& it : dataMap().numeric)
   {
     auto& plot = it.second;
-    const double t = duration_cast<duration<double>>(now - initial_time).count();
 
     const DataStreamSample::Parameters& param = _parameters[it.first];
-    double val = param.A*sin( param.B*t + param.C ) + param.D;
-    plot.pushBack(PlotData::Point(t + offset, val));
+    double val = param.A*sin( param.B*stamp + param.C ) + param.D;
+    plot.pushBack(PlotData::Point(stamp + offset, val));
+
   }
+
+  auto& col_series = dataMap().strings.find("color")->second;
+  col_series.pushBack( { stamp, colors[ count++ % 3]});
 }
 
 void DataStreamSample::loop()

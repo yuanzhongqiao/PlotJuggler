@@ -40,7 +40,7 @@ bool OutlierRemovalFilter::xmlLoadState(const QDomElement &parent_element)
   return true;
 }
 
-nonstd::optional<PJ::PlotData::Point>
+std::optional<PJ::PlotData::Point>
 OutlierRemovalFilter::calculateNextPoint(size_t index)
 {
   const auto& p = dataSource()->at(index);

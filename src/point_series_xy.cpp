@@ -16,7 +16,7 @@ size_t PointSeriesXY::size() const
   return _cached_curve.size();
 }
 
-nonstd::optional<QPointF> PointSeriesXY::sampleFromTime(double t)
+std::optional<QPointF> PointSeriesXY::sampleFromTime(double t)
 {
   if (_cached_curve.size() == 0)
   {

@@ -8,15 +8,15 @@
 using namespace PJ;
 
 
-// wrapper to PlotData inclduing a time offset
+// wrapper to Timeseries inclduing a time offset
 class QwtSeriesWrapper: public QwtSeriesData<QPointF>
 {
 private:
-  const PlotDataBase<double>* _data;
+  const PlotDataXY* _data;
   double _time_offset;
 
 public:
-  QwtSeriesWrapper(const PlotDataBase<double>* data): _data(data), _time_offset(0.0) {}
+  QwtSeriesWrapper(const PlotDataXY* data): _data(data), _time_offset(0.0) {}
 
   QPointF sample(size_t i) const override;
 
@@ -28,13 +28,13 @@ public:
 
   QRectF boundingRect() const override;
 
-  const PlotDataBase<double>* plotData() const;
+  const PlotDataXY* plotData() const;
 
   virtual RangeOpt getVisualizationRangeX();
 
   virtual RangeOpt getVisualizationRangeY(Range range_X) = 0;
 
-  virtual nonstd::optional<QPointF> sampleFromTime(double t) = 0;
+  virtual std::optional<QPointF> sampleFromTime(double t) = 0;
 
 };
 
@@ -50,7 +50,7 @@ public:
 
   virtual RangeOpt getVisualizationRangeY(Range range_X) override;
 
-  virtual nonstd::optional<QPointF> sampleFromTime(double t) override;
+  virtual std::optional<QPointF> sampleFromTime(double t) override;
 
 protected:
   const PlotData* _ts_data;

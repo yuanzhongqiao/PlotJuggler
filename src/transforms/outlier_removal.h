@@ -34,6 +34,6 @@ private:
   std::vector<double> _buffer;
   nonstd::ring_span_lite::ring_span<double> _ring_view;
 
-  nonstd::optional<PlotData::Point>
+  std::optional<PlotData::Point>
   calculateNextPoint(size_t index) override;
 };

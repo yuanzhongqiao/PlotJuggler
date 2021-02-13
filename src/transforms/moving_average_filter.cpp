@@ -30,7 +30,7 @@ void MovingAverageFilter::init()
   TimeSeriesTransform::init();
 }
 
-nonstd::optional<PlotData::Point>
+std::optional<PlotData::Point>
 MovingAverageFilter::calculateNextPoint(size_t index)
 {
   size_t buffer_size = std::min( int(ui->spinBoxSamples->value()), int(dataSource()->size()));

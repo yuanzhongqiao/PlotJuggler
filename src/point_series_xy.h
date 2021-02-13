@@ -16,7 +16,7 @@ public:
 
   size_t size() const override;
 
-  nonstd::optional<QPointF> sampleFromTime(double t) override;
+  std::optional<QPointF> sampleFromTime(double t) override;
 
   RangeOpt getVisualizationRangeY(Range range_X) override;
 
@@ -36,7 +36,7 @@ public:
 protected:
   const PlotData* _x_axis;
   const PlotData* _y_axis;
-  PlotDataBase<double> _cached_curve;
+  PlotDataXY _cached_curve;
 };
 
 #endif  // POINT_SERIES_H

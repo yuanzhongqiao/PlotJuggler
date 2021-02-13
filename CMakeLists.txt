@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 PROJECT(plotjuggler)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 add_definitions(
@@ -56,8 +59,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 SET(CMAKE_AUTOUIC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (NOT WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer")
@@ -228,8 +229,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/paho.mqtt.c/CMakeLists.txt")
     SET(CMAKE_INSTALL_INCLUDEDIR )
 
     add_subdirectory( 3rdparty/paho.mqtt.c EXCLUDE_FROM_ALL)
-
-    add_subdirectory( plugins/DataStreamMQTT )
+    add_subdirectory( plugins/DataStreamMQTT )  
 endif()
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/liblsl/CMakeLists.txt" AND NOT WIN32)
