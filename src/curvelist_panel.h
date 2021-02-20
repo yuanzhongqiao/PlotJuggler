@@ -74,6 +74,9 @@ public slots:
 
   void refreshValues();
 
+protected:
+  std::unordered_map<std::string, PlotData>* _numeric_data = nullptr;
+
 private:
   Ui::CurveListPanel* ui;
 
@@ -83,7 +86,6 @@ private:
   CurveTreeView* _tree_view;
 
   double _tracker_time = 0;
-  std::unordered_map<std::string, PlotData>* _numeric_data = nullptr;
 
   const CustomPlotMap& _custom_plots;
 

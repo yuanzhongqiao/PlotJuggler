@@ -127,7 +127,8 @@ bool CurveListPanel::is2ndColumnHidden() const
   return false;
 }
 
-void CurveListPanel::update2ndColumnValues(double tracker_time, std::unordered_map<std::string, PlotData>* numeric_data)
+void CurveListPanel::update2ndColumnValues(double tracker_time,
+                                           std::unordered_map<std::string, PlotData>* numeric_data)
 {
   _tracker_time = tracker_time;
   _numeric_data = numeric_data;
@@ -137,10 +138,7 @@ void CurveListPanel::update2ndColumnValues(double tracker_time, std::unordered_m
 
 void CurveListPanel::refreshValues()
 {
-  if (is2ndColumnHidden() || !_numeric_data)
-  {
-    return;
-  }
+  auto default_foreground = _custom_view->palette().foreground();
 
   auto FormattedNumber = [](double value) {
     QString num_text = QString::number(value, 'f', 3);
@@ -158,24 +156,30 @@ void CurveListPanel::refreshValues()
     return num_text + " ";
   };
 
-  auto GetValue = [&](const std::string& name) -> std::optional<double> {
+  auto GetPlotData = [&](const std::string& name) -> PlotData*
+  {
     auto it = _numeric_data->find(name);
     if (it != _numeric_data->end())
     {
-      auto& data = it->second;
+      return &(it->second);
+    }
+    else{
+      return nullptr;
+    }
+  };
 
-      if (_tracker_time < std::numeric_limits<double>::max())
-      {
-        auto value = data.getYfromX(_tracker_time);
-        if (value)
-        {
-          return value;
-        }
-      }
-      else if (data.size() > 0)
-      {
-        return data.back().y;
-      }
+  auto GetValue = [&](PlotData* data) -> std::optional<double> {
+
+    if( !data ) {
+      return {};
+    }
+    if (_tracker_time < std::numeric_limits<double>::max())
+    {
+      return data->getYfromX(_tracker_time);
+    }
+    else if (data->size() > 0)
+    {
+      return data->back().y;
     }
     return {};
   };
@@ -199,10 +203,20 @@ void CurveListPanel::refreshValues()
       }
 
       const std::string& name = table->item(row, 0)->text().toStdString();
-      auto val = GetValue(name);
-      if (val)
+      auto plotdata = GetPlotData(name);
+
+      auto label_color = plotdata->attribute("label_color");
+      auto text_color = ( label_color ) ?
+            QColor(QString::fromStdString(label_color.value())) : default_foreground.color();
+      table->item(row, 0)->setTextColor( text_color );
+
+      if ( !is2ndColumnHidden() )
       {
-        table->item(row, 1)->setText(FormattedNumber(val.value()));
+        auto val = GetValue(plotdata);
+        if (val)
+        {
+          table->item(row, 1)->setText(FormattedNumber(val.value()));
+        }
       }
     }
     if(_column_width_dirty)
@@ -232,10 +246,22 @@ void CurveListPanel::refreshValues()
           return;
         }
 
-        auto val = GetValue(curve_name.toStdString());
-        if (val)
+        auto plotdata = GetPlotData( curve_name.toStdString() );
+
+        auto default_brush = cell->foreground(0);
+
+        auto label_color = plotdata->attribute("label_color");
+        auto text_color = ( label_color ) ?
+              QColor(QString::fromStdString(label_color.value())) : default_foreground;
+        cell->setForeground(0, text_color );
+
+        if ( !is2ndColumnHidden() )
         {
-          cell->setText(1, FormattedNumber(val.value()));
+          auto val = GetValue(plotdata);
+          if (val)
+          {
+            cell->setText(1, FormattedNumber(val.value()));
+          }
         }
       }
     };

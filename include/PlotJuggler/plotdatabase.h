@@ -108,6 +108,14 @@ public:
         _attributes[ name ] = value;
     }
 
+    const std::map<std::string, std::string>& attributes() const{
+      return _attributes;
+    }
+
+    std::map<std::string, std::string>& attributes() {
+      return _attributes;
+    }
+
     std::optional<std::string> attribute(const std::string& name) const
     {
         auto it = _attributes.find( name );

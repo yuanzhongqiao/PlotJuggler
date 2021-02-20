@@ -37,7 +37,7 @@ public:
     std::optional<Value> getYfromX(double x) const
     {
       int index = getIndexFromX(x);
-      return ( index < 0 ) ? std::nullopt : std::optional(index);
+      return ( index < 0 ) ? std::nullopt : std::optional( _points[index].y );
     }
 
     void pushBack(const Point &p)
@@ -93,20 +93,12 @@ inline int TimeseriesBase<Value>::getIndexFromX(double x) const
     return 0;
   }
 
-  if (index > 0)
+  if (index > 0 && (abs(_points[index - 1].x - x) < abs(_points[index].x - x) ) )
   {
-    if (std::abs(_points[index - 1].x - x) < std::abs(_points[index].x - x))
-    {
-      return index - 1;
-    }
-    else
-    {
-      return index;
-    }
+      index =  index - 1;
   }
   return index;
 }
-
 
 } // end namespace
 

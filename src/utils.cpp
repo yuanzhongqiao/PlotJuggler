@@ -80,6 +80,13 @@ std::pair<std::vector<QString>, bool> MoveData(PlotDataMapRef &source,
           .first;
     }
     auto& destination_plot = plot_with_same_name->second;
+
+    // copy the attributes,
+    for (const auto& attr_it: source_plot.attributes() )
+    {
+      destination_plot.setAttribute(attr_it.first, attr_it.second );
+    }
+
     for (size_t i = 0; i < source_plot.size(); i++)
     {
       destination_plot.pushBack(source_plot.at(i));
@@ -103,6 +110,13 @@ std::pair<std::vector<QString>, bool> MoveData(PlotDataMapRef &source,
           .first;
     }
     auto& destination_plot = plot_with_same_name->second;
+
+    // copy the attributes,
+    for (const auto& attr_it: source_plot.attributes() )
+    {
+      destination_plot.setAttribute(attr_it.first, attr_it.second );
+    }
+
     for (size_t i = 0; i < source_plot.size(); i++)
     {
       destination_plot.pushBack( std::move(source_plot.at(i)) );

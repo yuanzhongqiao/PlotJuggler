@@ -113,7 +113,6 @@ void CurveTreeView::addItem(const QString& item_name)
       child_item->setFont(1, font);
       child_item->setTextAlignment(1, Qt::AlignRight);
 
-
       tree_parent = child_item;
 
       auto current_flag = child_item->flags();

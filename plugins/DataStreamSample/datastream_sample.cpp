@@ -22,9 +22,14 @@ DataStreamSample::DataStreamSample()
     param.C = 3 * ((double)rand() / (double)RAND_MAX);
     param.D = 20 * ((double)rand() / (double)RAND_MAX);
     _parameters.insert({str, param});
-    dataMap().addNumeric(str);
+    auto& plotdata = dataMap().addNumeric(str)->second;
+
+    if( i%5 == 0 ) {
+      plotdata.setAttribute("label_color", "red");
+    }
   }
-  dataMap().addStringSeries("color");
+
+  dataMap().addStringSeries("color")->second;
 }
 
 bool DataStreamSample::start(QStringList*)
@@ -83,7 +88,6 @@ void DataStreamSample::pushSingleCycle()
     const DataStreamSample::Parameters& param = _parameters[it.first];
     double val = param.A*sin( param.B*stamp + param.C ) + param.D;
     plot.pushBack(PlotData::Point(stamp + offset, val));
-
   }
 
   auto& col_series = dataMap().strings.find("color")->second;
