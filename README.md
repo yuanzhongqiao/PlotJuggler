@@ -89,16 +89,21 @@ To install PlotJuggler, just type:
 
     sudo apt install ros-${ROS_DISTRO}-plotjuggler-ros
        
-And run it with:
+I added a fix that will be available in the next release.
 
-    roslaunch plotjuggler_ros plotjuggler.launch
+To launch PlotJuggler on ROS, use the command:
+
+      rosrun plotjuggler plotjuggler
+
+or, if are using ROS2:
+
+       ros2 run plotjuggler plotjuggler
 
 Since version 3.x, ROS plugins have been moved to a separate repository:
 
 https://github.com/PlotJuggler/plotjuggler-ros-plugins
 
 Refer to the instructions in the this repository if you want to compile PJ and its ROS plugins from source.
-
 
 # If you like PlotJuggler, support it.
 
