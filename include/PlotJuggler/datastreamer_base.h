@@ -37,7 +37,7 @@ public:
     return _mutex;
   }
 
-  void setMaximumRange(double range);
+  void setMaximumRangeX(double range);
 
   PlotDataMapRef& dataMap()
   {
@@ -81,10 +81,14 @@ private:
   MessageParserFactory* _available_parsers;
 };
 
-inline void DataStreamer::setMaximumRange(double range)
+inline void DataStreamer::setMaximumRangeX(double range)
 {
   std::lock_guard<std::mutex> lock(mutex());
   for (auto& it : dataMap().numeric)
+  {
+    it.second.setMaximumRangeX(range);
+  }
+  for (auto& it : dataMap().strings)
   {
     it.second.setMaximumRangeX(range);
   }

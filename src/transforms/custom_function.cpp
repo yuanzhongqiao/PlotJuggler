@@ -55,7 +55,8 @@ const SnippetData &CustomFunction::snippet() const
   return _snippet;
 }
 
-void CustomFunction::calculate(const PlotDataMapRef& plotData, PlotData* dst_data)
+void CustomFunction::calculate(const PlotDataMapRef& plotData,
+                               PlotData* dst_data)
 {
   auto src_data_it = plotData.numeric.find(_linked_plot_name);
   if (src_data_it == plotData.numeric.end())
@@ -71,7 +72,7 @@ void CustomFunction::calculate(const PlotDataMapRef& plotData, PlotData* dst_dat
   }
 
   // clean up old data
-  dst_data->setMaximumRangeX(src_data.maximumRangeX());
+  dst_data->setMaximumRangeX( src_data.maximumRangeX() );
 
   std::vector<const PlotData*> channel_data;
   channel_data.reserve(_used_channels.size());

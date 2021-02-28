@@ -37,7 +37,7 @@ public:
     {
       return;
     }
-    dst_data->setMaximumRangeX( _src_data->maximumRangeX());
+    dst_data->setMaximumRangeX( _src_data->maximumRangeX() );
     if (dst_data->size() != 0)
     {
       _last_timestamp = dst_data->back().x;

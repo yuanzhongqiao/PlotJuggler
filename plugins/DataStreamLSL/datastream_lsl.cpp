@@ -182,15 +182,10 @@ void DataStreamLSL::dataReceived(std::vector<std::vector<double> > *chunk, std::
         std::vector<std::string> channel_names = streamer->channelList();
         for (unsigned int i = 0; i < channel_names.size(); ++i) {
 
-            std::string ch = channel_names[i];
-            auto index_it = dataMap().numeric.find(ch);
-
-            if( index_it == dataMap().numeric.end()) {
-                index_it = dataMap().addNumeric(ch);
-            }
+            auto& data = dataMap().findOrCreateNumberic( channel_names[i] );
 
             for (unsigned int j = 0; j < chunk->size(); ++j) {
-                index_it->second.pushBack(PJ::PlotData::Point( stamps->at(j), chunk->at(j).at(i)));
+                data.pushBack(PJ::PlotData::Point( stamps->at(j), chunk->at(j).at(i)));
             }
         }
     }

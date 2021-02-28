@@ -37,6 +37,83 @@ struct PlotDataMapRef
                            std::forward_as_tuple(name),
                            std::forward_as_tuple(name)).first;
   }
+
+  PlotData& findOrCreateNumberic(const std::string& name)
+  {
+    auto it = numeric.find( name );
+    if( it == numeric.end() ) {
+      it = addNumeric(name);
+    }
+    return it->second;
+  }
+
+  StringSeries& findOrCreateStringSeries(const std::string& name)
+  {
+    auto it = strings.find( name );
+    if( it == strings.end() ) {
+      it = addStringSeries(name);
+    }
+    return it->second;
+  }
+
+  PlotDataAny& findOrCreateUserDefined(const std::string& name)
+  {
+    auto it = user_defined.find( name );
+    if( it == user_defined.end() ) {
+      it = addUserDefined(name);
+    }
+    return it->second;
+  }
+
+  void clear()
+  {
+    numeric.clear();
+    strings.clear();
+    user_defined.clear();
+  }
+
+  void setMaximumRangeX( double range )
+  {
+    for (auto& it : numeric)
+    {
+      it.second.setMaximumRangeX( range );
+    }
+    for (auto& it : strings)
+    {
+      it.second.setMaximumRangeX( range );
+    }
+    for (auto& it : user_defined)
+    {
+      it.second.setMaximumRangeX( range );
+    }
+  }
+
+  bool erase(const std::string& name )
+  {
+    bool erased = false;
+    auto num_it = numeric.find(name);
+    if (num_it != numeric.end())
+    {
+      numeric.erase( num_it );
+      erased = true;
+    }
+
+    auto str_it = strings.find(name);
+    if (str_it != strings.end())
+    {
+      strings.erase( str_it );
+      erased = true;
+    }
+
+    auto any_it = user_defined.find(name);
+    if (any_it != user_defined.end())
+    {
+      user_defined.erase( any_it );
+      erased = true;
+    }
+    return erased;
+  }
+
 };
 
 template <typename Value>

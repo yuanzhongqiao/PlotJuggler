@@ -261,7 +261,7 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   if (interrupted)
   {
     progress_dialog.cancel();
-    plot_data.numeric.clear();
+    plot_data.clear();
   }
 
   if (monotonic_warning)

@@ -78,12 +78,7 @@ protected:
 
   PlotData& getSeries(const std::string& key)
   {
-    auto plot_pair = _plot_data.numeric.find(key);
-    if (plot_pair == _plot_data.numeric.end())
-    {
-      plot_pair = _plot_data.addNumeric(key);
-    }
-    return plot_pair->second;
+    return _plot_data.findOrCreateNumberic( key );
   }
 };
 

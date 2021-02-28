@@ -24,7 +24,9 @@ class CurveListPanel : public QWidget
   Q_OBJECT
 
 public:
-  explicit CurveListPanel(const CustomPlotMap& mapped_math_plots, QWidget* parent);
+  explicit CurveListPanel(PlotDataMapRef& mapped_plot_data,
+                          const CustomPlotMap& mapped_math_plots,
+                          QWidget* parent);
 
   ~CurveListPanel() override;
 
@@ -46,7 +48,7 @@ public:
 
   bool is2ndColumnHidden() const;
 
-  void update2ndColumnValues(double time, std::unordered_map<std::string, PlotData>* numeric_data);
+  void update2ndColumnValues(double time);
 
   virtual void keyPressEvent(QKeyEvent* event) override;
 
@@ -75,10 +77,11 @@ public slots:
   void refreshValues();
 
 protected:
-  std::unordered_map<std::string, PlotData>* _numeric_data = nullptr;
 
 private:
   Ui::CurveListPanel* ui;
+
+  PlotDataMapRef& _plot_data;
 
   void updateTreeModel();
 

@@ -77,7 +77,7 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _test_option = commandline_parser.isSet("test");
   _autostart_publishers = commandline_parser.isSet("publish");
 
-  _curvelist_widget = new CurveListPanel(_custom_plots, this);
+  _curvelist_widget = new CurveListPanel(_mapped_plot_data, _custom_plots, this);
 
   ui->setupUi(this);
 
@@ -118,29 +118,41 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   ui->labelStreamingAnimation->setMovie(_animated_streaming_movie);
   ui->labelStreamingAnimation->setHidden(true);
 
-  connect(this, &MainWindow::stylesheetChanged, this, &MainWindow::on_stylesheetChanged);
+  connect(this, &MainWindow::stylesheetChanged,
+          this, &MainWindow::on_stylesheetChanged);
 
-  connect(this, &MainWindow::stylesheetChanged, _curvelist_widget, &CurveListPanel::on_stylesheetChanged);
+  connect(this, &MainWindow::stylesheetChanged,
+          _curvelist_widget, &CurveListPanel::on_stylesheetChanged);
 
-  connect(_curvelist_widget, &CurveListPanel::hiddenItemsChanged, this, &MainWindow::onUpdateLeftTableValues);
+  connect(_curvelist_widget, &CurveListPanel::hiddenItemsChanged,
+          this, &MainWindow::onUpdateLeftTableValues);
 
-  connect(_curvelist_widget, &CurveListPanel::deleteCurves, this, &MainWindow::onDeleteMultipleCurves);
+  connect(_curvelist_widget, &CurveListPanel::deleteCurves,
+          this, &MainWindow::onDeleteMultipleCurves);
 
-  connect(_curvelist_widget, &CurveListPanel::createMathPlot, this, &MainWindow::onAddCustomPlot);
+  connect(_curvelist_widget, &CurveListPanel::createMathPlot,
+          this, &MainWindow::onAddCustomPlot);
 
-  connect(_curvelist_widget, &CurveListPanel::editMathPlot, this, &MainWindow::onEditCustomPlot);
+  connect(_curvelist_widget, &CurveListPanel::editMathPlot,
+          this, &MainWindow::onEditCustomPlot);
 
-  connect(_curvelist_widget, &CurveListPanel::refreshMathPlot, this, &MainWindow::onRefreshCustomPlot);
+  connect(_curvelist_widget, &CurveListPanel::refreshMathPlot,
+          this, &MainWindow::onRefreshCustomPlot);
 
-  connect(ui->timeSlider, &RealSlider::realValueChanged, this, &MainWindow::onTimeSlider_valueChanged);
+  connect(ui->timeSlider, &RealSlider::realValueChanged,
+          this, &MainWindow::onTimeSlider_valueChanged);
 
-  connect(ui->playbackRate, &QDoubleSpinBox::editingFinished, this, [this]() { ui->playbackRate->clearFocus(); });
+  connect(ui->playbackRate, &QDoubleSpinBox::editingFinished,
+          this, [this]() { ui->playbackRate->clearFocus(); });
 
-  connect(ui->playbackStep, &QDoubleSpinBox::editingFinished, this, [this]() { ui->playbackStep->clearFocus(); });
+  connect(ui->playbackStep, &QDoubleSpinBox::editingFinished,
+          this, [this]() { ui->playbackStep->clearFocus(); });
 
-  _main_tabbed_widget = new TabbedPlotWidget("Main Window", this, _mapped_plot_data, this);
+  _main_tabbed_widget = new TabbedPlotWidget("Main Window",
+                                             this, _mapped_plot_data, this);
 
-  connect(this, &MainWindow::stylesheetChanged, _main_tabbed_widget, &TabbedPlotWidget::on_stylesheetChanged);
+  connect(this, &MainWindow::stylesheetChanged, _main_tabbed_widget,
+          &TabbedPlotWidget::on_stylesheetChanged);
 
   ui->plottingLayout->insertWidget(0, _main_tabbed_widget, 1);
   ui->leftLayout->addWidget(_curvelist_widget,1);
@@ -393,7 +405,7 @@ void MainWindow::onUndoInvoked()
 
 void MainWindow::onUpdateLeftTableValues()
 {
-  _curvelist_widget->update2ndColumnValues(_tracker_time, &_mapped_plot_data.numeric);
+  _curvelist_widget->update2ndColumnValues(_tracker_time);
 }
 
 void MainWindow::onTrackerMovedFromWidget(QPointF relative_pos)
@@ -718,6 +730,7 @@ void MainWindow::buildDummyData()
 
   PlotData& sin_plot = datamap.addNumeric("_sin")->second;
   PlotData& cos_plot = datamap.addNumeric("_cos")->second;
+  StringSeries& str_plot = datamap.addStringSeries("str_value")->second;
 
   double t = 0;
   for (unsigned indx = 0; indx < SIZE; indx++)
@@ -725,6 +738,12 @@ void MainWindow::buildDummyData()
     t += 0.01;
     sin_plot.pushBack(PlotData::Point(t + 20, sin(t * 0.4)));
     cos_plot.pushBack(PlotData::Point(t + 20, cos(t * 0.4)));
+
+    switch( indx%3 ){
+    case 0: str_plot.pushBack( {t + 20, "Blue"} ); break;
+    case 1: str_plot.pushBack( {t + 20, "Red"} ); break;
+    case 2: str_plot.pushBack( {t + 20, "Green"} ); break;
+    }
   }
 
   importPlotDataMap(datamap, true);
@@ -897,6 +916,10 @@ void MainWindow::checkAllCurvesFromLayout(const QDomElement& root)
     {
       missing_curves.push_back(curve_name);
     }
+    if (_mapped_plot_data.strings.count(curve_name) == 0)
+    {
+      missing_curves.push_back(curve_name);
+    }
   }
   if (missing_curves.size() > 0)
   {
@@ -987,21 +1010,8 @@ void MainWindow::onDeleteMultipleCurves(const std::vector<std::string>& curve_na
 {
   for (const auto& curve_name : curve_names)
   {
-    auto plot_curve = _mapped_plot_data.numeric.find(curve_name);
-    if (plot_curve == _mapped_plot_data.numeric.end())
-    {
-      continue;
-    }
-
+    _mapped_plot_data.erase(curve_name);
     emit dataSourceRemoved(curve_name);
-    _mapped_plot_data.numeric.erase(plot_curve);
-
-    auto custom_it = _custom_plots.find(curve_name);
-    if (custom_it != _custom_plots.end())
-    {
-      _custom_plots.erase(custom_it);
-    }
-
     _curvelist_widget->removeCurve(curve_name);
   }
 
@@ -1093,8 +1103,7 @@ void MainWindow::deleteAllData()
 {
   forEachWidget([](PlotWidget* plot) { plot->removeAllCurves(); });
 
-  _mapped_plot_data.numeric.clear();
-  _mapped_plot_data.user_defined.clear();
+  _mapped_plot_data.clear();
   _custom_plots.clear();
   _curvelist_widget->clear();
   _loaded_datafiles.clear();
@@ -1160,11 +1169,6 @@ void importPlotDataMapHelper(std::unordered_map<std::string, T>& source,
 
 void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
 {
-  if (new_data.user_defined.empty() && new_data.numeric.empty())
-  {
-    return;
-  }
-
   if (remove_old)
   {
     std::vector<std::string> old_plots_to_delete;
@@ -1173,6 +1177,15 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
     {
       // timeseries in old but not in new
       if (new_data.numeric.count(it.first) == 0)
+      {
+        old_plots_to_delete.push_back(it.first);
+      }
+    }
+
+    for (auto& it : _mapped_plot_data.strings)
+    {
+      // timeseries in old but not in new
+      if (new_data.strings.count(it.first) == 0)
       {
         old_plots_to_delete.push_back(it.first);
       }
@@ -1191,10 +1204,21 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
   }
 
   bool curvelist_modified = false;
+
   for (auto& it : new_data.numeric)
   {
     const std::string& name = it.first;
     if (it.second.size() > 0 && _mapped_plot_data.numeric.count(name) == 0)
+    {
+      _curvelist_widget->addCurve(QString::fromStdString(name));
+      curvelist_modified = true;
+    }
+  }
+
+  for (auto& it : new_data.strings)
+  {
+    const std::string& name = it.first;
+    if (it.second.size() > 0 && _mapped_plot_data.strings.count(name) == 0)
     {
       _curvelist_widget->addCurve(QString::fromStdString(name));
       curvelist_modified = true;
@@ -1340,6 +1364,7 @@ bool MainWindow::loadDataFromFile(const FileLoadInfo& info)
       if (dataloader->readDataFromFile(&new_info, mapped_data))
       {
         AddPrefixToPlotData(info.prefix.toStdString(), mapped_data.numeric);
+        AddPrefixToPlotData(info.prefix.toStdString(), mapped_data.strings);
 
         importPlotDataMap(mapped_data, true);
 
@@ -1470,14 +1495,8 @@ void MainWindow::stopStreamingPlugin()
   }
 
   // reset max range.
-  for (auto& it : _mapped_plot_data.numeric)
-  {
-    it.second.setMaximumRangeX(std::numeric_limits<double>::max());
-  }
-  for (auto& it : _mapped_plot_data.user_defined)
-  {
-    it.second.setMaximumRangeX(std::numeric_limits<double>::max());
-  }
+  _mapped_plot_data.setMaximumRangeX( std::numeric_limits<double>::max() );
+
 }
 
 void MainWindow::startStreamingPlugin(QString streamer_name)
@@ -2021,10 +2040,7 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
       _curvelist_widget->refreshColumns();
     }
 
-    for (auto& it : _mapped_plot_data.numeric)
-    {
-      it.second.setMaximumRangeX( ui->streamingSpinBox->value() );
-    }
+    _mapped_plot_data.setMaximumRangeX( ui->streamingSpinBox->value() );
   }
 
   const bool is_streaming_active = isStreamingActive();
@@ -2096,19 +2112,11 @@ void MainWindow::on_streamingSpinBox_valueChanged(int value)
     return;
   }
 
-  for (auto& it : _mapped_plot_data.numeric)
-  {
-    it.second.setMaximumRangeX(real_value);
-  }
-
-  for (auto& it : _mapped_plot_data.user_defined)
-  {
-    it.second.setMaximumRangeX(real_value);
-  }
+  _mapped_plot_data.setMaximumRangeX( real_value );
 
   if (_active_streamer_plugin)
   {
-    _active_streamer_plugin->setMaximumRange(real_value);
+    _active_streamer_plugin->setMaximumRangeX(real_value);
   }
 }
 
@@ -2194,6 +2202,11 @@ void MainWindow::on_actionClearBuffer_triggered()
     it.second.clear();
   }
 
+  for (auto& it : _mapped_plot_data.strings)
+  {
+    it.second.clear();
+  }
+
   for (auto& it : _mapped_plot_data.user_defined)
   {
     it.second.clear();
@@ -2212,6 +2225,17 @@ void MainWindow::on_actionClearBuffer_triggered()
 
 void MainWindow::on_pushButtonUseDateTime_toggled(bool checked)
 {
+  static bool first = true;
+  if( checked && ui->pushButtonRemoveTimeOffset->isChecked() )
+  {
+    if( first ){
+      QMessageBox::information(this, tr("Note"),
+                               tr("When \"Use Date Time\" is checked, the option \"Remove Time Offset\" is automatically disabled.\n"
+                                  "This message will be shown only once."));
+      first = false;
+    }
+    ui->pushButtonRemoveTimeOffset->setChecked( false );
+  }
   updatedDisplayTime();
 }
 
@@ -2797,27 +2821,7 @@ void MainWindow::on_actionDeleteAllData_triggered()
     return;
   }
 
-  //    if( msgBox.clickedButton() == buttonPlaceholder )
-  //    {
-  //        for( auto& it: _mapped_plot_data.numeric )
-  //        {
-  //            it.second.clear();
-  //        }
-  //        for( auto& it: _mapped_plot_data.user_defined )
-  //        {
-  //            it.second.clear();
-  //        }
-
-  //        for(const auto& it: TabbedPlotWidget::instances())
-  //        {
-  //            PlotDocker* matrix =  it.second->currentTab() ;
-  //            matrix->maximumZoomOut(); // includes replot
-  //        }
-  //    }
-  //    else
-  {
-    deleteAllData();
-  }
+  deleteAllData();
 }
 
 void MainWindow::on_actionPreferences_triggered()
