@@ -30,6 +30,7 @@
 #include <QWindow>
 #include <QHeaderView>
 #include <QStandardPaths>
+#include <QXmlStreamReader>
 
 #include "mainwindow.h"
 #include "curvelist_panel.h"
@@ -247,7 +248,6 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   {
     loadLayoutFromFile(commandline_parser.value("layout"));
   }
-
 
   restoreGeometry(settings.value("MainWindow.geometry").toByteArray());
   restoreState(settings.value("MainWindow.state").toByteArray());
@@ -1542,7 +1542,7 @@ void MainWindow::startStreamingPlugin(QString streamer_name)
   {
     {
       std::lock_guard<std::mutex> lock(_active_streamer_plugin->mutex());
-      importPlotDataMap(_active_streamer_plugin->dataMap(), true);
+      importPlotDataMap(_active_streamer_plugin->dataMap(), false);
     }
 
     ui->actionClearBuffer->setEnabled(true);
@@ -1769,6 +1769,7 @@ bool MainWindow::loadLayoutFromFile(QString filename)
     return false;
   }
 
+
   QString errorStr;
   int errorLine, errorColumn;
 
@@ -1826,10 +1827,10 @@ bool MainWindow::loadLayoutFromFile(QString filename)
     datafile_elem = datafile_elem.nextSiblingElement("fileInfo");
   }
 
-  QDomElement previousl_streamer = root.firstChildElement("previouslyLoaded_Streamer");
-  if (!previousl_streamer.isNull())
+  QDomElement previous_streamer = root.firstChildElement("previouslyLoaded_Streamer");
+  if (!previous_streamer.isNull())
   {
-    QString streamer_name = previousl_streamer.attribute("name");
+    QString streamer_name = previous_streamer.attribute("name");
 
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("Start Streaming?");
@@ -1843,6 +1844,17 @@ bool MainWindow::loadLayoutFromFile(QString filename)
     {
       if (_data_streamer.count(streamer_name) != 0)
       {
+        auto allCurves = readAllCurvesFromXML( root );
+
+        // create placeholders, if necessary
+        for(auto curve_name: allCurves) {
+          std::string curve_str = curve_name.toStdString();
+          if( _mapped_plot_data.numeric.count( curve_str ) == 0 )
+          {
+            _mapped_plot_data.addNumeric( curve_str );
+          }
+        }
+
         startStreamingPlugin(streamer_name);
       }
       else
@@ -3011,4 +3023,37 @@ void MainWindow::on_buttonRecentLayout_clicked()
   }
   menu->exec();
 }
+
+
+QStringList MainWindow::readAllCurvesFromXML(QDomElement root_node)
+{
+  QStringList curves;
+
+  QStringList level_names =
+  {"tabbed_widget", "Tab", "Container",
+   "DockSplitter", "DockArea", "plot", "curve" };
+
+  std::function<void(int,QDomElement)> recursiveXmlStream;
+  recursiveXmlStream = [&](int level, QDomElement parent_elem)
+  {
+    QString level_name =  level_names[level];
+    for ( auto elem = parent_elem.firstChildElement(level_name);
+          elem.isNull() == false;
+          elem = elem.nextSiblingElement(level_name)) {
+      if( level_name == "curve" ){
+        curves.push_back( elem.attribute("name") );
+      }
+      else{
+        recursiveXmlStream(level+1, elem);
+      }
+    }
+  };
+
+  // start recursion
+  recursiveXmlStream(0, root_node);
+
+  return curves;
+}
+
+
 

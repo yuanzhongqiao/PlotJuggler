@@ -155,7 +155,6 @@ private:
   QMenu* _recent_data_files;
   QMenu* _recent_layout_files;
 
-
   void initializeActions();
   QStringList initializePlugins(QString subdir_name);
 
@@ -244,6 +243,9 @@ private slots:
   void on_pushButtonLoadLayout_clicked();
   void on_pushButtonSaveLayout_clicked();
   void on_pushButtonLoadDatafile_clicked();
+
+private:
+  QStringList readAllCurvesFromXML(QDomElement root_node);
 };
 
 class PopupMenu : public QMenu
