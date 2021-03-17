@@ -27,7 +27,6 @@ QWidget {
   font-size: 10pt;
 }
 
-
 QWidget:disabled{
   color: ${disabled_text};
   background: ${widget_background_disabled};

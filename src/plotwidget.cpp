@@ -49,10 +49,13 @@ QColor PlotWidget::getColorHint(PlotData* data)
   QSettings settings;
   bool remember_color = settings.value("Preferences::remember_color", true).toBool();
 
-  auto colorHint = data->attribute("color_hint");
-  if (data && remember_color && colorHint && !colorHint->empty())
+  if (data )
   {
-    return QColor(colorHint->c_str());
+    auto colorHint = data->attribute("color_hint");
+    if( remember_color && colorHint && !colorHint->empty())
+    {
+      return QColor(colorHint->c_str());
+    }
   }
   QColor color;
   bool use_plot_color_index = settings.value("Preferences::use_plot_color_index", false).toBool();
