@@ -42,7 +42,7 @@ public:
 
   virtual void clear() = 0;
 
-  virtual void addItem(const QString& item_name) = 0;
+  virtual void addItem(const QString& tree_name, const QString &plot_name) = 0;
 
   virtual std::vector<std::string> getSelectedNames() = 0;
 
@@ -87,7 +87,7 @@ public:
     _inserted_curves.clear();
   }
 
-  void addItem(const QString& item_name) override;
+  void addItem(const QString& tree_name, const QString &plot_name) override;
 
   void refreshColumns() override;
 

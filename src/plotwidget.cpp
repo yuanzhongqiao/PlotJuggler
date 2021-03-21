@@ -52,9 +52,9 @@ QColor PlotWidget::getColorHint(PlotData* data)
   if (data )
   {
     auto colorHint = data->attribute("color_hint");
-    if( remember_color && colorHint && !colorHint->empty())
+    if( remember_color && colorHint.isValid())
     {
-      return QColor(colorHint->c_str());
+      return colorHint.value<QColor>();
     }
   }
   QColor color;
@@ -97,7 +97,7 @@ QColor PlotWidget::getColorHint(PlotData* data)
   }
   if (data)
   {
-    data->setAttribute( "color_hint", color.name().toStdString() );
+    data->setAttribute( "color_hint", color );
   }
 
   return color;

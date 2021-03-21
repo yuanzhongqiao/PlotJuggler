@@ -1,10 +1,10 @@
 #include "utils.h"
 
-std::pair<std::vector<QString>, bool> MoveData(PlotDataMapRef &source,
+std::pair<std::vector<std::string>, bool> MoveData(PlotDataMapRef &source,
                                                PlotDataMapRef &destination)
 {
   bool destination_updated = false;
-  std::vector<QString> added_curves;
+  std::vector<std::string> added_curves;
 
   auto moveDataImpl = [&](auto& source_group, auto& destination_group)
   {
@@ -21,7 +21,7 @@ std::pair<std::vector<QString>, bool> MoveData(PlotDataMapRef &source,
 
       if (plot_with_same_name == destination_group.end())
       {
-        added_curves.push_back(QString::fromStdString(name));
+        added_curves.push_back(name);
 
         plot_with_same_name =
             destination_group

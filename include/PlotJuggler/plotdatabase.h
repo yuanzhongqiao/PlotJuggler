@@ -16,6 +16,7 @@
 #include <string_view>
 #include <any>
 #include <optional>
+#include <QVariant>
 
 namespace PJ {
 
@@ -26,6 +27,45 @@ struct Range
 };
 
 typedef std::optional<Range> RangeOpt;
+using Attributes = std::map<std::string, QVariant>;
+
+class PlotGroup
+{
+public:
+  PlotGroup(const std::string& name):
+    _name( name )
+  {
+
+  }
+
+  void setAttribute(const std::string& name, const QVariant& value)
+  {
+      _attributes[ name ] = value;
+  }
+
+  const Attributes& attributes() const{
+    return _attributes;
+  }
+
+  Attributes& attributes() {
+    return _attributes;
+  }
+
+  QVariant attribute(const std::string& name) const
+  {
+      auto it = _attributes.find( name );
+
+      if( it ==  _attributes.end() ) {
+        return {};
+      }
+      else {
+          return it->second;
+      }
+  }
+private:
+  const std::string _name;
+  Attributes _attributes;
+};
 
 // A Generic series of points
 template <typename TypeX, typename Value >
@@ -52,10 +92,11 @@ public:
     typedef typename std::deque<Point>::iterator Iterator;
     typedef typename std::deque<Point>::const_iterator ConstIterator;
 
-    PlotDataBase(const std::string& name):
+    PlotDataBase(const std::string& name, std::shared_ptr<PlotGroup> group = {}):
         _name(name),
         _range_x_dirty(true),
-        _range_y_dirty(true)
+        _range_y_dirty(true),
+        _group(group)
     {}
 
     PlotDataBase(const PlotDataBase& other) = delete;
@@ -69,6 +110,11 @@ public:
     const std::string& name() const
     {
         return _name;
+    }
+
+    const std::shared_ptr<PlotGroup>& group()
+    {
+      return _group;
     }
 
     virtual size_t size() const
@@ -103,25 +149,25 @@ public:
         _range_y_dirty = true;
     }
 
-    void setAttribute(const std::string& name, const std::string& value)
+    void setAttribute(const std::string& name, const QVariant& value)
     {
         _attributes[ name ] = value;
     }
 
-    const std::map<std::string, std::string>& attributes() const{
+    const Attributes& attributes() const{
       return _attributes;
     }
 
-    std::map<std::string, std::string>& attributes() {
+    Attributes& attributes() {
       return _attributes;
     }
 
-    std::optional<std::string> attribute(const std::string& name) const
+    QVariant attribute(const std::string& name) const
     {
         auto it = _attributes.find( name );
 
         if( it ==  _attributes.end() ) {
-            return std::nullopt;
+          return {};
         }
         else {
             return it->second;
@@ -282,14 +328,14 @@ public:
 
 protected:
     std::string _name;
-    std::map<std::string, std::string> _attributes;
+    Attributes _attributes;
     std::deque<Point> _points;
 
     mutable Range _range_x;
     mutable Range _range_y;
     mutable bool _range_x_dirty;
     mutable bool _range_y_dirty;
-
+    std::shared_ptr<PlotGroup> _group;
 
     // template specialization for types that support compare operator
     virtual void pushUpdateRangeX(const Point& p)

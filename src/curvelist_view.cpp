@@ -35,14 +35,14 @@ CurveTableView::CurveTableView(CurveListPanel* parent) : QTableWidget(parent), C
   setShowGrid(false);
 }
 
-void CurveTableView::addItem(const QString& item_name)
+void CurveTableView::addItem(const QString& , const QString &plot_name)
 {
-  if (_inserted_curves.contains(item_name))
+  if (_inserted_curves.contains(plot_name))
   {
     return;
   }
 
-  auto item = new SortedTableItem<QTableWidgetItem>(item_name);
+  auto item = new SortedTableItem<QTableWidgetItem>(plot_name);
   QFont font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
   font.setPointSize(_point_size);
   item->setFont(font);
@@ -59,7 +59,7 @@ void CurveTableView::addItem(const QString& item_name)
 
   QTableWidget::setItem(row, 1, val_cell);
 
-  _inserted_curves.insert({ item_name });
+  _inserted_curves.insert({ plot_name });
 }
 
 void CurveTableView::refreshColumns()

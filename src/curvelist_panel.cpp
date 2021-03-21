@@ -81,15 +81,33 @@ void CurveListPanel::clear()
   ui->labelNumberDisplayed->setText("0 of 0");
 }
 
-void CurveListPanel::addCurve(const QString& item_name)
+void CurveListPanel::addCurve(const std::string &plot_name)
 {
-  _tree_view->addItem(item_name);
+  auto tree_name = QString::fromStdString( plot_name );
+
+  auto num_it = _plot_data.numeric.find( plot_name );
+  if( num_it != _plot_data.numeric.end() ){
+    auto tree_name_attr =  num_it->second.attribute("tree_name");
+    if( tree_name_attr.isValid() ) {
+      tree_name = tree_name_attr.toString();
+    }
+  }
+
+  auto str_it = _plot_data.strings.find( plot_name );
+  if( str_it != _plot_data.strings.end() ){
+    auto tree_name_attr =  str_it->second.attribute("tree_name");
+    if( tree_name_attr.isValid() ) {
+      tree_name = tree_name_attr.toString();
+    }
+  }
+
+  _tree_view->addItem( tree_name, QString::fromStdString( plot_name ) );
   _column_width_dirty = true;
 }
 
 void CurveListPanel::addCustom(const QString& item_name)
 {
-  _custom_view->addItem(item_name);
+  _custom_view->addItem({}, item_name);
   _column_width_dirty = true;
 }
 

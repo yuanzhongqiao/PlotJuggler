@@ -17,7 +17,7 @@ public:
     _hidden_count = 0;
   }
 
-  void addItem(const QString& item_name) override;
+  void addItem(const QString& tree_name, const QString &plot_name) override;
 
   void refreshColumns() override;
 

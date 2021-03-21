@@ -32,7 +32,7 @@ public:
 
   void clear();
 
-  void addCurve(const QString& item_name);
+  void addCurve(const std::string &plot_name);
 
   void addCustom(const QString& item_name);
 
