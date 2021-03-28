@@ -68,7 +68,7 @@ public:
   }
 
 public slots:
-    void dataReceived( std::vector< std::vector<double> > *chunk, std::vector<double> *stamps);
+    void onDataReceived( std::vector< std::vector<double> > *chunk, std::vector<double> *stamps);
 
 private:
   bool _running;

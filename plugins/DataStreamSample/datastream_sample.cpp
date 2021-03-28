@@ -28,8 +28,20 @@ DataStreamSample::DataStreamSample()
       plotdata.setAttribute("label_color", "red");
     }
   }
+  //------------
+  dataMap().addStringSeries("color");
 
-  dataMap().addStringSeries("color")->second;
+  //------------
+  auto tcGroup = std::make_shared<PJ::PlotGroup>("tc");
+  tcGroup->setAttribute("text_color", QColor(Qt::blue) );
+
+  auto& tc_default = dataMap().addNumeric("tc/default")->second;
+  auto& tc_red = dataMap().addNumeric("tc/red")->second;
+
+  tc_red.setAttribute("text_color", QColor(Qt::red) );
+
+  tc_default.setGroup( tcGroup );
+  tc_red.setGroup( tcGroup );
 }
 
 bool DataStreamSample::start(QStringList*)
@@ -43,8 +55,9 @@ bool DataStreamSample::start(QStringList*)
 void DataStreamSample::shutdown()
 {
   _running = false;
-  if (_thread.joinable())
+  if (_thread.joinable()){
     _thread.join();
+  }
 }
 
 bool DataStreamSample::isRunning() const
@@ -79,19 +92,27 @@ void DataStreamSample::pushSingleCycle()
   auto now = high_resolution_clock::now();
   std::string colors[]= { "RED", "BLUE", "GREEN" };
 
-  const double stamp = duration_cast<duration<double>>(now - initial_time).count();
+  const double stamp = duration_cast<duration<double>>(now - initial_time).count() + offset;
 
-  for (auto& it : dataMap().numeric)
+  for (auto& it : _parameters)
   {
-    auto& plot = it.second;
+    auto& plot = dataMap().numeric.find(it.first)->second;
+    const DataStreamSample::Parameters& param = it.second;
 
-    const DataStreamSample::Parameters& param = _parameters[it.first];
     double val = param.A*sin( param.B*stamp + param.C ) + param.D;
-    plot.pushBack(PlotData::Point(stamp + offset, val));
+    plot.pushBack( PlotData::Point(stamp, val) );
   }
 
   auto& col_series = dataMap().strings.find("color")->second;
-  col_series.pushBack( { stamp, colors[ count++ % 3]});
+  col_series.pushBack( { stamp, colors[ (count/10) % 3]});
+
+  auto& tc_default = dataMap().numeric.find("tc/default")->second;
+  tc_default.pushBack( { stamp, double(count) });
+
+  auto& tc_red = dataMap().numeric.find("tc/red")->second;
+  tc_red.pushBack( { stamp, double(count) });
+
+  count++;
 }
 
 void DataStreamSample::loop()

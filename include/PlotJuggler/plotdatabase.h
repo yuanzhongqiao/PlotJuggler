@@ -92,11 +92,10 @@ public:
     typedef typename std::deque<Point>::iterator Iterator;
     typedef typename std::deque<Point>::const_iterator ConstIterator;
 
-    PlotDataBase(const std::string& name, std::shared_ptr<PlotGroup> group = {}):
+    PlotDataBase(const std::string& name ):
         _name(name),
         _range_x_dirty(true),
-        _range_y_dirty(true),
-        _group(group)
+        _range_y_dirty(true)
     {}
 
     PlotDataBase(const PlotDataBase& other) = delete;
@@ -115,6 +114,11 @@ public:
     const std::shared_ptr<PlotGroup>& group()
     {
       return _group;
+    }
+
+    void setGroup(std::shared_ptr<PlotGroup> group)
+    {
+      _group = group;
     }
 
     virtual size_t size() const

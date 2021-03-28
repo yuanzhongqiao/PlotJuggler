@@ -164,7 +164,9 @@ void DataStreamZMQ::receiveLoop()
       try {
         std::lock_guard<std::mutex> lock(mutex());
         _parser->parseMessage(msg, timestamp);
-      } catch (std::exception& err)
+        emit this->dataReceived();
+      }
+      catch (std::exception& err)
       {
         QMessageBox::warning(nullptr,
                              tr("ZMQ Subscriber"),

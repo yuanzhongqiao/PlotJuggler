@@ -116,7 +116,42 @@ void CurveListPanel::refreshColumns()
   _tree_view->refreshColumns();
   _custom_view->refreshColumns();
   _column_width_dirty = false;
+
   updateFilter();
+
+
+  auto defaultItemColor = _tree_view->invisibleRootItem()->foreground(0);
+
+  auto ChangeTextColor = [&](QTreeWidgetItem* cell) {
+
+    if( cell->childCount() > 0 ) {
+      return;
+    };
+
+    QVariant text_color;
+    const std::string& curve_name = cell->data(0, Qt::UserRole).toString().toStdString();
+
+    auto GetTextColor = [&](auto& plot_data){
+      auto it = plot_data.find(curve_name);
+      if ( it != plot_data.end() )
+      {
+        text_color = it->second.attribute("text_color");
+        if( !text_color.isValid() && it->second.group() ){
+          text_color = it->second.group()->attribute("text_color");
+        }
+      }
+    };
+
+    GetTextColor( _plot_data.numeric );
+    if( text_color.isValid() ){
+      GetTextColor( _plot_data.strings );
+    }
+
+    cell->setForeground(0, text_color.isValid() ? text_color.value<QColor>() :
+                                                  defaultItemColor );
+  };
+
+  _tree_view->treeVisitor(ChangeTextColor);
 }
 
 void CurveListPanel::updateFilter()

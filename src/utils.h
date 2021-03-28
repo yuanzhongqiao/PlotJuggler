@@ -36,7 +36,10 @@ private:
 };
 
 
-std::pair<std::vector<std::string>, bool> MoveData(PlotDataMapRef& source, PlotDataMapRef& destination);
+std::pair<std::vector<std::string>, bool>
+MoveData(PlotDataMapRef& source,
+         PlotDataMapRef& destination,
+         bool remove_older);
 
 
 #endif  // UTILS_H

@@ -221,7 +221,6 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   onUndoableChange();
 
   _replot_timer = new QTimer(this);
-  _replot_timer->setInterval(40);
   connect(_replot_timer, &QTimer::timeout, this, [this]() { updateDataAndReplot(false); });
 
   _publish_timer = new QTimer(this);
@@ -637,6 +636,16 @@ QStringList MainWindow::initializePlugins(QString directory_name)
           {
             _animated_streaming_movie->start();
             _animated_streaming_timer->start(500);
+          });
+
+          connect(streamer, &DataStreamer::dataReceived,
+                  this, [this]()
+          {
+            if( isStreamingActive() && !_replot_timer->isActive() )
+            {
+              _replot_timer->setSingleShot(true);
+              _replot_timer->start( 40 );
+            }
           });
         }
       }
@@ -1131,41 +1140,6 @@ void MainWindow::deleteAllData()
   }
 }
 
-template <typename T>
-void importPlotDataMapHelper(std::unordered_map<std::string, T>& source,
-                             std::unordered_map<std::string, T>& destination,
-                             bool delete_older)
-{
-  for (auto& it : source)
-  {
-    const std::string& name = it.first;
-    T& source_plot = it.second;
-    auto plot_with_same_name = destination.find(name);
-
-    // this is a new plot
-    if (plot_with_same_name == destination.end())
-    {
-      plot_with_same_name =
-          destination.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(name)).first;
-    }
-    T& destination_plot = plot_with_same_name->second;
-
-    if (delete_older)
-    {
-      double max_range_x = destination_plot.maximumRangeX();
-      destination_plot = std::move(source_plot);
-      destination_plot.setMaximumRangeX(max_range_x);  // just in case
-    }
-    else
-    {
-      for (size_t i = 0; i < source_plot.size(); i++)
-      {
-        destination_plot.pushBack( source_plot.at(i) );
-      }
-    }
-    source_plot.clear();
-  }
-}
 
 void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
 {
@@ -1203,33 +1177,15 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
     }
   }
 
-  bool curvelist_modified = false;
+  auto [ added_curves, dest_updated ] =
+      MoveData ( new_data, _mapped_plot_data, remove_old );
 
-  for (auto& it : new_data.numeric)
+  for(const auto& added_curve: added_curves )
   {
-    const std::string& name = it.first;
-    if (it.second.size() > 0 && _mapped_plot_data.numeric.count(name) == 0)
-    {
-      _curvelist_widget->addCurve( name );
-      curvelist_modified = true;
-    }
+    _curvelist_widget->addCurve( added_curve );
   }
 
-  for (auto& it : new_data.strings)
-  {
-    const std::string& name = it.first;
-    if (it.second.size() > 0 && _mapped_plot_data.strings.count(name) == 0)
-    {
-      _curvelist_widget->addCurve( name );
-      curvelist_modified = true;
-    }
-  }
-
-  importPlotDataMapHelper(new_data.numeric, _mapped_plot_data.numeric, remove_old);
-  importPlotDataMapHelper(new_data.strings, _mapped_plot_data.strings, remove_old);
-  importPlotDataMapHelper(new_data.user_defined, _mapped_plot_data.user_defined, remove_old);
-
-  if (curvelist_modified)
+  if (dest_updated)
   {
     _curvelist_widget->refreshColumns();
   }
@@ -1445,13 +1401,10 @@ void MainWindow::on_buttonStreamingPause_toggled(bool paused)
 
   if (!paused)
   {
-    _replot_timer->start();
     updateTimeOffset();
   }
   else
   {
-    _replot_timer->stop();
-    updateDataAndReplot(true);
     onUndoableChange();
   }
 }
@@ -2029,16 +1982,18 @@ void MainWindow::updateTimeOffset()
 
 void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
 {
+  _replot_timer->stop();
   bool data_updated_by_streamer = false;
 
   if (_active_streamer_plugin)
   {
     std::vector<std::string> curvelist_added;
-
     {
       std::lock_guard<std::mutex> lock(_active_streamer_plugin->mutex());
-      auto res = MoveData(_active_streamer_plugin->dataMap(), _mapped_plot_data);
-      curvelist_added = res.first;
+      auto res = MoveData(_active_streamer_plugin->dataMap(),
+                          _mapped_plot_data,
+                          false);
+      curvelist_added = std::move(res.first);
       data_updated_by_streamer = res.second;
     }
 
@@ -2047,7 +2002,7 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
       _curvelist_widget->addCurve(str);
     }
 
-    if (curvelist_added.size() > 0)
+    if (data_updated_by_streamer)
     {
       _curvelist_widget->refreshColumns();
     }
