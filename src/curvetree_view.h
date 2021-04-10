@@ -17,7 +17,7 @@ public:
     _hidden_count = 0;
   }
 
-  void addItem(const QString& tree_name, const QString &plot_name) override;
+  void addItem(const QString& prefix, const QString& tree_name, const QString &plot_ID) override;
 
   void refreshColumns() override;
 
@@ -27,18 +27,7 @@ public:
 
   bool applyVisibilityFilter(const QString& filter_string) override;
 
-  bool eventFilter(QObject* object, QEvent* event) override
-  {
-    bool ret = CurvesView::eventFilterBase(object, event);
-    if (!ret)
-    {
-      return QWidget::eventFilter(object, event);
-    }
-    else
-    {
-      return true;
-    }
-  }
+  bool eventFilter(QObject* object, QEvent* event) override;
 
   void removeCurve(const QString& name) override;
 
@@ -60,6 +49,7 @@ private:
 
   int _hidden_count = 0;
   int _leaf_count = 0;
+
 };
 
 #endif  // CURVETREE_VIEW_H

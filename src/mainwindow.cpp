@@ -41,6 +41,7 @@
 #include "utils.h"
 #include "PlotJuggler/svg_util.h"
 #include "stylesheet.h"
+#include "dummy_data.h"
 
 #include "ui_aboutdialog.h"
 #include "ui_support_dialog.h"
@@ -695,66 +696,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 void MainWindow::buildDummyData()
 {
   PlotDataMapRef datamap;
-
-  static int count = 0;
-  size_t SIZE = 1000;
-  QElapsedTimer timer;
-  timer.start();
-  QStringList words_list;
-  words_list << "world/siam"
-             << "world/tre"
-             << "walk/piccoli"
-             << "walk/porcellin"
-             << "fly/high/mai"
-             << "fly/high/nessun"
-             << "fly/low/ci"
-             << "fly/low/dividera"
-             << "data_1"
-             << "data_2"
-             << "data_3"
-             << "data_10";
-
-  for (int i = 0; i < 100; i++)
-  {
-    words_list.append(QString("data_vect/%1").arg(count++));
-  }
-
-  for (const QString& name : words_list)
-  {
-    double A = 6 * ((double)rand() / (double)RAND_MAX) - 3;
-    double B = 3 * ((double)rand() / (double)RAND_MAX);
-    double C = 3 * ((double)rand() / (double)RAND_MAX);
-    double D = 20 * ((double)rand() / (double)RAND_MAX);
-
-    auto it = datamap.addNumeric(name.toStdString());
-    PlotData& plot = it->second;
-
-    double t = 0;
-    for (unsigned indx = 0; indx < SIZE; indx++)
-    {
-      t += 0.01;
-      plot.pushBack(PlotData::Point(t + 35, A * sin(B * t + C) + D * t * 0.02));
-    }
-  }
-
-  PlotData& sin_plot = datamap.addNumeric("_sin")->second;
-  PlotData& cos_plot = datamap.addNumeric("_cos")->second;
-  StringSeries& str_plot = datamap.addStringSeries("str_value")->second;
-
-  double t = 0;
-  for (unsigned indx = 0; indx < SIZE; indx++)
-  {
-    t += 0.01;
-    sin_plot.pushBack(PlotData::Point(t + 20, sin(t * 0.4)));
-    cos_plot.pushBack(PlotData::Point(t + 20, cos(t * 0.4)));
-
-    switch( indx%3 ){
-    case 0: str_plot.pushBack( {t + 20, "Blue"} ); break;
-    case 1: str_plot.pushBack( {t + 20, "Red"} ); break;
-    case 2: str_plot.pushBack( {t + 20, "Green"} ); break;
-    }
-  }
-
+  BuildDummyData(datamap);
   importPlotDataMap(datamap, true);
 }
 
@@ -1147,23 +1089,20 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
   {
     std::vector<std::string> old_plots_to_delete;
 
-    for (auto& it : _mapped_plot_data.numeric)
+    auto AddToDeleteList = [&old_plots_to_delete](auto& prev_plot_data, auto& new_plot_data)
     {
-      // timeseries in old but not in new
-      if (new_data.numeric.count(it.first) == 0)
+      for (auto& it : prev_plot_data)
       {
-        old_plots_to_delete.push_back(it.first);
+        // timeseries in old but not in new
+        if (new_plot_data.count(it.first) == 0)
+        {
+          old_plots_to_delete.push_back(it.first);
+        }
       }
-    }
+    };
 
-    for (auto& it : _mapped_plot_data.strings)
-    {
-      // timeseries in old but not in new
-      if (new_data.strings.count(it.first) == 0)
-      {
-        old_plots_to_delete.push_back(it.first);
-      }
-    }
+    AddToDeleteList( _mapped_plot_data.numeric, new_data.numeric );
+    AddToDeleteList( _mapped_plot_data.strings, new_data.strings );
 
     if (!old_plots_to_delete.empty())
     {

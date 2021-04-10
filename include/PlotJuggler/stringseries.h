@@ -11,8 +11,8 @@ class StringSeries: public TimeseriesBase<std::string_view>
 public:
     using TimeseriesBase<std::string_view>::_points;
 
-    StringSeries(const std::string& name):
-        TimeseriesBase<std::string_view>(name)
+    StringSeries(const std::string& name, PlotGroup::Ptr group):
+        TimeseriesBase<std::string_view>(name, group)
     { }
 
     virtual void clear() override

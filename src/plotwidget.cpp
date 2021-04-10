@@ -565,7 +565,8 @@ void PlotWidget::onSourceDataRemoved(const std::string& src_name)
   {
     PointSeriesXY* curve_xy = dynamic_cast<PointSeriesXY*>(it->curve->data());
     bool remove_curve_xy =
-        curve_xy && (curve_xy->dataX()->name() == src_name || curve_xy->dataY()->name() == src_name);
+        curve_xy && (curve_xy->dataX()->plotName() == src_name ||
+                     curve_xy->dataY()->plotName() == src_name);
 
     if (it->src_name == src_name || remove_curve_xy)
     {
@@ -814,8 +815,8 @@ QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
     if (isXYPlot())
     {
       PointSeriesXY* curve_xy = dynamic_cast<PointSeriesXY*>(curve->data());
-      curve_el.setAttribute("curve_x", QString::fromStdString(curve_xy->dataX()->name()));
-      curve_el.setAttribute("curve_y", QString::fromStdString(curve_xy->dataY()->name()));
+      curve_el.setAttribute("curve_x", QString::fromStdString(curve_xy->dataX()->plotName()));
+      curve_el.setAttribute("curve_y", QString::fromStdString(curve_xy->dataY()->plotName()));
     }
     else{
       auto ts = dynamic_cast<TransformedTimeseries*>(curve->data());

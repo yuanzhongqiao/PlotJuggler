@@ -16,53 +16,77 @@ struct PlotDataMapRef
   std::unordered_map<std::string, PlotData> numeric;
   std::unordered_map<std::string, PlotDataAny> user_defined;
   std::unordered_map<std::string, StringSeries> strings;
+  std::unordered_map<std::string, PlotGroup::Ptr> groups;
 
-  std::unordered_map<std::string, PlotData>::iterator addNumeric(const std::string& name)
+  template <typename T>
+  typename std::unordered_map<std::string, T>::iterator addImpl(
+      std::unordered_map<std::string, T>& series, const std::string& name, PlotGroup::Ptr group )
   {
-    return numeric.emplace(std::piecewise_construct,
-                           std::forward_as_tuple(name),
-                           std::forward_as_tuple(name)).first;
+    std::string ID;
+    if( group )
+    {
+      ID = group->name();
+      if (ID.back() != '/')
+      {
+        ID.push_back('/');
+      }
+    }
+    ID += name;
+
+//    T plot( name, group );
+    return series.insert( {ID, T(name, group) } ).first;
   }
 
-  std::unordered_map<std::string, PlotDataAny>::iterator addUserDefined(const std::string& name)
+  template <typename T>
+  T& getOrCreateImpl(std::unordered_map<std::string, T>& series, const std::string& name, const PlotGroup::Ptr& group)
   {
-    return user_defined.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(name),
-                                std::forward_as_tuple(name)).first;
-  }
-
-  std::unordered_map<std::string, StringSeries>::iterator addStringSeries(const std::string& name)
-  {
-    return strings.emplace(std::piecewise_construct,
-                           std::forward_as_tuple(name),
-                           std::forward_as_tuple(name)).first;
-  }
-
-  PlotData& findOrCreateNumberic(const std::string& name)
-  {
-    auto it = numeric.find( name );
-    if( it == numeric.end() ) {
-      it = addNumeric(name);
+    auto it = series.find( name );
+    if( it == series.end() ) {
+      it = addImpl(series, name, group);
     }
     return it->second;
   }
 
-  StringSeries& findOrCreateStringSeries(const std::string& name)
+  std::unordered_map<std::string, PlotData>::iterator addNumeric(const std::string& name, PlotGroup::Ptr group = {})
   {
-    auto it = strings.find( name );
-    if( it == strings.end() ) {
-      it = addStringSeries(name);
-    }
-    return it->second;
+    return addImpl(numeric, name, group);
   }
 
-  PlotDataAny& findOrCreateUserDefined(const std::string& name)
+  std::unordered_map<std::string, PlotDataAny>::iterator addUserDefined(const std::string& name, PlotGroup::Ptr group = {})
   {
-    auto it = user_defined.find( name );
-    if( it == user_defined.end() ) {
-      it = addUserDefined(name);
+    return addImpl(user_defined, name, group);
+  }
+
+  std::unordered_map<std::string, StringSeries>::iterator addStringSeries(const std::string& name, PlotGroup::Ptr group = {})
+  {
+    return addImpl(strings, name, group);
+  }
+
+  PlotData& getOrCreateNumberic(const std::string& name, PlotGroup::Ptr group = {})
+  {
+    return getOrCreateImpl( numeric, name, group );
+  }
+
+  StringSeries& getOrCreateStringSeries(const std::string& name, PlotGroup::Ptr group = {})
+  {
+    return getOrCreateImpl( strings, name, group );
+  }
+
+  PlotDataAny& getOrCreateUserDefined(const std::string& name, PlotGroup::Ptr group = {})
+  {
+    return getOrCreateImpl( user_defined, name, group );
+  }
+
+  PlotGroup::Ptr getOrCreateGroup(const std::string& name)
+  {
+    if( name.empty() ) {
+      throw std::runtime_error( "Group name can not be empty" );
     }
-    return it->second;
+    auto& group = groups[ name ];
+    if( !group ) {
+      group = std::make_shared<PlotGroup>(name);
+    }
+    return group;
   }
 
   void clear()
@@ -134,7 +158,7 @@ inline void AddPrefixToPlotData(const std::string& prefix,
 
     auto new_plot = temp.emplace(std::piecewise_construct,
                                  std::forward_as_tuple(key),
-                                 std::forward_as_tuple(key)).first;
+                                 std::forward_as_tuple(key, it.second.group())).first;
 
     new_plot->second = std::move(it.second);
   }

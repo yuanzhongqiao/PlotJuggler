@@ -16,8 +16,8 @@ protected:
 public:
     using Point = typename PlotDataBase<double, Value>::Point;
 
-    TimeseriesBase(const std::string& name):
-        PlotDataBase<double, Value>(name),
+    TimeseriesBase(const std::string& name, PlotGroup::Ptr group):
+        PlotDataBase<double, Value>(name, group),
         _max_range_x( std::numeric_limits<double>::max() )
     { }
 

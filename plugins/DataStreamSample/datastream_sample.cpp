@@ -40,8 +40,6 @@ DataStreamSample::DataStreamSample()
 
   tc_red.setAttribute("text_color", QColor(Qt::red) );
 
-  tc_default.setGroup( tcGroup );
-  tc_red.setGroup( tcGroup );
 }
 
 bool DataStreamSample::start(QStringList*)

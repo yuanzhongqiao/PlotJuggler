@@ -84,31 +84,88 @@ void CurveListPanel::clear()
 void CurveListPanel::addCurve(const std::string &plot_name)
 {
   auto tree_name = QString::fromStdString( plot_name );
+  QString group_name;
 
-  auto num_it = _plot_data.numeric.find( plot_name );
-  if( num_it != _plot_data.numeric.end() ){
-    auto tree_name_attr =  num_it->second.attribute("tree_name");
-    if( tree_name_attr.isValid() ) {
-      tree_name = tree_name_attr.toString();
+  auto FindInPlotData = [&](auto& plot_data, const std::string &plot_name)
+  {
+    auto it = plot_data.find( plot_name );
+    if( it != plot_data.end() ){
+      auto& plot = it->second;
+      auto tree_name_attr =  plot.attribute("tree_name");
+      if( tree_name_attr.isValid() ) {
+        tree_name = tree_name_attr.toString();
+      }
+      if( plot.group() ){
+        group_name = QString::fromStdString( plot.group()->name() );
+      }
+      return true;
     }
+    return false;
+  };
+
+  bool found =
+      FindInPlotData( _plot_data.numeric, plot_name ) ||
+      FindInPlotData( _plot_data.strings, plot_name );
+
+  if( !found ) {
+    return;
   }
 
-  auto str_it = _plot_data.strings.find( plot_name );
-  if( str_it != _plot_data.strings.end() ){
-    auto tree_name_attr =  str_it->second.attribute("tree_name");
-    if( tree_name_attr.isValid() ) {
-      tree_name = tree_name_attr.toString();
-    }
-  }
-
-  _tree_view->addItem( tree_name, QString::fromStdString( plot_name ) );
+  _tree_view->addItem(group_name, tree_name, QString::fromStdString( plot_name ) );
   _column_width_dirty = true;
 }
 
 void CurveListPanel::addCustom(const QString& item_name)
 {
-  _custom_view->addItem({}, item_name);
+  _custom_view->addItem({}, item_name, item_name);
   _column_width_dirty = true;
+}
+
+void CurveListPanel::updateColors()
+{
+  auto ChangeTextColorVisitor = [&](QTreeWidgetItem* cell) {
+
+    if( cell->childCount() == 0 )
+    {
+      const std::string& curve_name = cell->data(0, Qt::UserRole).toString().toStdString();
+
+      QVariant text_color;
+
+      auto GetTextColor = [&](auto& plot_data, const std::string& curve_name){
+        auto it = plot_data.find(curve_name);
+        if ( it != plot_data.end() )
+        {
+          QVariant text_color = it->second.attribute("TextColor");
+          cell->setData(0, Qt::TextColorRole, text_color );
+
+          QVariant tooltip = it->second.attribute("ToolTip");
+          cell->setData(0, CurvesView::ToolTip, tooltip );
+
+          return true;
+        }
+        return false;
+      };
+
+      bool valid = ( GetTextColor( _plot_data.numeric, curve_name ) ||
+                     GetTextColor( _plot_data.strings, curve_name ));
+    }
+    else if( cell->data(0, CurvesView::IsGroupName).toBool() )
+    {
+
+      auto group_name = cell->data(0, CurvesView::Name).toString();
+      auto it = _plot_data.groups.find( group_name.toStdString() );
+      if ( it != _plot_data.groups.end() )
+      {
+        QVariant text_color = it->second->attribute("TextColor");
+        cell->setData(0, Qt::TextColorRole, text_color );
+
+        QVariant tooltip = it->second->attribute("ToolTip");
+        cell->setData(0, CurvesView::ToolTip, tooltip );
+      }
+    }
+  };
+
+  _tree_view->treeVisitor(ChangeTextColorVisitor);
 }
 
 void CurveListPanel::refreshColumns()
@@ -120,38 +177,7 @@ void CurveListPanel::refreshColumns()
   updateFilter();
 
 
-  auto defaultItemColor = _tree_view->invisibleRootItem()->foreground(0);
-
-  auto ChangeTextColor = [&](QTreeWidgetItem* cell) {
-
-    if( cell->childCount() > 0 ) {
-      return;
-    };
-
-    QVariant text_color;
-    const std::string& curve_name = cell->data(0, Qt::UserRole).toString().toStdString();
-
-    auto GetTextColor = [&](auto& plot_data){
-      auto it = plot_data.find(curve_name);
-      if ( it != plot_data.end() )
-      {
-        text_color = it->second.attribute("text_color");
-        if( !text_color.isValid() && it->second.group() ){
-          text_color = it->second.group()->attribute("text_color");
-        }
-      }
-    };
-
-    GetTextColor( _plot_data.numeric );
-    if( text_color.isValid() ){
-      GetTextColor( _plot_data.strings );
-    }
-
-    cell->setForeground(0, text_color.isValid() ? text_color.value<QColor>() :
-                                                  defaultItemColor );
-  };
-
-  _tree_view->treeVisitor(ChangeTextColor);
+  updateColors();
 }
 
 void CurveListPanel::updateFilter()
@@ -278,7 +304,7 @@ void CurveListPanel::refreshValues()
     const int vertical_height = tree_view->visibleRegion().boundingRect().height();
 
     auto DisplayValue = [&](QTreeWidgetItem* cell) {
-      QString curve_name = cell->data(0, Qt::UserRole).toString();
+      QString curve_name = cell->data(0, CurvesView::Name).toString();
 
       if (!curve_name.isEmpty())
       {

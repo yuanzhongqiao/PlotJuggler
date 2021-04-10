@@ -2,6 +2,8 @@
 #include "curvelist_panel.h"
 #include <QFontDatabase>
 #include <QObject>
+#include <QDebug>
+#include <QToolTip>
 
 class TreeWidgetItem : public QTreeWidgetItem
 {
@@ -23,6 +25,7 @@ CurveTreeView::CurveTreeView(CurveListPanel* parent) : QTreeWidget(parent), Curv
   setDragEnabled(false);
   setDefaultDropAction(Qt::IgnoreAction);
   setDragDropOverwriteMode(false);
+  setMouseTracking(true);
   setDragDropMode(NoDragDrop);
   viewport()->installEventFilter(this);
   setSelectionMode(ExtendedSelection);
@@ -56,7 +59,7 @@ CurveTreeView::CurveTreeView(CurveListPanel* parent) : QTreeWidget(parent), Curv
   });
 }
 
-void CurveTreeView::addItem(const QString& item_name)
+void CurveTreeView::addItem(const QString &group_name, const QString& tree_name, const QString& plot_ID)
 {
   QSettings settings;
   bool use_separator = settings.value("Preferences::use_separator", true).toBool();
@@ -74,6 +77,16 @@ void CurveTreeView::addItem(const QString& item_name)
   {
     return;
   }
+
+  bool prefix_is_group = tree_name.startsWith( group_name );
+  bool hasGroup = !group_name.isEmpty();
+
+  if( hasGroup && !prefix_is_group )
+  {
+    auto group_parts = group_name.split('/', QString::SplitBehavior::SkipEmptyParts);
+    parts = group_parts + parts;
+  }
+
 
   QTreeWidgetItem* tree_parent = this->invisibleRootItem();
 
@@ -104,8 +117,11 @@ void CurveTreeView::addItem(const QString& item_name)
       child_item->setText(0, part);
       child_item->setText(1, is_leaf ? "-" : "");
 
+      bool isGroupCell = ( i < group_parts.size() );
+
       QFont font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
       font.setPointSize(_point_size);
+      font.setBold(isGroupCell);
       child_item->setFont(0, font);
 
       font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
@@ -117,10 +133,15 @@ void CurveTreeView::addItem(const QString& item_name)
 
       auto current_flag = child_item->flags();
 
+      if( isGroupCell ){
+        child_item->setData(0, Name, group_name);
+        child_item->setData(0, IsGroupName, (i+1) == group_parts.size());
+      }
+
       if (is_leaf)
       {
         child_item->setFlags(current_flag | Qt::ItemIsSelectable);
-        child_item->setData(0, Qt::UserRole, item_name);
+        child_item->setData(0, Name, plot_ID);
       }
       else
       {
@@ -236,6 +257,35 @@ bool CurveTreeView::applyVisibilityFilter(const QString& search_string)
   //-------------
 
   return updated;
+}
+
+bool CurveTreeView::eventFilter(QObject *object, QEvent *event)
+{
+  if(event->type() == QEvent::MouseMove)
+  {
+    auto mouse_event =  static_cast<QMouseEvent*>(event);
+    auto *item = itemAt(mouse_event->pos());
+    if( item ){
+      auto tooltip = item->data(0, CurvesView::ToolTip);
+      if( tooltip.isValid() )
+      {
+        QToolTip::showText( mapToGlobal(mouse_event->pos()), tooltip.toString() );
+      }
+      else{
+        QToolTip::hideText();
+      }
+    }
+  }
+
+  bool ret = CurvesView::eventFilterBase(object, event);
+  if (!ret)
+  {
+    return QWidget::eventFilter(object, event);
+  }
+  else
+  {
+    return true;
+  }
 }
 
 void CurveTreeView::removeCurve(const QString& to_be_deleted)

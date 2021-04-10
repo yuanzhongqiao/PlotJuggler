@@ -52,6 +52,8 @@ public:
 
   virtual void keyPressEvent(QKeyEvent* event) override;
 
+  void updateColors();
+  
 private slots:
 
   void on_lineEditFilter_textChanged(const QString& search_string);

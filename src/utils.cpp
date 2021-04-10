@@ -9,30 +9,35 @@ MoveData(PlotDataMapRef &source,
 
   std::vector<std::string> added_curves;
 
-  auto moveDataImpl = [&](auto& source_group, auto& destination_group)
+  auto moveDataImpl = [&](auto& source_series, auto& destination_series)
   {
     bool need_update = false;
-    for (auto& it : source_group)
+    for (auto& it : source_series)
     {
-      const std::string& name = it.first;
+      const std::string& ID = it.first;
       auto& source_plot = it.second;
+      const std::string& plot_name = source_plot.plotName();
 
-      auto dest_plot_it = destination_group.find(name);
-      if (dest_plot_it == destination_group.end())
+      auto dest_plot_it = destination_series.find(ID);
+      if (dest_plot_it == destination_series.end())
       {
-        added_curves.push_back(name);
+        added_curves.push_back(ID);
+
+        PlotGroup::Ptr group = destination.getOrCreateGroup( source_plot.group()->name() );
 
         dest_plot_it =
-            destination_group
+            destination_series
             .emplace(std::piecewise_construct,
-                     std::forward_as_tuple(name),
-                     std::forward_as_tuple(name))
+                     std::forward_as_tuple(ID),
+                     std::forward_as_tuple(plot_name, group))
             .first;
         need_update = true;
       }
-      auto& destination_plot = dest_plot_it->second;
 
-      // copy the attributes, at the series and group level
+      auto& destination_plot = dest_plot_it->second;
+      PlotGroup::Ptr destination_group = destination_plot.group();
+
+      // copy plot attributes
       for (const auto& [name, attr]: source_plot.attributes() )
       {
         if( destination_plot.attribute(name) != attr ){
@@ -40,10 +45,23 @@ MoveData(PlotDataMapRef &source,
           need_update = true;
         }
       }
-      if( source_plot.group() && !destination_plot.group() )
+      // Copy the group name and attributes
+      if( source_plot.group() )
       {
-        destination_plot.setGroup( source_plot.group() );
-        need_update = true;
+        if( !destination_group || destination_group->name() != source_plot.group()->name() )
+        {
+          destination_group = destination.getOrCreateGroup( source_plot.group()->name() );
+          destination_plot.changeGroup( destination_group );
+        }
+
+        for (const auto& [name, attr]: source_plot.group()->attributes() )
+        {
+          if( destination_group->attribute(name) != attr )
+          {
+            destination_group->setAttribute( name, attr );
+            need_update = true;
+          }
+        }
       }
 
       if( remove_older ) {
@@ -68,6 +86,13 @@ MoveData(PlotDataMapRef &source,
   bool str_updated = moveDataImpl( source.strings, destination.strings );
 
   moveDataImpl( source.user_defined, destination.user_defined );
+
+  // copy the groups
+  for(const auto& it: source.groups)
+  {
+    const auto& name = it.first;
+    destination.groups[name] = it.second;
+  }
 
   return { added_curves, num_updated || str_updated };
 }

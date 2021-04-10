@@ -40,6 +40,7 @@ SET( PLOTTER_SRC
     curvelist_panel.cpp
     curvelist_view.cpp
     curvetree_view.cpp
+    dummy_data.cpp
     main.cpp
     mainwindow.cpp
     messageparser_base.cpp

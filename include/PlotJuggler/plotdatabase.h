@@ -32,10 +32,15 @@ using Attributes = std::map<std::string, QVariant>;
 class PlotGroup
 {
 public:
+
+  using Ptr = std::shared_ptr<PlotGroup>;
+
   PlotGroup(const std::string& name):
     _name( name )
-  {
+  { }
 
+  const std::string& name() const {
+    return _name;
   }
 
   void setAttribute(const std::string& name, const QVariant& value)
@@ -71,6 +76,7 @@ private:
 template <typename TypeX, typename Value >
 class PlotDataBase
 {
+
 public:
 
     class Point
@@ -92,10 +98,11 @@ public:
     typedef typename std::deque<Point>::iterator Iterator;
     typedef typename std::deque<Point>::const_iterator ConstIterator;
 
-    PlotDataBase(const std::string& name ):
+    PlotDataBase(const std::string& name, PlotGroup::Ptr group ):
         _name(name),
         _range_x_dirty(true),
-        _range_y_dirty(true)
+        _range_y_dirty(true),
+        _group(group)
     {}
 
     PlotDataBase(const PlotDataBase& other) = delete;
@@ -106,17 +113,17 @@ public:
 
     virtual ~PlotDataBase() = default;
 
-    const std::string& name() const
+    const std::string& plotName() const
     {
         return _name;
     }
 
-    const std::shared_ptr<PlotGroup>& group()
+    const PlotGroup::Ptr& group() const
     {
       return _group;
     }
 
-    void setGroup(std::shared_ptr<PlotGroup> group)
+    void changeGroup(PlotGroup::Ptr group)
     {
       _group = group;
     }
@@ -339,7 +346,7 @@ protected:
     mutable Range _range_y;
     mutable bool _range_x_dirty;
     mutable bool _range_y_dirty;
-    std::shared_ptr<PlotGroup> _group;
+    mutable  std::shared_ptr<PlotGroup> _group;
 
     // template specialization for types that support compare operator
     virtual void pushUpdateRangeX(const Point& p)
