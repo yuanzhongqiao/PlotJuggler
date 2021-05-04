@@ -1,5 +1,5 @@
-#ifndef PLOTDATA_H
-#define PLOTDATA_H
+#ifndef PJ_PLOTDATA_H
+#define PJ_PLOTDATA_H
 
 #include "plotdatabase.h"
 #include "timeseries.h"
@@ -33,7 +33,6 @@ struct PlotDataMapRef
     }
     ID += name;
 
-//    T plot( name, group );
     return series.insert( {ID, T(name, group) } ).first;
   }
 
@@ -167,4 +166,4 @@ inline void AddPrefixToPlotData(const std::string& prefix,
 
 }
 
-#endif // PLOTDATA_H
+#endif // PJ_PLOTDATA_H

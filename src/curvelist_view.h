@@ -35,15 +35,15 @@ protected:
   std::string str;
 };
 
+enum CustomRoles{
+  Name = Qt::UserRole,
+  IsGroupName = Qt::UserRole + 1,
+  ToolTip = Qt::UserRole + 2
+};
+
 class CurvesView
 {
 public:
-
-  enum CustomRoles{
-    Name = Qt::UserRole,
-    IsGroupName = Qt::UserRole + 1,
-    ToolTip = Qt::UserRole + 2
-  };
 
   CurvesView(CurveListPanel* parent);
 

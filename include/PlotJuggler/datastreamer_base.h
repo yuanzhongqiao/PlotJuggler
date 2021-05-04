@@ -68,6 +68,9 @@ signals:
   // Request to clear previous data
   void clearBuffers();
 
+  // Remove a list of timeseries
+  void removeGroup(std::string group_name);
+
   // signal published periodically when there is new data
   void dataReceived();
 

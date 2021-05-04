@@ -23,8 +23,11 @@ MoveData(PlotDataMapRef &source,
       {
         added_curves.push_back(ID);
 
-        PlotGroup::Ptr group = destination.getOrCreateGroup( source_plot.group()->name() );
-
+        PlotGroup::Ptr group;
+        if( source_plot.group() )
+        {
+          destination.getOrCreateGroup( source_plot.group()->name() );
+        }
         dest_plot_it =
             destination_series
             .emplace(std::piecewise_construct,

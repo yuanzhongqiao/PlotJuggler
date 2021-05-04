@@ -266,7 +266,7 @@ bool CurveTreeView::eventFilter(QObject *object, QEvent *event)
     auto mouse_event =  static_cast<QMouseEvent*>(event);
     auto *item = itemAt(mouse_event->pos());
     if( item ){
-      auto tooltip = item->data(0, CurvesView::ToolTip);
+      auto tooltip = item->data(0, CustomRoles::ToolTip);
       if( tooltip.isValid() )
       {
         QToolTip::showText( mapToGlobal(mouse_event->pos()), tooltip.toString() );

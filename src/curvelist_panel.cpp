@@ -129,7 +129,7 @@ void CurveListPanel::updateColors()
 
     if( cell->childCount() == 0 )
     {
-      const std::string& curve_name = cell->data(0, CurvesView::Name).toString().toStdString();
+      const std::string& curve_name = cell->data(0, CustomRoles::Name).toString().toStdString();
 
       QVariant text_color;
 
@@ -142,7 +142,7 @@ void CurveListPanel::updateColors()
                                                         default_color );
 
           QVariant tooltip = it->second.attribute("ToolTip");
-          cell->setData(0, CurvesView::ToolTip, tooltip );
+          cell->setData(0, CustomRoles::ToolTip, tooltip );
 
           return true;
         }
@@ -152,10 +152,10 @@ void CurveListPanel::updateColors()
       bool valid = ( GetTextColor( _plot_data.numeric, curve_name ) ||
                      GetTextColor( _plot_data.strings, curve_name ));
     }
-    else if( cell->data(0, CurvesView::IsGroupName).toBool() )
+    else if( cell->data(0, CustomRoles::IsGroupName).toBool() )
     {
 
-      auto group_name = cell->data(0, CurvesView::Name).toString();
+      auto group_name = cell->data(0, CustomRoles::Name).toString();
       auto it = _plot_data.groups.find( group_name.toStdString() );
       if ( it != _plot_data.groups.end() )
       {
@@ -164,7 +164,7 @@ void CurveListPanel::updateColors()
                                                       default_color );
 
         QVariant tooltip = it->second->attribute("ToolTip");
-        cell->setData(0, CurvesView::ToolTip, tooltip );
+        cell->setData(0, CustomRoles::ToolTip, tooltip );
       }
     }
   };
@@ -179,7 +179,6 @@ void CurveListPanel::refreshColumns()
   _column_width_dirty = false;
 
   updateFilter();
-
 
   updateColors();
 }
@@ -308,7 +307,7 @@ void CurveListPanel::refreshValues()
     const int vertical_height = tree_view->visibleRegion().boundingRect().height();
 
     auto DisplayValue = [&](QTreeWidgetItem* cell) {
-      QString curve_name = cell->data(0, CurvesView::Name).toString();
+      QString curve_name = cell->data(0, CustomRoles::Name).toString();
 
       if (!curve_name.isEmpty())
       {

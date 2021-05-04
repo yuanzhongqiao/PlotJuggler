@@ -639,6 +639,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
             _animated_streaming_timer->start(500);
           });
 
+          connect(streamer, &DataStreamer::removeGroup,
+                  this, &MainWindow::on_deleteSerieFromGroup );
+
           connect(streamer, &DataStreamer::dataReceived,
                   this, [this]()
           {
@@ -1471,6 +1474,7 @@ void MainWindow::loadStyleSheet(QString file_path)
       plot->replot();
     });
 
+    _curvelist_widget->updateColors();
     emit stylesheetChanged(theme);
   }
   catch( std::runtime_error& err )
@@ -2129,6 +2133,28 @@ void MainWindow::on_actionClearBuffer_triggered()
   });
 }
 
+void MainWindow::on_deleteSerieFromGroup(std::string group_name )
+{
+  std::vector<std::string> names;
+
+  auto AddFromGroup = [&]( auto& series )
+  {
+    for (auto& it : series)
+    {
+      const auto& group = it.second.group();
+      if( group && group->name() == group_name)
+      {
+        names.push_back( it.first );
+      }
+    }
+  };
+  AddFromGroup( _mapped_plot_data.numeric );
+  AddFromGroup( _mapped_plot_data.strings );
+  AddFromGroup( _mapped_plot_data.user_defined );
+
+  onDeleteMultipleCurves(names);
+}
+
 void MainWindow::on_pushButtonUseDateTime_toggled(bool checked)
 {
   static bool first = true;
@@ -2136,7 +2162,8 @@ void MainWindow::on_pushButtonUseDateTime_toggled(bool checked)
   {
     if( first ){
       QMessageBox::information(this, tr("Note"),
-                               tr("When \"Use Date Time\" is checked, the option \"Remove Time Offset\" is automatically disabled.\n"
+                               tr("When \"Use Date Time\" is checked, the option \"Remove Time Offset\" "
+                                  "is automatically disabled.\n"
                                   "This message will be shown only once."));
       first = false;
     }

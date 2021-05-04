@@ -142,6 +142,8 @@ private:
 
   QMovie* _animated_streaming_movie;
   QTimer* _animated_streaming_timer;
+  
+  
 
   enum LabelStatus
   {
@@ -205,6 +207,8 @@ public slots:
 
   void on_actionDeleteAllData_triggered();
   void on_actionClearBuffer_triggered();
+
+  void on_deleteSerieFromGroup(std::string group_name );
 
   void onActionFullscreenTriggered();
 
