@@ -36,10 +36,17 @@ private:
 };
 
 
-std::pair<std::vector<std::string>, bool>
-MoveData(PlotDataMapRef& source,
-         PlotDataMapRef& destination,
-         bool remove_older);
+struct MoveDataRet
+{
+  std::vector<std::string> added_curves;
+  bool curves_updated = false;
+  bool data_pushed = false;
+};
+
+
+MoveDataRet MoveData(PlotDataMapRef& source,
+            PlotDataMapRef& destination,
+            bool remove_older);
 
 
 #endif  // UTILS_H

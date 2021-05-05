@@ -1,17 +1,16 @@
 #include "utils.h"
 #include <QDebug>
 
-std::pair<std::vector<std::string>, bool>
-MoveData(PlotDataMapRef &source,
-         PlotDataMapRef &destination,
-         bool remove_older )
+
+MoveDataRet MoveData(PlotDataMapRef &source,
+                     PlotDataMapRef &destination,
+                     bool remove_older )
 {
 
-  std::vector<std::string> added_curves;
+  MoveDataRet ret;
 
   auto moveDataImpl = [&](auto& source_series, auto& destination_series)
   {
-    bool need_update = false;
     for (auto& it : source_series)
     {
       const std::string& ID = it.first;
@@ -21,7 +20,7 @@ MoveData(PlotDataMapRef &source,
       auto dest_plot_it = destination_series.find(ID);
       if (dest_plot_it == destination_series.end())
       {
-        added_curves.push_back(ID);
+        ret.added_curves.push_back(ID);
 
         PlotGroup::Ptr group;
         if( source_plot.group() )
@@ -34,7 +33,7 @@ MoveData(PlotDataMapRef &source,
                      std::forward_as_tuple(ID),
                      std::forward_as_tuple(plot_name, group))
             .first;
-        need_update = true;
+        ret.curves_updated = true;
       }
 
       auto& destination_plot = dest_plot_it->second;
@@ -45,7 +44,7 @@ MoveData(PlotDataMapRef &source,
       {
         if( destination_plot.attribute(name) != attr ){
           destination_plot.setAttribute( name, attr );
-          need_update = true;
+          ret.curves_updated = true;
         }
       }
       // Copy the group name and attributes
@@ -62,13 +61,18 @@ MoveData(PlotDataMapRef &source,
           if( destination_group->attribute(name) != attr )
           {
             destination_group->setAttribute( name, attr );
-            need_update = true;
+            ret.curves_updated = true;
           }
         }
       }
 
       if( remove_older ) {
         destination_plot.clear();
+      }
+
+      if( source_plot.size() > 0 )
+      {
+        ret.data_pushed = true;
       }
 
       for (size_t i = 0; i < source_plot.size(); i++)
@@ -81,14 +85,12 @@ MoveData(PlotDataMapRef &source,
 
       source_plot.clear();
     }
-    return need_update;
   };
 
   //--------------------------------------------
-  bool num_updated = moveDataImpl( source.numeric, destination.numeric );
-  bool str_updated = moveDataImpl( source.strings, destination.strings );
-
+  moveDataImpl( source.numeric, destination.numeric );
+  moveDataImpl( source.strings, destination.strings );
   moveDataImpl( source.user_defined, destination.user_defined );
 
-  return { added_curves, num_updated || str_updated };
+  return ret;
 }

@@ -1119,7 +1119,7 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
     }
   }
 
-  auto [ added_curves, dest_updated ] =
+  auto [ added_curves, curve_updated, data_pushed  ] =
       MoveData ( new_data, _mapped_plot_data, remove_old );
 
   for(const auto& added_curve: added_curves )
@@ -1127,7 +1127,7 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
     _curvelist_widget->addCurve( added_curve );
   }
 
-  if (dest_updated)
+  if (curve_updated)
   {
     _curvelist_widget->refreshColumns();
   }
@@ -1926,26 +1926,24 @@ void MainWindow::updateTimeOffset()
 void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
 {
   _replot_timer->stop();
-  bool data_updated_by_streamer = false;
+
+  MoveDataRet move_ret;
 
   if (_active_streamer_plugin)
   {
-    std::vector<std::string> curvelist_added;
     {
       std::lock_guard<std::mutex> lock(_active_streamer_plugin->mutex());
-      auto res = MoveData(_active_streamer_plugin->dataMap(),
+      move_ret = MoveData(_active_streamer_plugin->dataMap(),
                           _mapped_plot_data,
                           false);
-      curvelist_added = std::move(res.first);
-      data_updated_by_streamer = res.second;
     }
 
-    for (const auto& str : curvelist_added)
+    for (const auto& str : move_ret.added_curves)
     {
       _curvelist_widget->addCurve(str);
     }
 
-    if (data_updated_by_streamer)
+    if ( move_ret.curves_updated )
     {
       _curvelist_widget->refreshColumns();
     }
@@ -1965,12 +1963,6 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
     plot->updateCurves();
   });
 
-  if( data_updated_by_streamer )
-  {
-    _animated_streaming_movie->start();
-    _animated_streaming_timer->start(300);
-  }
-
   //--------------------------------
   // trigger again the execution of this callback if steaming == true
   if (is_streaming_active)
@@ -1986,7 +1978,7 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
     updateTimeSlider();
   }
   //--------------------------------
-  if( data_updated_by_streamer )
+  if( move_ret.data_pushed )
   {
     for (const auto& it : TabbedPlotWidget::instances())
     {
