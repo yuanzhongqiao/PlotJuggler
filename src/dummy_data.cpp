@@ -61,6 +61,8 @@ void BuildDummyData(PlotDataMapRef& datamap)
   cos_plot.setAttribute("ToolTip", QString("cosine") );
   str_plot.setAttribute("ToolTip", QString("this is a string") );
 
+  sin_plot.setAttribute("Italic", true);
+
   //--------------------------------
   double t = 0;
   for (unsigned indx = 0; indx < SIZE; indx++)

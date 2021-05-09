@@ -121,7 +121,7 @@ void CurveTreeView::addItem(const QString &group_name, const QString& tree_name,
 
       QFont font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
       font.setPointSize(_point_size);
-      font.setBold(isGroupCell);
+      //font.setBold(isGroupCell);
       child_item->setFont(0, font);
 
       font = QFontDatabase::systemFont(QFontDatabase::FixedFont);

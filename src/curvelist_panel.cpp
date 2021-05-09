@@ -122,9 +122,60 @@ void CurveListPanel::addCustom(const QString& item_name)
 void CurveListPanel::updateColors()
 {
   QColor default_color = _tree_view->palette().color( QPalette::Text );
+  //------------------------------------------
+  // Propagate change in color and style to the children of a group
+  std::function<void(QTreeWidgetItem*,QColor,bool)> ChangeColorAndStyle;
+  ChangeColorAndStyle = [&](QTreeWidgetItem* cell, QColor color, bool italic)
+  {
+    cell->setForeground(0, color);
+    auto font = cell->font(0);
+    font.setItalic( italic );
+    cell->setFont(0, font);
+    for (int c = 0; c < cell->childCount(); c++)
+    {
+        ChangeColorAndStyle(cell->child(c), color, italic);
+    };
+  };
 
-  auto ChangeTextColorVisitor = [&](QTreeWidgetItem* cell) {
+  // set everything to default first
+  for (int c = 0; c < _tree_view->invisibleRootItem()->childCount(); c++)
+  {
+    ChangeColorAndStyle(_tree_view->invisibleRootItem()->child(c),
+                        default_color,
+                        false);
+  }
+  //------------- Change groups first ---------------------
 
+  auto ChangeGroupVisitor = [&](QTreeWidgetItem* cell)
+  {
+    if( cell->data(0, CustomRoles::IsGroupName).toBool() )
+    {
+      auto group_name = cell->data(0, CustomRoles::Name).toString();
+      auto it = _plot_data.groups.find( group_name.toStdString() );
+      if ( it != _plot_data.groups.end() )
+      {
+        QVariant color_var = it->second->attribute("TextColor");
+        QColor text_color = color_var.isValid() ?
+              color_var.value<QColor>() : default_color;
+
+        QVariant style_var = it->second->attribute("Italic");
+        bool italic =( style_var.isValid() && style_var.value<bool>() );
+
+        ChangeColorAndStyle(cell, text_color, italic);
+
+        // tooltip doesn't propagate
+        QVariant tooltip = it->second->attribute("ToolTip");
+        cell->setData(0, CustomRoles::ToolTip, tooltip );
+      }
+    }
+  };
+
+  _tree_view->treeVisitor(ChangeGroupVisitor);
+
+  //------------- Change leaves ---------------------
+
+  auto ChangeLeavesVisitor = [&](QTreeWidgetItem* cell)
+  {
     if( cell->childCount() == 0 )
     {
       const std::string& curve_name = cell->data(0, CustomRoles::Name).toString().toStdString();
@@ -135,13 +186,23 @@ void CurveListPanel::updateColors()
         auto it = plot_data.find(curve_name);
         if ( it != plot_data.end() )
         {
-          QVariant text_color = it->second.attribute("TextColor");
-          cell->setForeground(0, text_color.isValid() ? text_color.value<QColor>() :
-                                                        default_color );
+          QVariant color_var = it->second.attribute("TextColor");
+          if( color_var.isValid() )
+          {
+            cell->setForeground(0, color_var.value<QColor>() );
+          }
 
-          QVariant tooltip = it->second.attribute("ToolTip");
-          cell->setData(0, CustomRoles::ToolTip, tooltip );
+          QVariant tooltip_var = it->second.attribute("ToolTip");
+          cell->setData(0, CustomRoles::ToolTip, tooltip_var );
 
+          QVariant style_var = it->second.attribute("Italic");
+          bool italic = ( style_var.isValid() && style_var.value<bool>() );
+          if( italic )
+          {
+            QFont font = cell->font(0);
+            font.setItalic(italic);
+            cell->setFont(0, font);
+          }
           return true;
         }
         return false;
@@ -150,24 +211,9 @@ void CurveListPanel::updateColors()
       bool valid = ( GetTextColor( _plot_data.numeric, curve_name ) ||
                      GetTextColor( _plot_data.strings, curve_name ));
     }
-    else if( cell->data(0, CustomRoles::IsGroupName).toBool() )
-    {
-
-      auto group_name = cell->data(0, CustomRoles::Name).toString();
-      auto it = _plot_data.groups.find( group_name.toStdString() );
-      if ( it != _plot_data.groups.end() )
-      {
-        QVariant text_color = it->second->attribute("TextColor");
-        cell->setForeground(0, text_color.isValid() ? text_color.value<QColor>() :
-                                                      default_color );
-
-        QVariant tooltip = it->second->attribute("ToolTip");
-        cell->setData(0, CustomRoles::ToolTip, tooltip );
-      }
-    }
   };
 
-  _tree_view->treeVisitor(ChangeTextColorVisitor);
+  _tree_view->treeVisitor(ChangeLeavesVisitor);
 }
 
 void CurveListPanel::refreshColumns()
