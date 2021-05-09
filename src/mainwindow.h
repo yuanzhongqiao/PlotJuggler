@@ -135,6 +135,7 @@ private:
 
   QTimer* _replot_timer;
   QTimer* _publish_timer;
+  QTimer* _tracker_delaty_timer;
 
   QDateTime _prev_publish_time;
 

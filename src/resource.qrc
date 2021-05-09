@@ -273,5 +273,7 @@
         <file>cheatsheet/img/tutorial_search.png</file>
         <file>cheatsheet/img/tutorial_custom.png</file>
         <file>cheatsheet/img/tutorial_layout.png</file>
+        <file>resources/svg/trash.svg</file>
+        <file>resources/svg/clear.svg</file>
     </qresource>
 </RCC>

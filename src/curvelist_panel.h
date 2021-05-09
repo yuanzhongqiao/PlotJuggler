@@ -68,6 +68,8 @@ private slots:
 
   void on_checkBoxShowValues_toggled(bool show);
 
+  void on_pushButtonTrash_clicked(bool checked);
+
 public slots:
 
   std::vector<std::string> getSelectedNames() const;
@@ -105,10 +107,14 @@ signals:
   void hiddenItemsChanged();
 
   void createMathPlot(const std::string& linked_plot);
+
   void editMathPlot(const std::string& plot_name);
+
   void refreshMathPlot(const std::string& curve_name);
 
   void deleteCurves(const std::vector<std::string>& curve_names);
+
+  void requestDeleteAll(int);
 };
 
 #endif  // CURVE_SELECTOR_H

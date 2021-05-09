@@ -479,6 +479,7 @@ void CurveListPanel::on_stylesheetChanged(QString theme)
   _style_dir = theme;
   ui->buttonAddCustom->setIcon(LoadSvgIcon(":/resources/svg/add_tab.svg", theme));
   ui->buttonEditCustom->setIcon(LoadSvgIcon(":/resources/svg/pencil-edit.svg", theme));
+  ui->pushButtonTrash->setIcon(LoadSvgIcon(":/resources/svg/trash.svg", theme));
 }
 
 void CurveListPanel::on_checkBoxShowValues_toggled(bool show)
@@ -486,4 +487,28 @@ void CurveListPanel::on_checkBoxShowValues_toggled(bool show)
   _tree_view->hideValuesColumn(!show);
   _custom_view->hideValuesColumn(!show);
   emit hiddenItemsChanged();
+}
+
+void CurveListPanel::on_pushButtonTrash_clicked(bool )
+{
+  QMessageBox msgBox(this);
+  msgBox.setWindowTitle("Warning. Can't be undone.");
+  msgBox.setText(tr("Delete data:\n\n"
+                    "[Delete All]: remove timeseries and plots.\n"
+                    "[Delete Points]: reset data points, but keep plots and timeseries.\n"
+                    ));
+  QPushButton* buttonAll = msgBox.addButton(tr("Delete All"), QMessageBox::NoRole);
+  QPushButton* buttonPoints = msgBox.addButton(tr("Delete Points"), QMessageBox::NoRole);
+  msgBox.addButton(QMessageBox::Cancel);
+  msgBox.setDefaultButton(QMessageBox::Cancel);
+
+  msgBox.exec();
+
+  if (msgBox.clickedButton() == buttonAll)
+  {
+    requestDeleteAll(1);
+  }
+  else if (msgBox.clickedButton() == buttonPoints) {
+    requestDeleteAll(2);
+  }
 }

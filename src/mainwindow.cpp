@@ -117,6 +117,16 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
     _animated_streaming_movie->jumpToFrame( 0 );
   });
 
+  _tracker_delaty_timer = new QTimer();
+  _tracker_delaty_timer->setSingleShot(true);
+
+  connect( _tracker_delaty_timer, &QTimer::timeout,
+           this, [this]()
+  {
+    updatedDisplayTime();
+    onUpdateLeftTableValues();
+  });
+
   ui->labelStreamingAnimation->setMovie(_animated_streaming_movie);
   ui->labelStreamingAnimation->setHidden(true);
 
@@ -149,6 +159,17 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
 
   connect(ui->playbackStep, &QDoubleSpinBox::editingFinished,
           this, [this]() { ui->playbackStep->clearFocus(); });
+
+  connect(_curvelist_widget, &CurveListPanel::requestDeleteAll,
+          this, [this](int option)
+  {
+    if( option == 1) {
+      deleteAllData();
+    }
+    else if( option == 2) {
+      on_actionClearBuffer_triggered();
+    }
+  });
 
   _main_tabbed_widget = new TabbedPlotWidget("Main Window",
                                              this, _mapped_plot_data, this);
@@ -426,9 +447,11 @@ void MainWindow::onTimeSlider_valueChanged(double abs_time)
 }
 
 void MainWindow::onTrackerTimeUpdated(double absolute_time, bool do_replot)
-{
-  updatedDisplayTime();
-  onUpdateLeftTableValues();
+{ 
+  if( !_tracker_delaty_timer->isActive() )
+  {
+    _tracker_delaty_timer->start( 100 ); // 10 Hz at most
+  }
 
   for (auto& it : _state_publisher)
   {
@@ -1061,6 +1084,8 @@ void MainWindow::deleteAllData()
   _custom_plots.clear();
   _curvelist_widget->clear();
   _loaded_datafiles.clear();
+  _undo_states.clear();
+  _redo_states.clear();
 
   bool stopped = false;
 
@@ -2738,7 +2763,6 @@ void MainWindow::on_actionDeleteAllData_triggered()
   msgBox.addButton(QMessageBox::No);
   msgBox.addButton(QMessageBox::Yes);
   msgBox.setDefaultButton(QMessageBox::Yes);
-  //  QPushButton* buttonPlaceholder = msgBox.addButton(tr("Keep empty placeholders"), QMessageBox::NoRole);
   auto reply = msgBox.exec();
 
   if (reply == QMessageBox::No)

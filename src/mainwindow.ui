@@ -23,7 +23,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_12">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -1324,7 +1324,7 @@
                      <string>tt</string>
                     </property>
                     <property name="icon">
-                     <iconset resource="resource.qrc">
+                     <iconset>
                       <normaloff>:/style_light/line_tracker_1.png</normaloff>:/style_light/line_tracker_1.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -1749,7 +1749,7 @@
      <x>0</x>
      <y>0</y>
      <width>1248</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="minimumSize">
@@ -1823,7 +1823,7 @@
   </action>
   <action name="actionReportBug">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset>
      <normaloff>:/resources/github.png</normaloff>:/resources/github.png</iconset>
    </property>
    <property name="text">
@@ -1884,7 +1884,7 @@
   </action>
   <action name="actionShare_the_love">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset>
      <normaloff>:/resources/twitter.png</normaloff>:/resources/twitter.png</iconset>
    </property>
    <property name="text">
@@ -1910,8 +1910,6 @@
    <header location="global">menubar.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
