@@ -83,7 +83,7 @@ void CurveListPanel::clear()
 
 void CurveListPanel::addCurve(const std::string &plot_name)
 {
-  auto tree_name = QString::fromStdString( plot_name );
+
   QString group_name;
 
   auto FindInPlotData = [&](auto& plot_data, const std::string &plot_name)
@@ -91,10 +91,6 @@ void CurveListPanel::addCurve(const std::string &plot_name)
     auto it = plot_data.find( plot_name );
     if( it != plot_data.end() ){
       auto& plot = it->second;
-      auto tree_name_attr =  plot.attribute("tree_name");
-      if( tree_name_attr.isValid() ) {
-        tree_name = tree_name_attr.toString();
-      }
       if( plot.group() ){
         group_name = QString::fromStdString( plot.group()->name() );
       }
@@ -111,7 +107,9 @@ void CurveListPanel::addCurve(const std::string &plot_name)
     return;
   }
 
-  _tree_view->addItem(group_name, tree_name, QString::fromStdString( plot_name ) );
+  QString plot_id = QString::fromStdString( plot_name );
+  _tree_view->addItem(group_name, getTreeName( plot_id ), plot_id );
+
   _column_width_dirty = true;
 }
 
@@ -334,6 +332,53 @@ void CurveListPanel::refreshValues()
     tree_view->treeVisitor(DisplayValue);
     // tree_view->setViewResizeEnabled(true);
   }
+}
+
+QString StringifyArray(QString str)
+{
+  static const QRegExp rx("(\\[\\d+\\])");
+  int pos = 0;
+  std::vector<std::pair<int,int>> index_positions;
+
+  while ((pos = rx.indexIn(str, pos)) != -1) {
+    QString array_index = rx.cap(1);
+
+    std::pair<int,int> index = {pos+1, array_index.size()-2};
+    index_positions.push_back(index);
+    pos += rx.matchedLength();
+  }
+  if( index_positions.empty() )
+  {
+    return str;
+  }
+
+  QStringList out_list;
+  out_list.push_back(str);
+
+  for(int i = index_positions.size()-1; i >= 0; i--)
+  {
+    std::pair<int,int> index = index_positions[i];
+    str.remove( index.first, index.second );
+    out_list.push_front(str);
+  }
+
+  return out_list.join("/");
+}
+
+QString CurveListPanel::getTreeName(QString name)
+{
+  auto parts = name.split('/', QString::SplitBehavior::SkipEmptyParts);
+
+  QString out;
+  for(int i=0; i < parts.size(); i++)
+  {
+    out += StringifyArray(parts[i]);
+    if( i+1 < parts.size() )
+    {
+      out += "/";
+    }
+  }
+  return out;
 }
 
 void CurveListPanel::on_lineEditFilter_textChanged(const QString& search_string)

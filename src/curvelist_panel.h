@@ -98,6 +98,8 @@ private:
 
   bool _column_width_dirty;
 
+  QString getTreeName(QString name);
+
 signals:
 
   void hiddenItemsChanged();
