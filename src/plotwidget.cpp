@@ -150,21 +150,28 @@ PlotWidget::PlotWidget(PlotDataMapRef& datamap, QWidget* parent)
   this->sizePolicy().setHorizontalPolicy(QSizePolicy::Expanding);
   this->sizePolicy().setVerticalPolicy(QSizePolicy::Expanding);
 
-#ifdef Q_OS_WIN
-  auto canvas = new QwtPlotCanvas();
-#else
-  auto canvas = new QwtPlotOpenGLCanvas();
-#endif
+  QSettings settings;
 
-  canvas->setFrameStyle(QFrame::NoFrame);
+  bool use_opengl = settings.value("Preferences::use_opengl", true).toBool();
+  if( use_opengl )
+  {
+    auto canvas = new QwtPlotOpenGLCanvas();
+    canvas->setFrameStyle(QFrame::NoFrame);
+    canvas->setFrameStyle( QFrame::Box | QFrame::Plain );
+    canvas->setLineWidth( 1 );
+    canvas->setPalette( Qt::white );
+    this->setCanvas(canvas);
+  }
+  else{
+    auto canvas = new QwtPlotCanvas();
+    canvas->setFrameStyle(QFrame::NoFrame);
+    canvas->setFrameStyle( QFrame::Box | QFrame::Plain );
+    canvas->setLineWidth( 1 );
+    canvas->setPalette( Qt::white );
+    canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
+    this->setCanvas(canvas);
+  }
 
-  canvas->setFrameStyle( QFrame::Box | QFrame::Plain );
-  canvas->setLineWidth( 1 );
-  canvas->setPalette( Qt::white );
-
- // canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
-
-  this->setCanvas(canvas);
   this->setCanvasBackground(Qt::white);
 
   this->setAxisAutoScale(QwtPlot::yLeft, true);
