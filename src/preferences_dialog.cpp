@@ -63,6 +63,7 @@ void PreferencesDialog::on_buttonBox_accepted()
   settings.setValue("Preferences::remember_color", ui->checkBoxRememberColor->isChecked());
   settings.setValue("Preferences::use_plot_color_index", ui->radioLocalColorIndex->isChecked());
   settings.setValue("Preferences::use_separator", ui->checkBoxSeparator->isChecked());
+  settings.setValue("Preferences::use_opengl", ui->checkBoxOpenGL->isChecked());
 
   QStringList plugin_folders;
   for(int row=0; row< ui->listWidget->count(); row++)
