@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.1 (2021-05-16)
+------------------
 * ulog: ignore parameter default message (`#413 <https://github.com/facontidavide/PlotJuggler/issues/413>`_)
 * Fix typo in "load transformations" prompt (`#416 <https://github.com/facontidavide/PlotJuggler/issues/416>`_)
 * added CSV export plugin
