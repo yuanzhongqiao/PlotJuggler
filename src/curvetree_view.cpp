@@ -67,10 +67,10 @@ void CurveTreeView::addItem(const QString &group_name, const QString& tree_name,
   QStringList parts;
   if( use_separator )
   {
-    parts = item_name.split('/', QString::SplitBehavior::SkipEmptyParts);
+    parts = tree_name.split('/', QString::SplitBehavior::SkipEmptyParts);
   }
   else{
-    parts.push_back(item_name);
+    parts.push_back(tree_name);
   }
 
   if (parts.size() == 0)
@@ -80,10 +80,10 @@ void CurveTreeView::addItem(const QString &group_name, const QString& tree_name,
 
   bool prefix_is_group = tree_name.startsWith( group_name );
   bool hasGroup = !group_name.isEmpty();
+  auto group_parts = group_name.split('/', QString::SplitBehavior::SkipEmptyParts);
 
   if( hasGroup && !prefix_is_group )
   {
-    auto group_parts = group_name.split('/', QString::SplitBehavior::SkipEmptyParts);
     parts = group_parts + parts;
   }
 
