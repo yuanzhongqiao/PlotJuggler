@@ -54,14 +54,14 @@ void StatePublisherCSV::setEnabled(bool enabled)
             this, [this]()
     {
       _start_time = _previous_time;
-      _ui->lineEditStart->setText( QString::number(_previous_time) );
+      _ui->lineEditStart->setText( QString::number(_previous_time, 'f', 3) );
       updateButtonsState();
     });
     //--------------------
     connect(_ui->buttonGetEnd, &QPushButton::clicked,
             this, [this](){
       _end_time = _previous_time;
-      _ui->lineEditEnd->setText( QString::number(_previous_time) );
+      _ui->lineEditEnd->setText( QString::number(_previous_time, 'f', 3) );
       updateButtonsState();
     });
     //--------------------
@@ -357,13 +357,13 @@ QString StatePublisherCSV::generateRangeCSV(double time_start, double time_end)
     }
 
     // the row to append to the CSV file
-    QString row_str = QString::number(min_time) + ",";
+    QString row_str = QString::number(min_time, 'f', 3) + ",";
 
     for( size_t i=0; i < plot_count; i++)
     {
       if( !std::isnan(row_values[i]) )
       {
-        row_str += QString::number(row_values[i]);
+        row_str += QString::number(row_values[i], 'f');
         // value used, move to the nex index
         indices[i]++;
       }
