@@ -1,7 +1,7 @@
-#ifndef TIMESERIES_RAW_H
-#define TIMESERIES_RAW_H
+#ifndef PJ_TIMESERIES_H
+#define PJ_TIMESERIES_H
 
-#include "plotdata.h"
+#include "plotdatabase.h"
 #include <algorithm>
 
 namespace PJ {
@@ -20,6 +20,12 @@ public:
         PlotDataBase<double, Value>(name, group),
         _max_range_x( std::numeric_limits<double>::max() )
     { }
+
+    TimeseriesBase(const TimeseriesBase& other) = delete;
+    TimeseriesBase(TimeseriesBase&& other) = default;
+
+    TimeseriesBase& operator=(const TimeseriesBase& other) = delete;
+    TimeseriesBase& operator=(TimeseriesBase&& other) = default;
 
     void setMaximumRangeX(double max_range)
     {
@@ -81,7 +87,7 @@ inline int TimeseriesBase<Value>::getIndexFromX(double x) const
   {
     return -1;
   }
-  auto lower = std::lower_bound(_points.begin(), _points.end(), Point(x, 0), TimeCompare );
+  auto lower = std::lower_bound(_points.begin(), _points.end(), Point(x, {}), TimeCompare );
   auto index = std::distance(_points.begin(), lower);
 
   if (index >= _points.size())

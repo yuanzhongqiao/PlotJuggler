@@ -1,5 +1,5 @@
-#ifndef PLOTDATA_BASE_H
-#define PLOTDATA_BASE_H
+#ifndef PJ_PLOTDATA_BASE_H
+#define PJ_PLOTDATA_BASE_H
 
 #include <vector>
 #include <memory>

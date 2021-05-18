@@ -1,8 +1,9 @@
-#ifndef STRINGSERIES_H
-#define STRINGSERIES_H
+#ifndef PJ_STRINGSERIES_H
+#define PJ_STRINGSERIES_H
 
 #include "timeseries.h"
 #include <algorithm>
+#include <unordered_set>
 
 namespace PJ {
 
@@ -14,6 +15,12 @@ public:
     StringSeries(const std::string& name, PlotGroup::Ptr group):
         TimeseriesBase<std::string_view>(name, group)
     { }
+
+    StringSeries(const StringSeries& other) = delete;
+    StringSeries(StringSeries&& other) = default;
+
+    StringSeries& operator=(const StringSeries& other) = delete;
+    StringSeries& operator=(StringSeries&& other) = default;
 
     virtual void clear() override
     {
@@ -29,6 +36,11 @@ public:
 
     virtual void pushBack(Point&& p) override
     {
+        // do not add empty strings
+        if ( p.y.data() == nullptr || p.y.size() == 0)
+        {
+            return;
+        }
         _tmp_str.assign( p.y.data(), p.y.size() );
 
         auto it = _storage.find( _tmp_str );
@@ -40,11 +52,10 @@ public:
     }
 
 private:
-    thread_local static std::string _tmp_str;
-    std::set<std::string> _storage;
+    std::string _tmp_str;
+    std::unordered_set<std::string> _storage;
 };
 
-inline thread_local std::string StringSeries::_tmp_str;
 
 } // end namespace
 

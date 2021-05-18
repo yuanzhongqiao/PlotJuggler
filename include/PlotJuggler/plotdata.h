@@ -33,7 +33,10 @@ struct PlotDataMapRef
     }
     ID += name;
 
-    return series.insert( {ID, T(name, group) } ).first;
+    return series.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(name),
+          std::forward_as_tuple(name, group)).first;
   }
 
   template <typename T>
@@ -147,7 +150,10 @@ inline void AddPrefixToPlotData(const std::string& prefix,
     return;
   }
 
-  std::unordered_map<std::string, Value> temp;
+  std::vector<std::string> temp_key;
+  temp_key.reserve( data.size() );
+  std::vector<Value> temp_value;
+  temp_value.reserve( data.size() );
 
   for (auto& it : data)
   {
@@ -155,13 +161,22 @@ inline void AddPrefixToPlotData(const std::string& prefix,
     key.reserve(prefix.size() + 2 + it.first.size());
     key =  (it.first.front() == '/') ? (prefix + it.first) : (prefix + "/" + it.first);
 
-    auto new_plot = temp.emplace(std::piecewise_construct,
-                                 std::forward_as_tuple(key),
-                                 std::forward_as_tuple(key, it.second.group())).first;
-
-    new_plot->second = std::move(it.second);
+    temp_key.emplace_back( key );
+    temp_value.emplace_back( std::move(it.second) );
   }
-  data = std::move(temp);
+
+  data.clear();
+
+  for (size_t i=0; i < temp_key.size(); i++)
+  {
+    const std::string& key = temp_key[i];
+
+    auto it = data.emplace(std::piecewise_construct,
+                           std::forward_as_tuple(key),
+                           std::forward_as_tuple(key, PlotGroup::Ptr()) ).first;
+
+    it->second = std::move(temp_value[i]);
+  }
 }
 
 }
