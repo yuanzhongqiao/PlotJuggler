@@ -5,6 +5,7 @@
 [![CI](https://github.com/facontidavide/PlotJuggler/workflows/ros2/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions?query=workflow%3Aros2)
 [![Join the chat at https://gitter.im/PlotJuggler/Lobby](https://badges.gitter.im/PlotJuggler/Lobby.svg)](https://gitter.im/PlotJuggler/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=I%20use%20PlotJuggler%20and%20it%20is%20amazing%0D%0A&url=https://github.com/facontidavide/PlotJuggler&via=facontidavide&hashtags=dataviz,plotjuggler,GoROS,PX4)
+**Gold Sponsor**: [Greenzie](https://www.greenzie.com/)
 
 # PlotJuggler 3.1
 
@@ -50,14 +51,25 @@ If you are not familiar with Lua, don't be afraid, you won't need more than 5 mi
 ![](docs/custom_editor.png)
 
 
-## Just "Download and Run" 
+## Installation
 
-On Linux, the simplest way to install PlotJuggler is through **snaps**:
+### Binary installers (with basic plugins)
+
+**Linux Installer**: 
+[Plotjuggler-Linux-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/Plotjuggler-Linux-3.1.1-installer.run)
+
+**Windows Installer**: 
+[PlotJuggler-Windows-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-Windows-3.1.1-installer.exe)
+
+### For ROS User
+
+Install the debian packages using: 
+
+     sudo apt install ros-<distro>-plotjuggler-ros
+
+Alternatively, you may download the Snaps version that include the ROS1 plugins:
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-white.svg)](https://snapcraft.io/plotjuggler)
-    
-**Windows Installer**: 
-[PlotJuggler-3.1-WinInstaller.exe](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.0/PlotJuggler-3.1-WinInstaller.exe)
 
 ## How to build
 
@@ -116,7 +128,6 @@ If you find PlotJuggler useful, consider making a donation on [PayPal](https://w
 If you use PlotJuggler at work, your company can support the development of those specific features they need.
 
 [Contact me](https://www.plotjuggler.io/support) for more details.
-
 
 # Stargazers
 

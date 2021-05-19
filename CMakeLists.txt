@@ -7,7 +7,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
 add_definitions(
     -DPJ_MAJOR_VERSION="3"
     -DPJ_MINOR_VERSION="1"
-    -DPJ_PATCH_VERSION="0" )
+    -DPJ_PATCH_VERSION="1" )
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
@@ -248,6 +248,7 @@ add_subdirectory( plugins/DataLoadULog )
 add_subdirectory( plugins/DataStreamSample )
 add_subdirectory( plugins/DataStreamWebsocket )
 add_subdirectory( plugins/DataStreamUDP )
+add_subdirectory( plugins/StatePublisherCSV )
 
 
 if( ZMQ_FOUND )
