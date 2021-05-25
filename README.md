@@ -55,8 +55,8 @@ If you are not familiar with Lua, don't be afraid, you won't need more than 5 mi
 
 ### Binary installers (with basic plugins)
 
-**Linux Installer**: 
-[Plotjuggler-Linux-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/Plotjuggler-Linux-3.1.1-installer.run)
+**Linux AppImage** (compatible with Ubuntu 18.04 or later: 
+[PlotJuggler-3.1.1-x86_64.AppImage](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-3.1.1-x86_64.AppImage)
 
 **Windows Installer**: 
 [PlotJuggler-Windows-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-Windows-3.1.1-installer.exe)
