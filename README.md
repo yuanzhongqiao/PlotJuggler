@@ -50,6 +50,11 @@ If you are not familiar with Lua, don't be afraid, you won't need more than 5 mi
 
 ![](docs/custom_editor.png)
 
+## Tutorials
+
+To learns how to use PlotJuggler, check the tutorials here:
+
+https://slides.com/davidefaconti/decks/plotjuggler
 
 ## Installation
 
