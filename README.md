@@ -61,10 +61,10 @@ https://slides.com/davidefaconti/decks/plotjuggler
 ### Binary installers (with basic plugins)
 
 **Linux AppImage** (compatible with Ubuntu 18.04 or later: 
-[PlotJuggler-3.1.1-x86_64.AppImage](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-3.1.1-x86_64.AppImage)
+[PlotJuggler-3.1.2-x86_64.AppImage](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.2/PlotJuggler-3.1.2-x86_64.AppImage)
 
 **Windows Installer**: 
-[PlotJuggler-Windows-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-Windows-3.1.1-installer.exe)
+[PlotJuggler-Windows-3.1.2-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.2/PlotJuggler-Windows-3.1.2-installer.exe)
 
 ### For ROS User
 
