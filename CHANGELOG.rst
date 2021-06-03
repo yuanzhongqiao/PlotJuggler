@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.2 (2021-06-03)
+------------------
 * add disable_opnegl option in command line
 * new API for MessagePublishers
 * bug fix that affects statepublishers
