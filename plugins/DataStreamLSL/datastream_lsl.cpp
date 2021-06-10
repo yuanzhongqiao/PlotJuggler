@@ -31,6 +31,10 @@ StreamLSLDialog::StreamLSLDialog(QWidget *parent) :
             this, &StreamLSLDialog::resolveLSLStreams);
 
     _timer->start(1000);
+
+    connect(ui->pushButtonSelectAll, &QPushButton::clicked, this, [&](){
+        ui->tableView->selectAll();
+    });
 }
 
 StreamLSLDialog::~StreamLSLDialog()
@@ -54,7 +58,7 @@ QStringList StreamLSLDialog::getSelectedStreams()
 
 void StreamLSLDialog::resolveLSLStreams()
 {
-    std::vector<lsl::stream_info> streams = lsl::resolve_streams(0.0);
+    std::vector<lsl::stream_info> streams = lsl::resolve_streams(0.75);
 
     std::set<std::string> streams_id;
     for (const auto& stream: streams)
@@ -171,7 +175,7 @@ void DataStreamLSL::dataReceived(std::vector<std::vector<double> > *chunk, std::
 {
     Streamer *streamer = qobject_cast<Streamer*>(sender());
 
-    if (!streamer || (stamps->size() > 0))
+    if (streamer && (stamps->size() > 0))
     {
         //    qInfo() << chunk->size() << chunk->at(0).size();
         std::lock_guard<std::mutex> lock( mutex() );
@@ -191,4 +195,3 @@ void DataStreamLSL::dataReceived(std::vector<std::vector<double> > *chunk, std::
         }
     }
 }
-
