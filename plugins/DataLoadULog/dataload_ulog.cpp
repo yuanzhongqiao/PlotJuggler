@@ -33,7 +33,16 @@ bool DataLoadULog::readDataFromFile(FileLoadInfo* fileload_info, PlotDataMapRef&
 {
   const auto& filename = fileload_info->filename;
 
-  ULogParser parser(filename.toStdString());
+  QFile file(filename);
+
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    throw std::runtime_error("ULog: Failed to open file");
+  }
+  QByteArray file_array = file.readAll();
+  ULogParser::DataStream datastream( file_array.data(), file_array.size() );
+
+  ULogParser parser(datastream);
 
   const auto& timeseries_map = parser.getTimeseriesMap();
 

@@ -13,6 +13,28 @@ typedef nonstd::string_view StringView;
 class ULogParser
 {
 public:
+  struct DataStream
+  {
+    const char* _data;
+    const size_t _length;
+    size_t offset;
+
+    DataStream(char* data, int len):
+      _data(data),
+      _length(len),
+      offset(0) {}
+
+    void read(char* dst, int len)
+    {
+      memcpy(dst, &_data[offset], len);
+      offset += len;
+    }
+
+    operator bool() {
+      return offset < _length;
+    }
+  };
+
   enum FormatType
   {
     UINT8,
@@ -88,7 +110,7 @@ public:
   };
 
 public:
-  ULogParser(const std::string& filename);
+  ULogParser(DataStream &datastream);
 
   const std::map<std::string, Timeseries>& getTimeseriesMap() const;
 
@@ -99,23 +121,6 @@ public:
   const std::vector<MessageLog>& getLogs() const;
 
 private:
-  struct DataStream
-  {
-    DataStream(): offset(0) {}
-
-    std::vector<char> data;
-    size_t offset;
-
-    void read(char* dst, int len)
-    {
-      memcpy(dst, &data[offset], len);
-      offset += len;
-    }
-
-    operator bool() {
-        return offset < data.size();
-    }
-  };
 
   bool readFileHeader(DataStream& datastream);
 

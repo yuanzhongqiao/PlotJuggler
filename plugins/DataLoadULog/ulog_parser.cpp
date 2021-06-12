@@ -10,33 +10,8 @@
 
 using ios = std::ios;
 
-
-
-ULogParser::ULogParser(const std::string& filename) : _file_start_time(0)
+ULogParser::ULogParser(DataStream &datastream) : _file_start_time(0)
 {
-
-  DataStream datastream;
-
-  {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file.is_open())
-    {
-      throw std::runtime_error("ULog: Failed to open replay file");
-    }
-
-    file.seekg(0, std::ios::end);    // go to the end
-    long length = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    datastream.data.resize(length);
-    file.read( &datastream.data[0], length);
-
-    if (!file) {
-         throw std::runtime_error("ULog: error reading file");
-    }
-    file.close();
-  }
-
   bool ret = readFileHeader(datastream);
 
   if (!ret)
