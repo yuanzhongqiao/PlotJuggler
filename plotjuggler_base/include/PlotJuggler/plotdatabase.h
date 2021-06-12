@@ -29,6 +29,11 @@ struct Range
 typedef std::optional<Range> RangeOpt;
 using Attributes = std::map<std::string, QVariant>;
 
+/**
+ * @brief PlotData may or may not have a group. Think of PlotGroup
+ * as a way to say that certain set of series are "siblings".
+ *
+ */
 class PlotGroup
 {
 public:
