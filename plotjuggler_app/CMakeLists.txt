@@ -31,7 +31,7 @@ QT5_WRAP_UI ( UI_SRC
     cheatsheet/cheatsheet_dialog.ui
     )
 
-SET( PLOTTER_SRC
+SET( PLOtJUGGLER_SRC
 
     cheatsheet/cheatsheet_dialog.cpp
 
@@ -74,22 +74,21 @@ SET( PLOTTER_SRC
     transforms/first_derivative.cpp
     transforms/scale_transform.cpp
 
+    utils.h
     utils.cpp
 
     mainwindow.h
     realslider.h
-    utils.h
-
-    ../include/PlotJuggler/transform_function.h
-    ../include/PlotJuggler/plotdata.h
-    ../include/PlotJuggler/datastreamer_base.h
-    ../include/PlotJuggler/statepublisher_base.h
 
     nlohmann_parsers.cpp
     )
 
 
-add_executable(plotjuggler ${PLOTTER_SRC} ${RES_SRC} ${UI_SRC} ${BACKWARD_ENABLE})
+add_executable(plotjuggler
+    ${PLOtJUGGLER_SRC}
+    ${RES_SRC}
+    ${UI_SRC}
+    ${BACKWARD_ENABLE} )
 
 if (NOT WIN32)
     add_backward(plotjuggler)
@@ -101,6 +100,7 @@ target_link_libraries(plotjuggler
     qwt_static
     lua_static
     qt_advanced_docking
+    plotjuggler_base
     )
 
 if(COMPILING_WITH_CATKIN)

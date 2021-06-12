@@ -9,10 +9,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 add_definitions(
     -DPJ_MAJOR_VERSION="3"
-    -DPJ_MINOR_VERSION="1"
-    -DPJ_PATCH_VERSION="2" )
+    -DPJ_MINOR_VERSION="2"
+    -DPJ_PATCH_VERSION="0" )
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
+include_directories( plotjuggler_base/include )
 
 # http://answers.ros.org/question/230877/optionally-build-a-package-with-catkin/
 if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
@@ -25,8 +25,8 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
     find_package(catkin REQUIRED COMPONENTS roslib )
 
     catkin_package(
-        INCLUDE_DIRS  include
-        LIBRARIES  plotjuggler_plugin_base
+        INCLUDE_DIRS  plotjuggler_base/include
+        LIBRARIES  plotjuggler_base
         CATKIN_DEPENDS roslib
     )
 
@@ -131,19 +131,6 @@ include_directories(
     ./3rdparty/liblsl/include
 )
 
-#########################  LIBRARY  ####################################
-
-qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
-  include/PlotJuggler/dataloader_base.h
-  include/PlotJuggler/datastreamer_base.h
-  include/PlotJuggler/statepublisher_base.h
-  include/PlotJuggler/transform_function.h
-)
-
-add_library( plotjuggler_plugin_base STATIC ${PLOTJUGGLER_BASE_MOCS})
-target_link_libraries( plotjuggler_plugin_base PRIVATE
-    ${Qt5Widgets_LIBRARIES}
-    ${catkin_LIBRARIES} )
 
 #########################  INSTALL  ####################################
 
@@ -157,7 +144,6 @@ elseif(COMPILING_WITH_AMENT)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-    ament_export_targets(export_plotjuggler_plugin_base HAS_LIBRARY_TARGET)
     ament_package()
 
 else()
@@ -166,18 +152,6 @@ else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 endif()
-
-
-install(
-    TARGETS plotjuggler_plugin_base
-    EXPORT export_plotjuggler_plugin_base
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include )
 
 set(DESKTOP_ICON_DIR "${CMAKE_INSTALL_PREFIX}/share/icons")
 
@@ -229,7 +203,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/paho.mqtt.c/CMakeLists.txt")
     SET(CMAKE_INSTALL_INCLUDEDIR )
 
     add_subdirectory( 3rdparty/paho.mqtt.c EXCLUDE_FROM_ALL)
-    add_subdirectory( plugins/DataStreamMQTT )  
+    add_subdirectory( plotjuggler_plugins/DataStreamMQTT )
 endif()
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/liblsl/CMakeLists.txt" AND NOT WIN32)
@@ -238,20 +212,21 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/liblsl/CMakeLists.txt" AND NOT WIN32)
     SET(LSL_BUILD_STATIC TRUE CACHE BOOL "Build static library" FORCE)
     SET(LSL_BUILD_SHARED FALSE CACHE BOOL "Build shared library" FORCE)
     add_subdirectory( 3rdparty/liblsl )
-    add_subdirectory( plugins/DataStreamLSL )
+    add_subdirectory( plotjuggler_plugins/DataStreamLSL )
 endif()
 
-add_subdirectory( src )
+add_subdirectory( plotjuggler_base )
+add_subdirectory( plotjuggler_app )
 
-add_subdirectory( plugins/DataLoadCSV )
-add_subdirectory( plugins/DataLoadULog )
-add_subdirectory( plugins/DataStreamSample )
-add_subdirectory( plugins/DataStreamWebsocket )
-add_subdirectory( plugins/DataStreamUDP )
-add_subdirectory( plugins/StatePublisherCSV )
+add_subdirectory( plotjuggler_plugins/DataLoadCSV )
+add_subdirectory( plotjuggler_plugins/DataLoadULog )
+add_subdirectory( plotjuggler_plugins/DataStreamSample )
+add_subdirectory( plotjuggler_plugins/DataStreamWebsocket )
+add_subdirectory( plotjuggler_plugins/DataStreamUDP )
+add_subdirectory( plotjuggler_plugins/StatePublisherCSV )
 
 
 if( ZMQ_FOUND )
-  add_subdirectory( plugins/DataStreamZMQ )
+  add_subdirectory( plotjuggler_plugins/DataStreamZMQ )
 endif()
 
