@@ -26,7 +26,7 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
 
     catkin_package(
         INCLUDE_DIRS  plotjuggler_base/include
-        LIBRARIES  plotjuggler_base
+        LIBRARIES  plotjuggler_plugin_base
         CATKIN_DEPENDS roslib
     )
 

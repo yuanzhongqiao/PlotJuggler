@@ -11,22 +11,22 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   include/PlotJuggler/transform_function.h
 )
 
-add_library( plotjuggler_base STATIC ${PLOTJUGGLER_BASE_MOCS})
-target_link_libraries( plotjuggler_base PRIVATE
+add_library( plotjuggler_plugin_base STATIC ${PLOTJUGGLER_BASE_MOCS})
+target_link_libraries( plotjuggler_plugin_base PRIVATE
     ${Qt5Widgets_LIBRARIES}
     ${catkin_LIBRARIES} )
 
 if(COMPILING_WITH_CATKIN)
 
 elseif(COMPILING_WITH_AMENT)
-    ament_export_targets(export_plotjuggler_base HAS_LIBRARY_TARGET)
+    ament_export_targets(export_plotjuggler_plugin_base HAS_LIBRARY_TARGET)
 else()
 
 endif()
 
 install(
-    TARGETS plotjuggler_base
-    EXPORT export_plotjuggler_base
+    TARGETS plotjuggler_plugin_base
+    EXPORT export_plotjuggler_plugin_base
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
