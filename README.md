@@ -57,13 +57,13 @@ To learns how to use PlotJuggler, check the tutorials here:
 <table>
   <tr>
     <a href="https://slides.com/davidefaconti/introduction-to-plotjuggler">
-        <td><img src="docs/tutorial_1.png"  height = 300px ></td>
+        <td><img src="docs/tutorial_1.png"></td>
     </a>
     <a href="https://slides.com/davidefaconti/plotjuggler-data">
-        <td><img src="docs/tutorial_2.png"  height = 300px ></td>
+        <td><img src="docs/tutorial_2.png"></td>
     </a>
     <a href="https://slides.com/davidefaconti/plotjuggler-transforms">
-        <td><img src="docs/tutorial_3.png"  height = 300px ></td>
+        <td><img src="docs/tutorial_3.png"></td>
     </a>
    </tr>
 </table>
