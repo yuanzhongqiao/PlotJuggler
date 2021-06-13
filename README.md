@@ -88,7 +88,7 @@ If you want a simple example to learn how to write your own plugins, have a look
 ### Binary installers (with basic plugins)
 
 **Linux AppImage** (compatible with Ubuntu 18.04 or later: 
-[PlotJuggler-3.1.2-x86_64.AppImage](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.2/PlotJuggler-3.1.2-x86_64.AppImage)
+[PlotJuggler-3.2.0-x86_64.AppImage](https://github.com/facontidavide/PlotJuggler/releases/download/3.2.0/PlotJuggler-3.2.0-x86_64.AppImage)
 
 **Windows Installer**: 
 [PlotJuggler-Windows-3.1.1-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.1.1/PlotJuggler-Windows-3.1.1-installer.exe)
