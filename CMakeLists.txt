@@ -123,12 +123,9 @@ include_directories(
     ./3rdparty/
     ./3rdparty/color_widgets/include
     ./3rdparty/Qt-Advanced-Docking/include
-    ./3rdparty/paho.mqtt.c/src
     ./3rdparty/qwt/src
     ./3rdparty/sol
     ./3rdparty/lua-5.4.1/src
-    ./3rdparty/liblsl/src
-    ./3rdparty/liblsl/include
 )
 
 #########################  BASE library  ####################################

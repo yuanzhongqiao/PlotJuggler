@@ -54,7 +54,34 @@ If you are not familiar with Lua, don't be afraid, you won't need more than 5 mi
 
 To learns how to use PlotJuggler, check the tutorials here:
 
-https://slides.com/davidefaconti/decks/plotjuggler
+<table>
+  <tr>
+    <a href="https://slides.com/davidefaconti/introduction-to-plotjuggler">
+        <td><img src="docs/tutorial_1.png"  height = 300px ></td>
+    </a>
+    <a href="https://slides.com/davidefaconti/plotjuggler-data">
+        <td><img src="docs/tutorial_2.png"  height = 300px ></td>
+    </a>
+    <a href="https://slides.com/davidefaconti/plotjuggler-transforms">
+        <td><img src="docs/tutorial_3.png"  height = 300px ></td>
+    </a>
+   </tr>
+</table>
+
+## Supported plugins
+
+Some plugin can be found in a different repository. The individual README files
+*should* include all the information needed to compile and use the plugin.
+
+Please submit specific issues, Pull Requests and questions on the related Github repository:
+
+- [MQTT DataStreamer](https://github.com/PlotJuggler/plotjuggler-mqtt).
+- [Lab Streaming Layer DataStreamer](https://github.com/PlotJuggler/plotjuggler-lsl).
+- [ROS plugins](https://github.com/PlotJuggler/plotjuggler-ros-plugins).
+- [CAN .dbg DataLoader](https://github.com/PlotJuggler/plotjuggler-CAN-dbs).
+
+If you want a simple example to learn how to write your own plugins, have a look at
+[PlotJuggler/plotjuggler-sample-plugins](https://github.com/PlotJuggler/plotjuggler-sample-plugins)
 
 ## Installation
 
