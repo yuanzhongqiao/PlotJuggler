@@ -16,21 +16,15 @@ target_link_libraries( plotjuggler_plugin_base PRIVATE
     ${Qt5Widgets_LIBRARIES}
     ${catkin_LIBRARIES} )
 
-if(COMPILING_WITH_CATKIN)
-
-elseif(COMPILING_WITH_AMENT)
-    ament_export_targets(export_plotjuggler_plugin_base HAS_LIBRARY_TARGET)
-else()
-
-endif()
 
 install(
-    TARGETS plotjuggler_plugin_base
-    EXPORT export_plotjuggler_plugin_base
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    RUNTIME DESTINATION bin
-    INCLUDES DESTINATION include
-    )
+        TARGETS plotjuggler_plugin_base
+        EXPORT export_plotjuggler_plugin_base
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+        )
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include )
+

@@ -144,6 +144,7 @@ elseif(COMPILING_WITH_AMENT)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+    ament_export_targets(export_plotjuggler_plugin_base HAS_LIBRARY_TARGET)
     ament_package()
 
 else()
