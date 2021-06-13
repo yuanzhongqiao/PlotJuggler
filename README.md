@@ -80,7 +80,7 @@ Alternatively, you may download the Snaps version that include the ROS1 plugins:
 
 Clone the repository as usual:
 
-    git clone --recurse-submodules https://github.com/facontidavide/PlotJuggler.git
+    git clone https://github.com/facontidavide/PlotJuggler.git
 
 The only binary dependency that you need installed in your system is Qt5. 
 On Ubuntu, the debians can be installed with the the command:

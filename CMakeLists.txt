@@ -197,50 +197,7 @@ endif()
 add_subdirectory( 3rdparty/color_widgets )
 add_subdirectory( 3rdparty/Qt-Advanced-Docking )
 add_subdirectory( 3rdparty/qwt/src )
-
 add_subdirectory( 3rdparty/lua-5.4.1 )
-
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
-# Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message("git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
-        endif()
-    endif()
-endif()
-
-if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/paho.mqtt.c/CMakeLists.txt")
-    SET(PAHO_ENABLE_TESTING FALSE CACHE BOOL "Build tests and run" FORCE)
-    SET(PAHO_ENABLE_CPACK FALSE CACHE BOOL "Enable CPack" FORCE)
-
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        SET(PAHO_BUILD_STATIC FALSE CACHE BOOL "Build static library" FORCE)
-        SET(PAHO_BUILD_SHARED TRUE CACHE BOOL "Build shared library" FORCE)
-    else()
-        SET(PAHO_BUILD_STATIC TRUE CACHE BOOL "Build static library" FORCE)
-        SET(PAHO_BUILD_SHARED FALSE CACHE BOOL "Build shared library" FORCE)
-    endif()
-
-    SET(CMAKE_INSTALL_INCLUDEDIR )
-
-    #add_subdirectory( 3rdparty/paho.mqtt.c EXCLUDE_FROM_ALL)
-    #add_subdirectory( plotjuggler_plugins/DataStreamMQTT )
-endif()
-
-if(EXISTS "${PROJECT_SOURCE_DIR}/3rdparty/liblsl/CMakeLists.txt" AND NOT WIN32)
-    SET(LSL_ENABLE_TESTING FALSE CACHE BOOL "Build tests and run" FORCE)
-    SET(LSL_ENABLE_CPACK FALSE CACHE BOOL "Enable CPack" FORCE)
-    SET(LSL_BUILD_STATIC TRUE CACHE BOOL "Build static library" FORCE)
-    SET(LSL_BUILD_SHARED FALSE CACHE BOOL "Build shared library" FORCE)
-    #add_subdirectory( 3rdparty/liblsl )
-    #add_subdirectory( plotjuggler_plugins/DataStreamLSL )
-endif()
 
 add_subdirectory( plotjuggler_app )
 
