@@ -41,7 +41,7 @@ return integral</function>
   </snippet>
   <snippet name="rad_to_deg">
     <global></global>
-    <function>return value*180/3.1417</function>
+    <function>return value*180/3.14159</function>
     <linkedSource></linkedSource>
   </snippet>
   <snippet name="remove_offset">
