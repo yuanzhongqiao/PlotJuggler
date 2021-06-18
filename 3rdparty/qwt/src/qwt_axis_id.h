@@ -7,20 +7,22 @@
  * modify it under the terms of the Qwt License, Version 1.0
  *****************************************************************************/
 
-#ifndef QWT_H
-#define QWT_H
+#ifndef QWT_AXIS_ID_H
+#define QWT_AXIS_ID_H
 
 #include "qwt_global.h"
-
-class QSize;
+#include "qwt_axis.h"
 
 /*!
-   Some constants for use within Qwt.
- */
-namespace Qwt
-{
-}
+    \brief Axis identifier
 
-QWT_EXPORT QSize qwtExpandedToGlobalStrut( const QSize& );
+    An axis id is one of values of QwtAxis::Position.
+
+    QwtAxisId is a placeholder for future releases ( -> multiaxes branch ),
+    where it is possible to have more than one axis at each side of a plot.
+
+    \sa QwtAxis
+ */
+typedef int QwtAxisId;
 
 #endif
