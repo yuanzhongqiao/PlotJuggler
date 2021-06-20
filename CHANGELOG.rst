@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.2.1 (2021-06-20)
+------------------
 * adding string reference
 * qwt updated and fix for `#463 <https://github.com/facontidavide/PlotJuggler/issues/463>`_
 * fix `#461 <https://github.com/facontidavide/PlotJuggler/issues/461>`_
