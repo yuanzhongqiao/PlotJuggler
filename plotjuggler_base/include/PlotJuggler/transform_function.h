@@ -8,52 +8,92 @@
 
 namespace PJ {
 
-class TimeSeriesTransform : public PlotJugglerPlugin
+// Generic interface for a multi input - multi output transformation function.
+class TransformFunction : public PlotJugglerPlugin
+{
+  Q_OBJECT
+
+protected:
+  std::vector<const PlotData*> _src_vector;
+
+public:
+  using Ptr = std::shared_ptr<TransformFunction>;
+
+  TransformFunction()
+  {
+    reset();
+  }
+
+  virtual ~TransformFunction() = default;
+
+  virtual const char* name() const = 0;
+
+  virtual void reset() {}
+
+  virtual void setDataSource(const std::vector<const PlotData*>& src_data)
+  {
+    _src_vector = src_data;
+  }
+
+  virtual void calculate(std::vector<PlotData*>& dst_data) = 0;
+
+signals:
+  void parametersChanged();
+
+};
+
+// Simplified version with Single input and single output
+class TransformFunction_SISO : public TransformFunction
 {
   Q_OBJECT
 public:
 
-  TimeSeriesTransform(): _src_data(nullptr)
-  {
-    init();
-  }
+  TransformFunction_SISO() = default;
 
-  virtual ~TimeSeriesTransform() {}
-
-  void setDataSource(const PlotData *src_data){
-    _src_data = src_data;
-  }
-
-  virtual void init()
+  virtual void reset() override
   {
     _last_timestamp = - std::numeric_limits<double>::max();
   }
 
-  virtual const char* name() const = 0;
-
-  void calculate(PlotData* dst_data)
+  virtual void setDataSource(const std::vector<const PlotData*>& src_data) override
   {
-    if (_src_data->size() == 0)
+    if( src_data.size() != 1 )
+    {
+      throw std::runtime_error("Wrong number of input data sources");
+    }
+    _src_vector = src_data;
+  }
+
+  virtual void calculate(std::vector<PlotData*>& dst_vector) override
+  {
+    if( dst_vector.size() != 1 )
+    {
+      throw std::runtime_error("Wrong number of output data sources");
+    }
+
+    PlotData* dst_data = dst_vector.front();
+    if (dataSource()->size() == 0)
     {
       return;
     }
-    dst_data->setMaximumRangeX( _src_data->maximumRangeX() );
+    dst_data->setMaximumRangeX( dataSource()->maximumRangeX() );
     if (dst_data->size() != 0)
     {
       _last_timestamp = dst_data->back().x;
     }
 
-    int pos = _src_data->getIndexFromX( _last_timestamp );
+    int pos = dataSource()->getIndexFromX( _last_timestamp );
     size_t index = pos < 0 ? 0 : static_cast<size_t>(pos);
 
-    while(index < _src_data->size())
+    while(index < dataSource()->size())
     {
-      const auto& in_point = _src_data->at(index);
+      const auto& in_point = dataSource()->at(index);
 
       if (in_point.x >= _last_timestamp)
       {
         auto out_point = calculateNextPoint(index);
-        if (out_point){
+        if (out_point)
+        {
           dst_data->pushBack( std::move(out_point.value()) );
         }
         _last_timestamp = in_point.x;
@@ -62,32 +102,21 @@ public:
     }
   }
 
-  const PlotData* dataSource() const{
-    return _src_data;
-  }
-
-  QString alias() const {
-    return _alias;
-  }
-
-  void setAlias(QString alias) {
-    _alias = alias;
-  }
-
-signals:
-  void parametersChanged();
-
 protected:
 
-  const PlotData *_src_data;
-  QString _alias;
+  const PlotData* dataSource()
+  {
+    if( _src_vector.empty() )
+    {
+      return nullptr;
+    }
+    return _src_vector.front();
+  }
+
+  virtual std::optional<PlotData::Point> calculateNextPoint(size_t index) = 0;
+
   double _last_timestamp;
-
-  virtual std::optional<PlotData::Point>
-  calculateNextPoint(size_t index) = 0;
 };
-
-using TimeSeriesTransformPtr = std::shared_ptr<TimeSeriesTransform>;
 
 ///------ The factory to create instances of a SeriesTransform -------------
 
@@ -100,7 +129,7 @@ private:
   TransformFactory(const TransformFactory&) = delete;
   TransformFactory& operator=(const TransformFactory&) = delete;
 
-  std::map<std::string, std::function<TimeSeriesTransformPtr()>> creators_;
+  std::map<std::string, std::function<TransformFunction::Ptr()>> creators_;
   std::set<std::string> names_;
 
   static TransformFactory* instance();
@@ -119,7 +148,7 @@ public:
     instance()->creators_[name] = [](){ return std::make_shared<T>(); };
   }
 
-  static TimeSeriesTransformPtr create(const std::string& name)
+  static TransformFunction::Ptr create(const std::string& name)
   {
     auto it = instance()->creators_.find(name);
     if( it == instance()->creators_.end())
@@ -154,7 +183,12 @@ inline PJ::TransformFactory* PJ::TransformFactory::instance()
 
 
 QT_BEGIN_NAMESPACE
-#define TimeSeriesTransform_iid "facontidavide.PlotJuggler3.TimeSeriesTransform"
-Q_DECLARE_INTERFACE(PJ::TimeSeriesTransform, TimeSeriesTransform_iid)
+
+#define TransformFunction_iid "facontidavide.PlotJuggler3.TransformFunction"
+Q_DECLARE_INTERFACE(PJ::TransformFunction, TransformFunction_iid)
+
+#define TransformFunctionSISO_iid "facontidavide.PlotJuggler3.TransformFunctionSISO"
+Q_DECLARE_INTERFACE(PJ::TransformFunction_SISO, TransformFunctionSISO_iid)
+
 QT_END_NAMESPACE
 

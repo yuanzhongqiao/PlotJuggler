@@ -824,7 +824,7 @@ QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
       {
         QDomElement transform_el = doc.createElement("transform");
         transform_el.setAttribute("name", ts->transformName() );
-        transform_el.setAttribute("alias", ts->transform()->alias() );
+        transform_el.setAttribute("alias", ts->alias() );
         ts->transform()->xmlSaveState(doc, transform_el);
         curve_el.appendChild(transform_el);
       }
@@ -904,7 +904,7 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
           ts->transform()->xmlLoadState(transform_el);
           ts->updateCache(true);
           auto alias = transform_el.attribute("alias");
-          ts->transform()->setAlias( alias );
+          ts->setAlias( alias );
           curve->setTitle( alias );
         }
       }

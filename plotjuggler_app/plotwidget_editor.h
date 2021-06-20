@@ -92,7 +92,7 @@ private:
   void onDeleteRow(QWidget *w);
   void disableWidgets();
 
-  std::unordered_map<std::string, std::shared_ptr<TimeSeriesTransform>> _transforms;
+  std::unordered_map<std::string, std::shared_ptr<TransformFunction>> _transforms;
 };
 
 #endif // PLOTWIDGET_EDITOR_H
