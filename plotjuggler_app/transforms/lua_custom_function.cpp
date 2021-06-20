@@ -12,10 +12,10 @@ void LuaCustomFunction::initEngine()
 
   _lua_engine = std::unique_ptr<sol::state>(new sol::state());
   _lua_engine->open_libraries();
-  _lua_engine->script(_snippet.globalVars.toStdString());
+  _lua_engine->script(_snippet.global_vars.toStdString());
 
   auto calcMethodStr = QString("function calc(time, value");
-  for(int index = 1; index <= _snippet.additionalSources.size(); index++ )
+  for(int index = 1; index <= _snippet.additional_sources.size(); index++ )
   {
     calcMethodStr += QString(", v%1").arg(index);
   }
@@ -26,21 +26,21 @@ void LuaCustomFunction::initEngine()
   _lua_function = (*_lua_engine)["calc"];
 }
 
-void LuaCustomFunction::calculatePoints(const PlotData& src_data,
-                                        const std::vector<const PlotData*>& channels_data,
+void LuaCustomFunction::calculatePoints(const PlotData &src_data,
+                                        const std::vector<const PlotData *> &channels_data,
                                         size_t point_index,
                                         std::vector<PlotData::Point> &points)
 {
   std::unique_lock<std::mutex> lk(mutex_);
 
-  _chan_values.resize(channels_data.size());
+  _chan_values.resize( channels_data.size());
 
   const PlotData::Point& old_point = src_data.at(point_index);
 
   for (size_t chan_index = 0; chan_index < channels_data.size(); chan_index++)
   {
     double value;
-    const auto& chan_data = channels_data[chan_index];
+    const PlotData* chan_data = channels_data[chan_index];
     int index = chan_data->getIndexFromX(old_point.x);
     if (index != -1)
     {
@@ -56,7 +56,7 @@ void LuaCustomFunction::calculatePoints(const PlotData& src_data,
   sol::safe_function_result result;
   const auto& v = _chan_values;
   // ugly code, sorry
-  switch( _snippet.additionalSources.size() )
+  switch( _snippet.additional_sources.size() )
   {
   case 0: result = _lua_function(old_point.x, old_point.y);
     break;

@@ -28,6 +28,10 @@ public:
 
   virtual const char* name() const = 0;
 
+  virtual int numInputs() const = 0;
+
+  virtual int numOutputs() const = 0;
+
   virtual void reset() {}
 
   virtual void setDataSource(const std::vector<const PlotData*>& src_data)
@@ -50,14 +54,21 @@ public:
 
   TransformFunction_SISO() = default;
 
-  virtual void reset() override
-  {
+  void reset() override {
     _last_timestamp = - std::numeric_limits<double>::max();
+  }
+
+  int numInputs() const override {
+    return 1;
+  }
+
+  int numOutputs() const override {
+    return 1;
   }
 
   virtual void setDataSource(const std::vector<const PlotData*>& src_data) override
   {
-    if( src_data.size() != 1 )
+    if( src_data.size() != numInputs() )
     {
       throw std::runtime_error("Wrong number of input data sources");
     }
@@ -66,9 +77,9 @@ public:
 
   virtual void calculate(std::vector<PlotData*>& dst_vector) override
   {
-    if( dst_vector.size() != 1 )
+    if( dst_vector.size() != numOutputs() )
     {
-      throw std::runtime_error("Wrong number of output data sources");
+      throw std::runtime_error("Wrong number of output data destinations");
     }
 
     PlotData* dst_data = dst_vector.front();

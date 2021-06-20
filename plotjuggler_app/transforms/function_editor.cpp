@@ -176,7 +176,7 @@ QString FunctionEditorWidget::getLinkedData() const
   return ui->lineEditSource->text();
 }
 
-QString FunctionEditorWidget::getGlobalVars() const
+QString FunctionEditorWidget::getglobal_vars() const
 {
   return ui->globalVarsTextField->toPlainText();
 }
@@ -201,9 +201,9 @@ void FunctionEditorWidget::createNewPlot()
 
 void FunctionEditorWidget::editExistingPlot(CustomPlotPtr data)
 {
-  ui->globalVarsTextField->setPlainText(data->snippet().globalVars);
+  ui->globalVarsTextField->setPlainText(data->snippet().global_vars);
   ui->mathEquation->setPlainText(data->snippet().function);
-  setLinkedPlotName(QString::fromStdString(data->linkedPlotName()));
+  setLinkedPlotName( data->snippet().linked_source );
   ui->nameLineEdit->setText(QString::fromStdString(data->name()));
   ui->nameLineEdit->setEnabled(false);
 
@@ -212,7 +212,7 @@ void FunctionEditorWidget::editExistingPlot(CustomPlotPtr data)
   auto list_widget = ui->listAdditionalSources;
   list_widget->setRowCount(0);
 
-  for (QString curve_name: data->snippet().additionalSources) {
+  for (QString curve_name: data->snippet().additional_sources) {
     if( list_widget->findItems(curve_name, Qt::MatchExactly).isEmpty() &&
         curve_name != ui->lineEditSource->text() )
     {
@@ -307,14 +307,14 @@ void FunctionEditorWidget::importSnippets(const QByteArray& xml_text)
   {
     const auto& math_plot = custom_it.second;
     SnippetData snippet;
-    snippet.name = QString::fromStdString(math_plot->name());
+    snippet.alias_name = QString::fromStdString(math_plot->name());
 
-    if (_snipped_saved.count(snippet.name) > 0)
+    if (_snipped_saved.count(snippet.alias_name) > 0)
     {
       continue;
     }
 
-    snippet.globalVars = math_plot->snippet().globalVars;
+    snippet.global_vars = math_plot->snippet().global_vars;
     snippet.function = math_plot->snippet().function;
   }
   ui->snippetsListSaved->sortItems();
@@ -340,13 +340,13 @@ void FunctionEditorWidget::on_snippetsListSaved_currentRowChanged(int current_ro
 
   QString preview;
 
-  if( !snippet.globalVars.isEmpty() )
+  if( !snippet.global_vars.isEmpty() )
   {
-    preview +=  snippet.globalVars + "\n\n";
+    preview +=  snippet.global_vars + "\n\n";
   }
   preview += "function calc(time, value";
 
-  for (int i=1; i<= snippet.additionalSources.size(); i++)
+  for (int i=1; i<= snippet.additional_sources.size(); i++)
   {
     preview += QString(", v%1").arg(i);
   }
@@ -366,7 +366,7 @@ void FunctionEditorWidget::on_snippetsListSaved_doubleClicked(const QModelIndex&
   const auto& name = ui->snippetsListSaved->item(index.row())->text();
   const SnippetData& snippet = _snipped_saved.at(name);
 
-  ui->globalVarsTextField->setPlainText(snippet.globalVars);
+  ui->globalVarsTextField->setPlainText(snippet.global_vars);
   ui->mathEquation->setPlainText(snippet.function);
 }
 
@@ -493,8 +493,8 @@ void FunctionEditorWidget::on_buttonSaveCurrent_clicked()
   }
 
   SnippetData snippet;
-  snippet.name = name;
-  snippet.globalVars = ui->globalVarsTextField->toPlainText();
+  snippet.alias_name = name;
+  snippet.global_vars = ui->globalVarsTextField->toPlainText();
   snippet.function = ui->mathEquation->toPlainText();
 
   addToSaved(name, snippet);
@@ -546,7 +546,7 @@ void FunctionEditorWidget::onRenameSaved()
 
   SnippetData snippet = _snipped_saved[name];
   _snipped_saved.erase(name);
-  snippet.name = new_name;
+  snippet.alias_name = new_name;
 
   _snipped_saved.insert({ new_name, snippet });
   item->setText(new_name);
@@ -579,12 +579,12 @@ void FunctionEditorWidget::on_pushButtonCreate_clicked()
 
     SnippetData snippet;
     snippet.function = getEquation();
-    snippet.globalVars = getGlobalVars();
-    snippet.name = getName();
-    snippet.linkedSource = getLinkedData();
+    snippet.global_vars = getglobal_vars();
+    snippet.alias_name = getName();
+    snippet.linked_source = getLinkedData();
     for(int row = 0; row < ui->listAdditionalSources->rowCount(); row++)
     {
-      snippet.additionalSources.push_back( ui->listAdditionalSources->item(row,1)->text());
+      snippet.additional_sources.push_back( ui->listAdditionalSources->item(row,1)->text());
     }
 
     CustomPlotPtr plot = std::make_unique<LuaCustomFunction>(snippet);
@@ -692,12 +692,12 @@ void FunctionEditorWidget::on_updatePreview()
 
   SnippetData snippet;
   snippet.function = getEquation();
-  snippet.globalVars = getGlobalVars();
-  snippet.name = getName();
-  snippet.linkedSource = getLinkedData();
+  snippet.global_vars = getglobal_vars();
+  snippet.alias_name = getName();
+  snippet.linked_source = getLinkedData();
   for(int row = 0; row < ui->listAdditionalSources->rowCount(); row++)
   {
-    snippet.additionalSources.push_back( ui->listAdditionalSources->item(row,1)->text());
+    snippet.additional_sources.push_back( ui->listAdditionalSources->item(row,1)->text());
   }
 
   CustomPlotPtr plot;

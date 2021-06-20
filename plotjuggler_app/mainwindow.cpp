@@ -1354,7 +1354,7 @@ bool MainWindow::loadDataFromFile(const FileLoadInfo& info)
     {
       dst_data_it->second.clear();
     }
-    custom_it.second->clear();
+    custom_it.second->reset();
   }
 
   updateDataAndReplot(true);
@@ -1863,7 +1863,7 @@ bool MainWindow::loadLayoutFromFile(QString filename)
 
       if (prev_it == snippets_previous.end() ||
           prev_it->second.function != snippet_it.second.function ||
-          prev_it->second.globalVars != snippet_it.second.globalVars)
+          prev_it->second.global_vars != snippet_it.second.global_vars)
       {
         snippets_are_different = true;
         break;
@@ -2159,7 +2159,7 @@ void MainWindow::on_actionClearBuffer_triggered()
 
   for (auto& it : _custom_plots)
   {
-    it.second->clear();
+    it.second->reset();
   }
 
   forEachWidget([](PlotWidget* plot) {

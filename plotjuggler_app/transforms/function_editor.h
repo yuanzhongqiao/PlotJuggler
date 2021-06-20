@@ -31,7 +31,7 @@ public:
   void clear();
 
   QString getLinkedData() const;
-  QString getGlobalVars() const;
+  QString getglobal_vars() const;
   QString getEquation() const;
   QString getName() const;
 

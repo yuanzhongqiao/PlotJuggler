@@ -8,6 +8,7 @@
 #include <QDomDocument>
 #include <QString>
 #include "PlotJuggler/plotdata.h"
+#include "PlotJuggler/transform_function.h"
 
 using namespace PJ;
 
@@ -18,11 +19,11 @@ typedef std::unordered_map<std::string, CustomPlotPtr> CustomPlotMap;
 
 struct SnippetData
 {
-  QString name;
-  QString globalVars;
+  QString alias_name;
+  QString global_vars;
   QString function;
-  QString linkedSource;
-  QStringList additionalSources;
+  QString linked_source;
+  QStringList additional_sources;
 };
 
 typedef std::map<QString, SnippetData> SnippetsMap;
@@ -37,28 +38,29 @@ QDomElement ExportSnippetToXML(const SnippetData& snippet, QDomDocument& destina
 
 QDomElement ExportSnippets(const SnippetsMap& snippets, QDomDocument& destination_doc);
 
-
-class CustomFunction
+class CustomFunction : public PJ::TransformFunction
 {
 public:
 
   CustomFunction(const SnippetData& snippet);
 
-  void clear();
+  void reset() override;
 
-  void calculateAndAdd(PlotDataMapRef& plotData);
+  int numInputs() const override {
+    return int(_used_channels.size()) + 1;
+  }
+
+  int numOutputs() const override {
+    return 1;
+  }
+
+  void calculate(std::vector<PlotData*>& dst_data) override;
+
+  bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
+
+  bool xmlLoadState(const QDomElement& parent_element) override;
 
   const SnippetData& snippet() const;
-
-  const std::string& name() const;
-
-  const std::string& linkedPlotName() const;
-
-  QDomElement xmlSaveState(QDomDocument& doc) const;
-
-  static CustomPlotPtr createFromXML(QDomElement& element);
-
-  void calculate(const PlotDataMapRef& plotData, PlotData* dst_data);
 
   virtual QString language() const = 0;
 
