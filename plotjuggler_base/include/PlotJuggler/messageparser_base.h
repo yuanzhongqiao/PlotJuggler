@@ -80,6 +80,11 @@ protected:
   {
     return _plot_data.getOrCreateNumeric( key );
   }
+
+  StringSeries& getStringSeries(const std::string& key)
+  {
+    return _plot_data.getOrCreateStringSeries( key );
+  }
 };
 
 using MessageParserPtr = std::shared_ptr<MessageParser>;
