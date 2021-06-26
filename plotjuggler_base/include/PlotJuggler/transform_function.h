@@ -8,71 +8,65 @@
 
 namespace PJ {
 
-// Generic interface for a multi input - multi output transformation function.
+/** @brief Generic interface for a multi input - multi output transformation function.
+ * Contrariwise to other plugins, multiple instances of the this class might be created.
+ * For this reason, a TransformFactory is also defined
+ */
 class TransformFunction : public PlotJugglerPlugin
 {
   Q_OBJECT
 
-protected:
-  std::vector<const PlotData*> _src_vector;
-
-  PlotDataMapRef* _data;
-
 public:
   using Ptr = std::shared_ptr<TransformFunction>;
 
-  TransformFunction():
-    _data(nullptr)
-  {
-    reset();
-  }
+  TransformFunction();
 
   virtual ~TransformFunction() = default;
 
   virtual const char* name() const = 0;
 
+  /** Number of inputs. Return -1 if it is not a constant.
+  *
+  * When numInputs() > 0, then the data will be initialized using
+  * the method:
+  *     setDataSource(const std::vector<const PlotData*>& src_data)
+  *
+  * When  numInputs() == -1, then the number of inputs is undefined and the
+  * data will be initialized using the method_
+  *     setDataSource( PlotDataMapRef* data )
+  */
   virtual int numInputs() const = 0;
 
+  /** Number of outputs. Define the size of the vector used in:
+   *     calculate(std::vector<PlotData*>& dst_data)
+   */
   virtual int numOutputs() const = 0;
 
+  /** Clear the cache, state and any stored data */
   virtual void reset() {}
 
-  PlotDataMapRef* plotData()
-  {
+  PlotDataMapRef* plotData() {
     return _data;
   }
 
-  virtual void setDataSource(PlotDataMapRef* data )
-  {
-    if( numInputs() > 0 )
-    {
-      throw std::runtime_error("When numInputs() > 0, the method "
-                               "setDataSource(const std::vector<const PlotData*>&) "
-                               "should be used.");
-    }
-    _data = data;
-  }
+  virtual void setDataSource( PlotDataMapRef* data );
 
-  virtual void setDataSource(const std::vector<const PlotData*>& src_data)
-  {
-    if( src_data.size() != numInputs() )
-    {
-      throw std::runtime_error("Wrong number of input data sources "
-                               "in setDataSource");
-    }
-    _src_vector = src_data;
-  }
+  virtual void setDataSource(const std::vector<const PlotData*>& src_data);
 
   virtual void calculate(std::vector<PlotData*>& dst_data) = 0;
 
 signals:
   void parametersChanged();
 
+protected:
+  std::vector<const PlotData*> _src_vector;
+  PlotDataMapRef* _data;
+
 };
 
 using TransformsMap = std::unordered_map<std::string, std::shared_ptr<TransformFunction>>;
 
-// Simplified version with Single input and single output
+/// Simplified version with Single input and Single output
 class TransformFunction_SISO : public TransformFunction
 {
   Q_OBJECT
@@ -80,9 +74,7 @@ public:
 
   TransformFunction_SISO() = default;
 
-  void reset() override {
-    _last_timestamp = - std::numeric_limits<double>::max();
-  }
+  void reset() override;
 
   int numInputs() const override {
     return 1;
@@ -92,57 +84,15 @@ public:
     return 1;
   }
 
-  virtual void calculate(std::vector<PlotData*>& dst_vector) override
-  {
-    if( dst_vector.size() != numOutputs() )
-    {
-      throw std::runtime_error("Wrong number of output data destinations");
-    }
+  void calculate(std::vector<PlotData*>& dst_vector) override;
 
-    PlotData* dst_data = dst_vector.front();
-    if (dataSource()->size() == 0)
-    {
-      return;
-    }
-    dst_data->setMaximumRangeX( dataSource()->maximumRangeX() );
-    if (dst_data->size() != 0)
-    {
-      _last_timestamp = dst_data->back().x;
-    }
-
-    int pos = dataSource()->getIndexFromX( _last_timestamp );
-    size_t index = pos < 0 ? 0 : static_cast<size_t>(pos);
-
-    while(index < dataSource()->size())
-    {
-      const auto& in_point = dataSource()->at(index);
-
-      if (in_point.x >= _last_timestamp)
-      {
-        auto out_point = calculateNextPoint(index);
-        if (out_point)
-        {
-          dst_data->pushBack( std::move(out_point.value()) );
-        }
-        _last_timestamp = in_point.x;
-      }
-      index++;
-    }
-  }
+  /// Method to be implemented by the user to apply a statefull function to each point.
+  /// Index will increase monotonically, unless reset() is used.
+  virtual std::optional<PlotData::Point> calculateNextPoint(size_t index) = 0;
 
 protected:
 
-  const PlotData* dataSource()
-  {
-    if( _src_vector.empty() )
-    {
-      return nullptr;
-    }
-    return _src_vector.front();
-  }
-
-  virtual std::optional<PlotData::Point> calculateNextPoint(size_t index) = 0;
-
+  const PlotData* dataSource();
   double _last_timestamp;
 };
 
@@ -164,9 +114,7 @@ private:
 
 public:
 
-  static const std::set<std::string>& registeredTransforms() {
-    return instance()->names_;
-  }
+  static const std::set<std::string>& registeredTransforms();
 
   template <typename T> static void registerTransform()
   {
@@ -176,15 +124,7 @@ public:
     instance()->creators_[name] = [](){ return std::make_shared<T>(); };
   }
 
-  static TransformFunction::Ptr create(const std::string& name)
-  {
-    auto it = instance()->creators_.find(name);
-    if( it == instance()->creators_.end())
-    {
-      return {};
-    }
-    return it->second();
-  }
+  static TransformFunction::Ptr create(const std::string& name);
 };
 
 } // end namespace
@@ -192,22 +132,6 @@ public:
 Q_DECLARE_OPAQUE_POINTER(PJ::TransformFactory *)
 Q_DECLARE_METATYPE(PJ::TransformFactory *)
 Q_GLOBAL_STATIC(PJ::TransformFactory, _transform_factory_ptr_from_macro)
-
-inline PJ::TransformFactory* PJ::TransformFactory::instance()
-{
-  static TransformFactory * _ptr(nullptr);
-  if (!qApp->property("TransformFactory").isValid() && !_ptr) {
-    _ptr = _transform_factory_ptr_from_macro;
-    qApp->setProperty("TransformFactory", QVariant::fromValue(_ptr));
-  }
-  else if (!_ptr) {
-    _ptr = qvariant_cast<TransformFactory *>(qApp->property("TransformFactory"));
-  }
-  else if (!qApp->property("TransformFactory").isValid()) {
-    qApp->setProperty("TransformFactory", QVariant::fromValue(_ptr));
-  }
-  return _ptr;
-}
 
 
 QT_BEGIN_NAMESPACE

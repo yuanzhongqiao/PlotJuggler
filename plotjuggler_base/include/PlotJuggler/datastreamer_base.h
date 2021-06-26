@@ -10,71 +10,80 @@
 namespace PJ {
 
 /**
- * @brief The DataStreamer base class to create your own plugin.
+ * @brief The DataStreamer base classm used to read streaming of data.
  *
- * Important. To avoid problems with thread safety, it is important that ANY update to
- * dataMap(), which share its elements with the main application, is protected by the mutex()
- *
- * In particular the periodic updates.
+ * Important. To avoid problems with thread safety, ANY update to
+ * dataMap(), which share its elements with the main application, must be protected
+ * using the mutex().
  */
 class DataStreamer : public PlotJugglerPlugin
 {
   Q_OBJECT
 public:
 
-  DataStreamer(): _available_parsers(nullptr) {}
-
-  virtual bool start(QStringList*) = 0;
-
-  virtual void shutdown() = 0;
-
-  virtual bool isRunning() const = 0;
+  DataStreamer() = default;
 
   virtual ~DataStreamer() = default;
 
-  std::mutex& mutex()
-  {
+  /**
+   * @brief start streaming.
+   *
+   * @param optional list of pre selected sources.
+   * @return true if started correctly.
+   */
+  virtual bool start(QStringList* pre_selected_sources) = 0;
+
+  /**
+   * @brief shutdown Stop streaming
+   */
+  virtual void shutdown() = 0;
+
+  /**
+   * @brief isRunning
+   *
+   * @return true if start() called, false after shutwodn()
+   */
+  virtual bool isRunning() const = 0;
+
+
+  std::mutex& mutex() {
     return _mutex;
   }
 
   void setMaximumRangeX(double range);
 
-  PlotDataMapRef& dataMap()
-  {
+  PlotDataMapRef& dataMap() {
     return _data_map;
   }
 
-  const PlotDataMapRef& dataMap() const
-  {
+  const PlotDataMapRef& dataMap() const {
     return _data_map;
   }
 
-  void setAvailableParsers(std::shared_ptr<MessageParserFactory> parsers )
-  {
-    _available_parsers = parsers;
-  }
+  /**
+   * @brief setAvailableParsers is invoked by the main application to share
+   * the MessageParserFactory instance.
+   *
+   * @param parsers
+   */
+  void setAvailableParsers(std::shared_ptr<MessageParserFactory> parsers_factory );
 
-  std::shared_ptr<MessageParserFactory> availableParsers()
-  {
-    if( _available_parsers && _available_parsers->empty() )
-    {
-      return {};
-    }
-    return _available_parsers;
-  }
+  std::shared_ptr<MessageParserFactory> availableParsers();
 
 signals:
 
-  // Request to clear previous data
+  /// Request the main application to clear previous data points
   void clearBuffers();
 
-  // Remove a list of timeseries
+  /// All the series which share this group, will be deleted
   void removeGroup(std::string group_name);
 
-  // signal published periodically when there is new data
+  /// Signal to be published periodically to notify to the main app
+  /// that new data is available.
   void dataReceived();
 
-  // Stopping a plugin from the "inside"
+  /// The method shutdown () is used by the main app to stop streaming.
+  /// When the plugin stops itself, this signal must be emitted.
   void closed();
 
 private:
@@ -84,27 +93,9 @@ private:
   std::shared_ptr<MessageParserFactory> _available_parsers;
 };
 
-inline void DataStreamer::setMaximumRangeX(double range)
-{
-  std::lock_guard<std::mutex> lock(mutex());
-  for (auto& it : dataMap().numeric)
-  {
-    it.second.setMaximumRangeX(range);
-  }
-  for (auto& it : dataMap().strings)
-  {
-    it.second.setMaximumRangeX(range);
-  }
-  for (auto& it : dataMap().user_defined)
-  {
-    it.second.setMaximumRangeX(range);
-  }
-}
-
 using DataStreamerPtr = std::shared_ptr<DataStreamer>;
 
 }
-
 
 QT_BEGIN_NAMESPACE
 #define DataStream_iid "facontidavide.PlotJuggler3.DataStreamer"

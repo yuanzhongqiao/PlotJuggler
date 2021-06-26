@@ -17,6 +17,8 @@ set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-point
 
 include_directories( plotjuggler_base/include )
 
+add_definitions( -DFMT_HEADER_ONLY )
+
 # http://answers.ros.org/question/230877/optionally-build-a-package-with-catkin/
 if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
     set(COMPILING_WITH_CATKIN 1)
@@ -135,13 +137,17 @@ include_directories(
 
 qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/dataloader_base.h
-  plotjuggler_base/include/PlotJuggler/datastreamer_base.h
   plotjuggler_base/include/PlotJuggler/statepublisher_base.h
-  plotjuggler_base/include/PlotJuggler/transform_function.h
   plotjuggler_base/include/PlotJuggler/toolbox_base.h
+  plotjuggler_base/include/PlotJuggler/datastreamer_base.h
+  plotjuggler_base/include/PlotJuggler/transform_function.h
 )
 
-add_library( plotjuggler_plugin_base STATIC ${PLOTJUGGLER_BASE_MOCS} )
+add_library( plotjuggler_plugin_base STATIC
+    ${PLOTJUGGLER_BASE_MOCS}
+     plotjuggler_base/src/plotdata.cpp
+     plotjuggler_base/src/datastreamer_base.cpp
+     plotjuggler_base/src/transform_function.cpp)
 
 #########################  INSTALL  ####################################
 

@@ -14,6 +14,9 @@
 #include <QPixmap>
 #include <QDebug>
 
+// Useful function to change the color of SVG icons programmatically.
+// Useful to switch between dark view and light view.
+// To work, the SVG file must use the color #ffffff and #000000 only.
 inline QIcon LoadSvgIcon(QString filename, QString style_name = "light")
 {
   QFile file(filename);
