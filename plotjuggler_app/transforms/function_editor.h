@@ -16,7 +16,7 @@ class FunctionEditorWidget : public QWidget
 
 public:
   explicit FunctionEditorWidget(PlotDataMapRef& plotMapData,
-                                const CustomPlotMap& mapped_custom_plots,
+                                const TransformsMap& mapped_custom_plots,
                                 QWidget* parent);
   virtual ~FunctionEditorWidget() override;
 
@@ -96,7 +96,7 @@ private:
   QTimer _update_preview_timer;
 
   PlotDataMapRef& _plot_map_data;
-  const CustomPlotMap& _custom_plots;
+  const TransformsMap& _transform_maps;
   Ui::FunctionEditor* ui;
 
   int _v_count;

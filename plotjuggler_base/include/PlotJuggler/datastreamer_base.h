@@ -49,16 +49,16 @@ public:
     return _data_map;
   }
 
-  void setAvailableParsers(MessageParserFactory* parsers )
+  void setAvailableParsers(std::shared_ptr<MessageParserFactory> parsers )
   {
     _available_parsers = parsers;
   }
 
-  MessageParserFactory* availableParsers()
+  std::shared_ptr<MessageParserFactory> availableParsers()
   {
     if( _available_parsers && _available_parsers->empty() )
     {
-      return nullptr;
+      return {};
     }
     return _available_parsers;
   }
@@ -81,7 +81,7 @@ private:
   std::mutex _mutex;
   PlotDataMapRef _data_map;
   QAction* _start_streamer;
-  MessageParserFactory* _available_parsers;
+  std::shared_ptr<MessageParserFactory> _available_parsers;
 };
 
 inline void DataStreamer::setMaximumRangeX(double range)

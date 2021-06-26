@@ -1,6 +1,6 @@
 #include "lua_custom_function.h"
 
-LuaCustomFunction::LuaCustomFunction(const SnippetData& snippet)
+LuaCustomFunction::LuaCustomFunction(SnippetData snippet)
   : CustomFunction(snippet)
 {
   initEngine();
@@ -127,4 +127,11 @@ void LuaCustomFunction::calculatePoints(const PlotData &src_data,
     throw std::runtime_error("Lua Engine : return either a single value, two values (time, value) "
                              "or an array of two-sized arrays (time, value)");
   }
+}
+
+bool LuaCustomFunction::xmlLoadState(const QDomElement &parent_element)
+{
+  bool ret = CustomFunction::xmlLoadState(parent_element);
+  initEngine();
+  return ret;
 }

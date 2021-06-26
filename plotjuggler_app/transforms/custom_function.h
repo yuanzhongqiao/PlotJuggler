@@ -15,7 +15,6 @@ using namespace PJ;
 class CustomFunction;
 
 typedef std::shared_ptr<CustomFunction> CustomPlotPtr;
-typedef std::unordered_map<std::string, CustomPlotPtr> CustomPlotMap;
 
 struct SnippetData
 {
@@ -42,19 +41,25 @@ class CustomFunction : public PJ::TransformFunction
 {
 public:
 
-  CustomFunction(const SnippetData& snippet);
+  CustomFunction(SnippetData snippet = {});
+
+  void setSnippet(const SnippetData& snippet);
 
   void reset() override;
 
   int numInputs() const override {
-    return int(_used_channels.size()) + 1;
+    return -1;
   }
 
   int numOutputs() const override {
     return 1;
   }
 
-  void calculate(std::vector<PlotData*>& dst_data) override;
+  QString aliasName() const {
+    return _snippet.alias_name;
+  }
+
+  void calculate(std::vector<PlotData*>& dst_vector) override;
 
   bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
 
@@ -66,15 +71,18 @@ public:
 
   virtual void initEngine() = 0;
 
-  virtual void calculatePoints(const PlotData& src_data,
-                               const std::vector<const PlotData*>& channels_data,
-                               size_t point_index,
-                               std::vector<PlotData::Point> &new_points) = 0;
+  void calculateAndAdd(PlotDataMapRef &src_data);
+
+  virtual void calculatePoints(
+      const PlotData& src_data,
+      const std::vector<const PlotData*>& channels_data,
+      size_t point_index,
+      std::vector<PlotData::Point> &new_points) = 0;
 
 protected:
-  const SnippetData _snippet;
-  const std::string _linked_plot_name;
-  const std::string _plot_name;
+  SnippetData _snippet;
+  std::string _linked_plot_name;
+  std::string _plot_name;
 
   std::vector<std::string> _used_channels;
 };

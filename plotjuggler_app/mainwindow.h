@@ -106,12 +106,14 @@ private:
   CurveListPanel* _curvelist_widget;
 
   PlotDataMapRef _mapped_plot_data;
-  CustomPlotMap _custom_plots;
+
+  TransformsMap _transform_functions;
 
   std::map<QString, DataLoaderPtr> _data_loader;
   std::map<QString, StatePublisherPtr> _state_publisher;
   std::map<QString, DataStreamerPtr> _data_streamer;
-  std::map<QString, std::shared_ptr<MessageParserCreator>> _message_parser_factory;
+
+  std::shared_ptr<MessageParserFactory> _message_parser_factory;
 
   std::shared_ptr<DataStreamer> _active_streamer_plugin;
 

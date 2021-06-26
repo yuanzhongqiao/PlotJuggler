@@ -68,11 +68,11 @@ void FunctionEditorWidget::on_stylesheetChanged(QString theme)
 }
 
 FunctionEditorWidget::FunctionEditorWidget(PlotDataMapRef& plotMapData,
-                                           const CustomPlotMap& mapped_custom_plots,
+                                           const TransformsMap &mapped_custom_plots,
                                            QWidget* parent)
   : QWidget(parent)
   , _plot_map_data(plotMapData)
-  , _custom_plots(mapped_custom_plots)
+  , _transform_maps(mapped_custom_plots)
   , ui(new Ui::FunctionEditor)
   , _v_count(1)
   , _preview_widget(new PlotWidget(_local_plot_data, this))
@@ -204,7 +204,7 @@ void FunctionEditorWidget::editExistingPlot(CustomPlotPtr data)
   ui->globalVarsTextField->setPlainText(data->snippet().global_vars);
   ui->mathEquation->setPlainText(data->snippet().function);
   setLinkedPlotName( data->snippet().linked_source );
-  ui->nameLineEdit->setText(QString::fromStdString(data->name()));
+  ui->nameLineEdit->setText( data->aliasName() );
   ui->nameLineEdit->setEnabled(false);
 
   _editor_mode = MODIFY;
@@ -303,11 +303,14 @@ void FunctionEditorWidget::importSnippets(const QByteArray& xml_text)
     ui->snippetsListSaved->addItem(it.first);
   }
 
-  for (const auto& custom_it : _custom_plots)
+  for (const auto& custom_it : _transform_maps)
   {
-    const auto& math_plot = custom_it.second;
+    auto math_plot = dynamic_cast<LuaCustomFunction*>( custom_it.second.get() );
+    if ( !math_plot ){
+      continue;
+    }
     SnippetData snippet;
-    snippet.alias_name = QString::fromStdString(math_plot->name());
+    snippet.alias_name = math_plot->aliasName();
 
     if (_snipped_saved.count(snippet.alias_name) > 0)
     {
@@ -559,7 +562,7 @@ void FunctionEditorWidget::on_pushButtonCreate_clicked()
   {
     std::string new_plot_name = getName().toStdString();
 
-    if (_editor_mode == CREATE && _custom_plots.count(new_plot_name) != 0)
+    if (_editor_mode == CREATE && _transform_maps.count(new_plot_name) != 0)
     {
       QMessageBox msgBox(this);
       msgBox.setWindowTitle("Warning");
@@ -665,7 +668,7 @@ void FunctionEditorWidget::on_updatePreview()
   QString errors;
   std::string new_plot_name = ui->nameLineEdit->text().toStdString();
 
-  if ( _custom_plots.count(new_plot_name) != 0 )
+  if ( _transform_maps.count(new_plot_name) != 0 )
   {
     if( ui->lineEditSource->text().toStdString() == new_plot_name ||
         ui->listAdditionalSources->findItems(getName(), Qt::MatchExactly).isEmpty() == false )
@@ -679,7 +682,7 @@ void FunctionEditorWidget::on_updatePreview()
   }
   else{
     // check if name is unique (except if is custom_plot)
-    if (_plot_map_data.numeric.count(new_plot_name) != 0 && _custom_plots.count(new_plot_name) == 0)
+    if (_plot_map_data.numeric.count(new_plot_name) != 0 && _transform_maps.count(new_plot_name) == 0)
     {
       errors+= "- Plot name already exists and can't be modified.\n";
     }
@@ -700,9 +703,9 @@ void FunctionEditorWidget::on_updatePreview()
     snippet.additional_sources.push_back( ui->listAdditionalSources->item(row,1)->text());
   }
 
-  CustomPlotPtr plot;
+  CustomPlotPtr lua_function;
   try {
-    plot = std::make_unique<LuaCustomFunction>(snippet);
+    lua_function = std::make_unique<LuaCustomFunction>(snippet);
     ui->buttonSaveCurrent->setEnabled(true);
   } catch (...)
   {
@@ -710,13 +713,15 @@ void FunctionEditorWidget::on_updatePreview()
     ui->buttonSaveCurrent->setEnabled(false);
   }
 
-  if( plot )
+  if( lua_function )
   {
     try {
       std::string name = new_plot_name.empty() ? "no_name" : new_plot_name;
       PlotData& out_data = _local_plot_data.addNumeric(name)->second;
       out_data.clear();
-      plot->calculate(_plot_map_data, &out_data);
+      lua_function->setDataSource( &_plot_map_data );
+      std::vector<PlotData*> out_vector = {&out_data};
+      lua_function->calculate(out_vector);
 
       _preview_widget->removeAllCurves();
       _preview_widget->addCurve(name, Qt::blue);

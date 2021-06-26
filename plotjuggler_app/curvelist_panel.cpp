@@ -24,14 +24,14 @@
 //-------------------------------------------------
 
 CurveListPanel::CurveListPanel(PlotDataMapRef& mapped_plot_data,
-                               const CustomPlotMap& mapped_math_plots,
+                               const TransformsMap &mapped_math_plots,
                                QWidget* parent)
   : QWidget(parent)
   , ui(new Ui::CurveListPanel)
   , _plot_data( mapped_plot_data )
   , _custom_view(new CurveTableView(this))
   , _tree_view(new CurveTreeView(this))
-  , _custom_plots(mapped_math_plots)
+  , _transforms_map(mapped_math_plots)
   , _column_width_dirty (true)
 {
   ui->setupUi(this);

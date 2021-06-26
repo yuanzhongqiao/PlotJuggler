@@ -7,7 +7,8 @@
 class LuaCustomFunction : public CustomFunction
 {
 public:
-  LuaCustomFunction(const SnippetData& snippet);
+
+  LuaCustomFunction(SnippetData snippet = {});
 
   void initEngine() override;
 
@@ -20,6 +21,13 @@ public:
   {
     return "LUA";
   }
+
+  const char* name() const override
+  {
+    return "LuaCustomFunction";
+  }
+
+  bool xmlLoadState(const QDomElement& parent_element) override;
 
 private:
   std::unique_ptr<sol::state> _lua_engine;

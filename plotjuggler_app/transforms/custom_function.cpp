@@ -6,11 +6,18 @@
 #include <QElapsedTimer>
 #include "lua_custom_function.h"
 
-CustomFunction::CustomFunction(const SnippetData& snippet):
-  _snippet(snippet)
-, _linked_plot_name(snippet.linked_source.toStdString())
-, _plot_name(snippet.alias_name.toStdString())
+CustomFunction::CustomFunction(SnippetData snippet)
 {
+  setSnippet(snippet);
+}
+
+void CustomFunction::setSnippet(const SnippetData &snippet)
+{
+  _snippet = snippet;
+  _linked_plot_name = snippet.linked_source.toStdString();
+  _plot_name = snippet.alias_name.toStdString();
+
+  _used_channels.clear();
   for( QString source: snippet.additional_sources){
     _used_channels.push_back( source.toStdString() );
   }
@@ -22,14 +29,16 @@ void CustomFunction::reset()
   // initEngine();
 }
 
-void CustomFunction::calculateAndAdd(PlotDataMapRef& plotData)
+void CustomFunction::calculateAndAdd(PlotDataMapRef& src_data)
 {
+  setDataSource( &src_data );
+
   bool newly_added = false;
 
-  auto dst_data_it = plotData.numeric.find(_plot_name);
-  if (dst_data_it == plotData.numeric.end())
+  auto dst_data_it = plotData()->numeric.find(_plot_name);
+  if (dst_data_it == plotData()->numeric.end())
   {
-    dst_data_it = plotData.addNumeric(_plot_name);
+    dst_data_it = plotData()->addNumeric(_plot_name);
     newly_added = true;
   }
 
@@ -38,13 +47,14 @@ void CustomFunction::calculateAndAdd(PlotDataMapRef& plotData)
 
   try
   {
-    calculate(plotData, &dst_data);
+    std::vector<PlotData*> dst_vector = { &dst_data };
+    calculate( dst_vector );
   }
   catch (...)
   {
     if (newly_added)
     {
-      plotData.numeric.erase(dst_data_it);
+      plotData()->numeric.erase(dst_data_it);
     }
     std::rethrow_exception(std::current_exception());
   }
@@ -55,11 +65,16 @@ const SnippetData &CustomFunction::snippet() const
   return _snippet;
 }
 
-void CustomFunction::calculate(const PlotDataMapRef& plotData,
-                               PlotData* dst_data)
+void CustomFunction::calculate(std::vector<PlotData*>& dst_vector)
 {
-  auto src_data_it = plotData.numeric.find(_linked_plot_name);
-  if (src_data_it == plotData.numeric.end())
+  if( dst_vector.size() != numOutputs() )
+  {
+    throw std::runtime_error("Wrong number of outputs");
+  }
+  auto dst_data = dst_vector.front();
+
+  auto src_data_it = plotData()->numeric.find(_linked_plot_name);
+  if (src_data_it == plotData()->numeric.end())
   {
     // failed! keep it empty
     return;
@@ -79,8 +94,8 @@ void CustomFunction::calculate(const PlotDataMapRef& plotData,
 
   for (const auto& channel : _used_channels)
   {
-    auto it = plotData.numeric.find(channel);
-    if (it == plotData.numeric.end())
+    auto it = plotData()->numeric.find(channel);
+    if (it == plotData()->numeric.end())
     {
       throw std::runtime_error("Invalid channel name");
     }
@@ -109,16 +124,16 @@ void CustomFunction::calculate(const PlotDataMapRef& plotData,
   }
 }
 
-
-QDomElement CustomFunction::xmlSaveState(QDomDocument& doc) const
+bool CustomFunction::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const
 {
-  return ExportSnippetToXML(_snippet, doc);
+  parent_element.appendChild( ExportSnippetToXML(_snippet, doc) );
+  return true;
 }
 
-CustomPlotPtr CustomFunction::createFromXML(QDomElement& element)
+bool CustomFunction::xmlLoadState(const QDomElement &parent_element)
 {
-  SnippetData snippet = GetSnippetFromXML(element);
-  return std::make_unique<LuaCustomFunction>(snippet);
+  setSnippet ( GetSnippetFromXML(parent_element) );
+  return true;
 }
 
 SnippetsMap GetSnippetsFromXML(const QString& xml_text)

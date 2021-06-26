@@ -16,10 +16,13 @@ class TransformFunction : public PlotJugglerPlugin
 protected:
   std::vector<const PlotData*> _src_vector;
 
+  PlotDataMapRef* _data;
+
 public:
   using Ptr = std::shared_ptr<TransformFunction>;
 
-  TransformFunction()
+  TransformFunction():
+    _data(nullptr)
   {
     reset();
   }
@@ -34,8 +37,29 @@ public:
 
   virtual void reset() {}
 
+  PlotDataMapRef* plotData()
+  {
+    return _data;
+  }
+
+  virtual void setDataSource(PlotDataMapRef* data )
+  {
+    if( numInputs() > 0 )
+    {
+      throw std::runtime_error("When numInputs() > 0, the method "
+                               "setDataSource(const std::vector<const PlotData*>&) "
+                               "should be used.");
+    }
+    _data = data;
+  }
+
   virtual void setDataSource(const std::vector<const PlotData*>& src_data)
   {
+    if( src_data.size() != numInputs() )
+    {
+      throw std::runtime_error("Wrong number of input data sources "
+                               "in setDataSource");
+    }
     _src_vector = src_data;
   }
 
@@ -45,6 +69,8 @@ signals:
   void parametersChanged();
 
 };
+
+using TransformsMap = std::unordered_map<std::string, std::shared_ptr<TransformFunction>>;
 
 // Simplified version with Single input and single output
 class TransformFunction_SISO : public TransformFunction
@@ -64,15 +90,6 @@ public:
 
   int numOutputs() const override {
     return 1;
-  }
-
-  virtual void setDataSource(const std::vector<const PlotData*>& src_data) override
-  {
-    if( src_data.size() != numInputs() )
-    {
-      throw std::runtime_error("Wrong number of input data sources");
-    }
-    _src_vector = src_data;
   }
 
   virtual void calculate(std::vector<PlotData*>& dst_vector) override

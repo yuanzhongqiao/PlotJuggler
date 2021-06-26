@@ -12,6 +12,9 @@ add_definitions(
     -DPJ_MINOR_VERSION="2"
     -DPJ_PATCH_VERSION="0" )
 
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+
 include_directories( plotjuggler_base/include )
 
 # http://answers.ros.org/question/230877/optionally-build-a-package-with-catkin/
@@ -135,6 +138,7 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/datastreamer_base.h
   plotjuggler_base/include/PlotJuggler/statepublisher_base.h
   plotjuggler_base/include/PlotJuggler/transform_function.h
+  plotjuggler_base/include/PlotJuggler/toolbox_base.h
 )
 
 add_library( plotjuggler_plugin_base STATIC ${PLOTJUGGLER_BASE_MOCS} )
