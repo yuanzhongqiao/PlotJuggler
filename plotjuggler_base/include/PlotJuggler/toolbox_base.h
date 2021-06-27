@@ -10,7 +10,7 @@
 
 namespace PJ {
 
-class ToolboxPlugin : public PlotJugglerPlugin
+class ToolboxPlugin : public QObject, public PlotJugglerPlugin
 {
   Q_OBJECT
 

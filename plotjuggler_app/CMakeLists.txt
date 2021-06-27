@@ -48,6 +48,7 @@ SET( PLOtJUGGLER_SRC
     new_release_dialog.cpp
     plotlegend.cpp
     plotwidget.cpp
+    plotwidget_proxy.cpp
     plotwidget_editor.cpp
     plotwidget_transforms.cpp
     plot_docker.cpp

@@ -12,7 +12,7 @@ namespace PJ {
 /**
  * @brief The PlotJugglerPlugin is the base class of all the plugins.
  */
-class PlotJugglerPlugin : public QObject
+class PlotJugglerPlugin
 {
 public:
   PlotJugglerPlugin() = default;

@@ -11,7 +11,7 @@
 
 namespace PJ {
 
-class StatePublisher : public PlotJugglerPlugin
+class StatePublisher : public QObject, public PlotJugglerPlugin
 {
   Q_OBJECT
 public:
