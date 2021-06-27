@@ -29,36 +29,6 @@
 #include "PlotJuggler/svg_util.h"
 #include "ui_function_editor_help.h"
 
-//class Highlighter : public QSyntaxHighlighter
-//{
-//    Q_OBJECT
-
-//public:
-//    Highlighter(QTextDocument *parent = nullptr);
-
-//protected:
-//    void highlightBlock(const QString &text) override;
-
-//private:
-//    struct HighlightingRule
-//    {
-//        QRegularExpression pattern;
-//        QTextCharFormat format;
-//    };
-//    QVector<HighlightingRule> highlightingRules;
-
-//    QRegularExpression commentStartExpression;
-//    QRegularExpression commentEndExpression;
-
-//    QTextCharFormat keywordFormat;
-//    QTextCharFormat classFormat;
-//    QTextCharFormat singleLineCommentFormat;
-//    QTextCharFormat multiLineCommentFormat;
-//    QTextCharFormat quotationFormat;
-//    QTextCharFormat functionFormat;
-//};
-
-
 void FunctionEditorWidget::on_stylesheetChanged(QString theme)
 {
   ui->pushButtonDeleteCurves->setIcon(LoadSvgIcon(":/resources/svg/remove_red.svg", theme));

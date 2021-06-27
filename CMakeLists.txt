@@ -214,6 +214,7 @@ add_subdirectory( plotjuggler_plugins/DataStreamSample )
 add_subdirectory( plotjuggler_plugins/DataStreamWebsocket )
 add_subdirectory( plotjuggler_plugins/DataStreamUDP )
 add_subdirectory( plotjuggler_plugins/StatePublisherCSV )
+add_subdirectory( plotjuggler_plugins/ToolboxQuaternion )
 
 if( ZMQ_FOUND )
   add_subdirectory( plotjuggler_plugins/DataStreamZMQ )

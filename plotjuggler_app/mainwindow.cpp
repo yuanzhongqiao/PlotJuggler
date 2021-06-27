@@ -550,6 +550,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       StatePublisher* publisher = qobject_cast<StatePublisher*>(plugin);
       DataStreamer* streamer = qobject_cast<DataStreamer*>(plugin);
       MessageParserCreator* message_parser =  qobject_cast<MessageParserCreator*>(plugin);
+      ToolboxPlugin* toolbox = qobject_cast<ToolboxPlugin*>(plugin);
 
       QString plugin_name;
 
@@ -695,6 +696,30 @@ QStringList MainWindow::initializePlugins(QString directory_name)
             }
           });
         }
+      }
+      else if(toolbox)
+      {
+        toolbox->init( _mapped_plot_data, _transform_functions );
+
+        auto action = ui->menuTools->addAction( toolbox->name() );
+
+        int new_index = ui->widgetStack->count();
+        auto provided =  toolbox->providedWidget();
+        auto widget =  provided.first;
+        ui->widgetStack->addWidget( widget );
+
+        connect( action, &QAction::triggered,
+                 toolbox, &ToolboxPlugin::onShowWidget );
+
+        connect( action, &QAction::triggered,
+                 this, [=]() {
+          ui->widgetStack->setCurrentIndex(new_index);
+        });
+
+        connect( toolbox, &ToolboxPlugin::closed,
+                 this, [=]() {
+          ui->widgetStack->setCurrentIndex(0);
+        });
       }
     }
     else

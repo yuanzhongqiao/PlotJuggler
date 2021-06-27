@@ -20,6 +20,7 @@
 #include "utils.h"
 #include "PlotJuggler/dataloader_base.h"
 #include "PlotJuggler/statepublisher_base.h"
+#include "PlotJuggler/toolbox_base.h"
 #include "PlotJuggler/datastreamer_base.h"
 #include "transforms/custom_function.h"
 #include "transforms/function_editor.h"

@@ -31,18 +31,14 @@ struct FileLoadInfo
 class DataLoader : public PlotJugglerPlugin
 {
 public:
-  DataLoader()
-  {
-  }
+  DataLoader() = default;
+
+  virtual ~DataLoader() = default;
 
   /// Provide a list of file extensions that this plugin can open
   virtual const std::vector<const char*>& compatibleFileExtensions() const = 0;
 
   virtual bool readDataFromFile(FileLoadInfo* fileload_info, PlotDataMapRef& destination) = 0;
-
-  virtual ~DataLoader() = default;
-
-protected:
 };
 
 using DataLoaderPtr = std::shared_ptr<DataLoader>;

@@ -18,11 +18,8 @@ public:
 
   ToolboxPlugin() = default;
 
-  virtual void setDataSource( PlotDataMapRef& src_data, TransformsMap& transform_map)
-  {
-    _src_data = &src_data;
-    _transform_map = &transform_map;
-  }
+  virtual void init( PlotDataMapRef& src_data,
+                     TransformsMap& transform_map) = 0;
 
   virtual ~ToolboxPlugin() = default;
 
@@ -31,19 +28,18 @@ public:
     FIXED
   };
 
-  std::pair<QWidget*, WidgetType> providedWidget() const;
+  virtual std::pair<QWidget*, WidgetType> providedWidget() const = 0;
 
 public slots:
 
-  virtual bool onShowWidget(PlotDataMapRef& data) = 0;
+  virtual bool onShowWidget() = 0;
 
 signals:
 
   void plotCreated(QString plot_name, bool is_custom);
 
-protected:
-  PlotDataMapRef* _src_data = nullptr;
-  TransformsMap* _transform_map = nullptr;
+  void closed();
+
 };
 
 using ToolboxPluginPtr = std::shared_ptr<ToolboxPlugin>;
