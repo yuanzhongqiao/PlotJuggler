@@ -141,13 +141,22 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/toolbox_base.h
   plotjuggler_base/include/PlotJuggler/datastreamer_base.h
   plotjuggler_base/include/PlotJuggler/transform_function.h
+  plotjuggler_base/include/PlotJuggler/plotwidget_base.h
+  plotjuggler_base/include/PlotJuggler/plotzoomer.h
+  plotjuggler_base/include/PlotJuggler/plotmagnifier.h
+  plotjuggler_base/include/PlotJuggler/plotlegend.h
 )
 
-add_library( plotjuggler_plugin_base STATIC
+add_library( plotjuggler_plugin_base SHARED
     ${PLOTJUGGLER_BASE_MOCS}
      plotjuggler_base/src/plotdata.cpp
      plotjuggler_base/src/datastreamer_base.cpp
-     plotjuggler_base/src/transform_function.cpp)
+     plotjuggler_base/src/transform_function.cpp
+     plotjuggler_base/src/plotwidget_base.cpp
+     plotjuggler_base/src/plotzoomer.cpp
+     plotjuggler_base/src/plotmagnifier.cpp
+     plotjuggler_base/src/plotlegend.cpp
+     )
 
 #########################  INSTALL  ####################################
 

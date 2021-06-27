@@ -604,7 +604,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
           ui->layoutPublishers->setColumnStretch(0, 1.0);
 
-          int row = _state_publisher.size() -1;
+          int row = _state_publisher.size() - 1;
           auto label = new QLabel(plugin_name, ui->framePublishers);
           ui->layoutPublishers->addWidget(label, row, 0);
 
@@ -615,8 +615,8 @@ QStringList MainWindow::initializePlugins(QString directory_name)
           connect(start_checkbox, &QCheckBox::toggled, this,
                   [=](bool enable) { publisher->setEnabled(enable); });
 
-          connect(publisher, &StatePublisher::closed, start_checkbox,
-                  [=]() {start_checkbox->setChecked(false);} );
+          connect(publisher, &StatePublisher::closed,
+                  start_checkbox, [=]() {start_checkbox->setChecked(false);} );
 
           if( publisher->availableActions().empty() )
           {

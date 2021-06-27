@@ -46,16 +46,15 @@ SET( PLOtJUGGLER_SRC
     messageparser_base.cpp
     menubar.cpp
     new_release_dialog.cpp
-    plotlegend.cpp
+#    plotlegend.cpp
     plotwidget.cpp
-    plotwidget_proxy.cpp
     plotwidget_editor.cpp
     plotwidget_transforms.cpp
     plot_docker.cpp
-    plotmagnifier.cpp
+#    plotmagnifier.cpp
     preferences_dialog.cpp
     point_series_xy.cpp
-    plotzoomer.cpp
+#    plotzoomer.cpp
 
     suggest_dialog.cpp
     timeseries_qwt.cpp
@@ -98,9 +97,9 @@ endif()
 target_link_libraries(plotjuggler
     ${QT_LINK_LIBRARIES}
     colorwidgets
-    qwt_static
     lua_static
     qt_advanced_docking
+    plotjuggler_qwt
     plotjuggler_plugin_base
     )
 

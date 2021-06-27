@@ -13,7 +13,9 @@ namespace PJ {
 
 class StatePublisher : public QObject, public PlotJugglerPlugin
 {
+
   Q_OBJECT
+
 public:
 
   /// True if started
@@ -38,7 +40,7 @@ public slots:
 
 signals:
 
-  /// Singal to be emitted when the plugin disable itself.
+  /// signal to be emitted when the plugin disable itself.
   void closed();
 
 protected:

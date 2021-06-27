@@ -3,7 +3,7 @@
 #include <QtPlugin>
 #include <thread>
 #include "PlotJuggler/toolbox_base.h"
-#include "PlotJuggler/plotwidget_proxy.h"
+#include "PlotJuggler/plotwidget_base.h"
 
 namespace Ui {
 class quaternion_to_RPY;
@@ -42,7 +42,7 @@ private:
 
    void autoFill(QString prefix);
 
-   PJ::PlotWidgetProxy* _plot_widget;
+   PJ::PlotWidgetBase* _plot_widget;
 
    PJ::PlotDataMapRef* _plot_data = nullptr;
 

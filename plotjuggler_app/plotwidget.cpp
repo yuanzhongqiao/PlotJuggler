@@ -2036,10 +2036,6 @@ void PlotWidget::setLegendSize(int size)
   replot();
 }
 
-bool PlotWidget::isLegendVisible() const
-{
-  return _legend && _legend->isVisible();
-}
 
 void PlotWidget::setLegendAlignment(Qt::Alignment alignment)
 {

@@ -8,8 +8,7 @@
 #include <QDomDocument>
 #include <QMessageBox>
 #include <QTime>
-#include "plotmagnifier.h"
-#include "plotzoomer.h"
+
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_plot_grid.h"
@@ -18,11 +17,16 @@
 #include "qwt_plot_rescaler.h"
 #include "qwt_plot_panner.h"
 #include "qwt_plot_legenditem.h"
+
+#include "PlotJuggler/plotmagnifier.h"
+#include "PlotJuggler/plotzoomer.h"
+#include "PlotJuggler/plotlegend.h"
+
 #include "timeseries_qwt.h"
 #include "customtracker.h"
+
 #include "transforms/transform_selector.h"
 #include "transforms/custom_function.h"
-#include "plotlegend.h"
 
 class PlotWidget : public QwtPlot
 {
@@ -77,8 +81,6 @@ public:
   CurveInfo* addCurve(const std::string& name, QColor color = Qt::transparent);
 
   void setLegendSize(int size);
-
-  bool isLegendVisible() const;
 
   void setLegendAlignment(Qt::Alignment alignment);
 

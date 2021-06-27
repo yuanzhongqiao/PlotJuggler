@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <QWheelEvent>
 #include <QApplication>
-#include "plotmagnifier.h"
+#include "PlotJuggler/plotmagnifier.h"
 #include "qwt_plot.h"
 #include "qwt_scale_map.h"
 

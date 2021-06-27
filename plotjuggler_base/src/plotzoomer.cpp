@@ -1,4 +1,4 @@
-#include "plotzoomer.h"
+#include "PlotJuggler/plotzoomer.h"
 #include <QMouseEvent>
 #include <QApplication>
 #include <QSettings>

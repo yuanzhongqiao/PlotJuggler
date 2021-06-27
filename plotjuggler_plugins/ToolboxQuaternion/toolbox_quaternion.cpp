@@ -28,7 +28,7 @@ void ToolboxQuaternion::init(PJ::PlotDataMapRef &src_data,
   _plot_data = &src_data;
   _transforms = &transform_map;
 
-  _plot_widget = new PJ::PlotWidgetProxy( src_data, ui->frame );
+ // _plot_widget = new PJ::PlotWidgetProxy(src_data, ui->frame);
 }
 
 std::pair<QWidget*, PJ::ToolboxPlugin::WidgetType>

@@ -193,9 +193,9 @@ set( QWT_SRC
     qwt_plot_opengl_canvas.cpp
     )
 
-add_library(qwt_static STATIC ${QWT_SRC})
+add_library(plotjuggler_qwt SHARED ${QWT_SRC})
 
-target_link_libraries(qwt_static
+target_link_libraries(plotjuggler_qwt
         ${Qt5Widgets_LIBRARIES}
         ${Qt5PrintSupport_LIBRARIES}
         ${Qt5Concurrent_LIBRARIES}

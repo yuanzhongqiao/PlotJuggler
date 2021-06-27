@@ -1,4 +1,4 @@
-#include "plotlegend.h"
+#include "PlotJuggler/plotlegend.h"
 #include <QEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
