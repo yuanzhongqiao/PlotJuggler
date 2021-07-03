@@ -4,6 +4,7 @@
 #include <thread>
 #include "PlotJuggler/toolbox_base.h"
 #include "PlotJuggler/plotwidget_base.h"
+#include "quaternion_to_rpy.h"
 
 namespace Ui {
 class quaternion_to_RPY;
@@ -40,22 +41,31 @@ private slots:
 
   void onParametersChanged();
 
+  void onClosed();
+
 private:
   QWidget* _widget;
   Ui::quaternion_to_RPY *ui;
 
-   bool eventFilter(QObject *obj, QEvent *event) override;
+  bool eventFilter(QObject *obj, QEvent *event) override;
 
-   QString _dragging_curve;
+  QString _dragging_curve;
 
-   void autoFill(QString prefix);
+  void autoFill(QString prefix);
 
-   PJ::PlotWidgetBase* _plot_widget = nullptr;
+  PJ::PlotWidgetBase* _plot_widget = nullptr;
 
-   PJ::PlotDataMapRef* _plot_data = nullptr;
+  PJ::PlotDataMapRef* _plot_data = nullptr;
 
-   PJ::TransformsMap* _transforms = nullptr;
+  PJ::TransformsMap* _transforms = nullptr;
 
-   void generateRPY();
+  enum GenerateType{
+    PREVIEW,
+    SAVE
+  };
+
+  void generateRPY(GenerateType type);
+
+  std::vector<const PlotData*> getSrcData();
 };
 

@@ -36,7 +36,7 @@ public slots:
 
 signals:
 
-  void plotCreated(QString plot_name, bool is_custom);
+  void plotCreated(std::string plot_name);
 
   void closed();
 

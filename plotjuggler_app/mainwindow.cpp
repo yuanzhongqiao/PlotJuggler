@@ -722,14 +722,8 @@ QStringList MainWindow::initializePlugins(QString directory_name)
         });
 
         connect( toolbox, &ToolboxPlugin::plotCreated,
-                 this, [=](QString name, bool custom) {
-          if( custom )
-          {
-            _curvelist_widget->addCustom( name );
-          }
-          else{
-            _curvelist_widget->addCurve( name.toStdString() );
-          }
+                 this, [=](std::string name) {
+          _curvelist_widget->addCurve( name );
         });
       }
     }

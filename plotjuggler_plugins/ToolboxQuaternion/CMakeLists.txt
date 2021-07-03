@@ -10,6 +10,7 @@ QT5_WRAP_UI ( UI_SRC
 
 add_library(ToolboxQuaternion SHARED
     toolbox_quaternion.cpp
+    quaternion_to_rpy.cpp
     ${UI_SRC}  )
 
 target_link_libraries(ToolboxQuaternion
