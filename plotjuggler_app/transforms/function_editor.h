@@ -2,6 +2,7 @@
 #define AddCustomPlotDialog_H
 
 #include <QDialog>
+#include <QTimer>
 #include <QListWidgetItem>
 #include <unordered_map>
 #include "PlotJuggler/plotdata.h"
@@ -18,6 +19,7 @@ public:
   explicit FunctionEditorWidget(PlotDataMapRef& plotMapData,
                                 const TransformsMap& mapped_custom_plots,
                                 QWidget* parent);
+
   virtual ~FunctionEditorWidget() override;
 
   void setLinkedPlotName(const QString& linkedPlotName);

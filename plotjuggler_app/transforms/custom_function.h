@@ -59,7 +59,7 @@ public:
     return _snippet.alias_name;
   }
 
-  void calculate(std::vector<PlotData*>& dst_vector) override;
+  void calculate() override;
 
   bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
 
@@ -74,8 +74,7 @@ public:
   void calculateAndAdd(PlotDataMapRef &src_data);
 
   virtual void calculatePoints(
-      const PlotData& src_data,
-      const std::vector<const PlotData*>& channels_data,
+      const std::vector<const PlotData*>& src_data,
       size_t point_index,
       std::vector<PlotData::Point> &new_points) = 0;
 

@@ -2,60 +2,117 @@
 #define PLOTWIDGET_BASE_H
 
 #include <QWidget>
-#include "PlotJuggler/plotdata.h"
-#include "PlotJuggler/plotmagnifier.h"
-#include "PlotJuggler/plotzoomer.h"
+#include "plotdata.h"
+#include "timeseries_qwt.h"
 
-#include "qwt_plot.h"
-#include "qwt_plot_curve.h"
-#include "qwt_plot_grid.h"
-#include "qwt_symbol.h"
-#include "qwt_legend.h"
-#include "qwt_plot_curve.h"
-#include "qwt_plot_rescaler.h"
-#include "qwt_plot_panner.h"
-#include "qwt_plot_legenditem.h"
-#include "qwt_plot_marker.h"
+class QwtPlot;
+class QwtPlotCurve;
+class QwtPlotPanner;
+class QwtPlotMarker;
+
+class PlotZoomer;
+class PlotMagnifier;
+class PlotLegend;
 
 namespace PJ
 {
 
-class PlotWidgetBase: public QwtPlot
+class PlotWidgetBase: public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
 
-    struct CurveInfo
-    {
-        std::string src_name;
-        QwtPlotCurve* curve;
-        QwtPlotMarker* marker;
-    };
+  enum CurveStyle {
+    LINES,
+    DOTS,
+    LINES_AND_DOTS
+  };
 
-    PlotWidgetBase(PlotDataMapRef& datamap, QWidget* parent);
+  struct CurveInfo
+  {
+    std::string src_name;
+    QwtPlotCurve* curve;
+    QwtPlotMarker* marker;
+  };
 
-    ~PlotWidgetBase();
+  PlotWidgetBase(QWidget* parent);
 
-    CurveInfo* addCurve(const std::string& name,
-                        QColor color = Qt::transparent);
+  ~PlotWidgetBase();
 
-    bool isEmpty() const;
+  virtual CurveInfo* addCurve(const std::string& name,
+                              PlotData &src_data,
+                              QColor color = Qt::transparent);
 
-    void removeCurve(const QString& title);
 
-    const std::list<CurveInfo> &curveList() const;
+  virtual void removeCurve(const QString& title);
 
-    QColor getColorHint(PlotData* data);
+  const std::list<CurveInfo> &curveList() const;
 
-    const CurveInfo* curveFromTitle(const QString &title) const;
+  bool isEmpty() const;
 
-private:
-    PlotDataMapRef& _mapped_data;
+  QColor getColorHint(PlotData* data);
 
-    std::list<CurveInfo> _curve_list;
+  std::map<QString, QColor> getCurveColors() const;
 
-     QwtPlotCurve::CurveStyle _curve_style;
+  CurveInfo* curveFromTitle(const QString &title);
+
+  virtual QwtSeriesWrapper* createTimeSeries(
+      const QString& transform_ID,
+      const PlotData* data);
+
+  void setLegendSize(int size);
+
+  void setLegendAlignment(Qt::Alignment alignment);
+
+  void setZoomEnabled(bool enabled);
+
+  bool isZoomEnabled() const;
+
+  void changeCurvesStyle(CurveStyle style);
+
+  CurveStyle curveStyle() const;
+
+  QWidget* widget();
+  const QWidget* widget() const;
+
+  void resetZoom();
+
+  virtual PJ::Range getMaximumRangeX() const;
+
+  virtual PJ::Range getMaximumRangeY(PJ::Range range_X) const;
+
+public slots:
+
+  void replot();
+
+  virtual void removeAllCurves();
+
+signals:
+
+  void curveListChanged();
+
+  void viewResized(const QRectF&);
+
+  void dragEnterSignal(QDragEnterEvent* event);
+
+  void dropSignal(QDropEvent* event);
+
+protected:
+
+  class QwtPlotPimpl;
+  QwtPlotPimpl* p = nullptr;
+
+  static void setStyle( QwtPlotCurve* curve, CurveStyle style );
+
+  QwtPlot* qwtPlot();
+  const QwtPlot* qwtPlot() const;
+
+  std::list<CurveInfo> &curveList();
+
+  PlotLegend* legend();
+  PlotZoomer* zoomer();
+  PlotMagnifier* magnifier();
 
 };
 

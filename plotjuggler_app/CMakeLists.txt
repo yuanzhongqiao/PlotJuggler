@@ -57,7 +57,7 @@ SET( PLOtJUGGLER_SRC
 #    plotzoomer.cpp
 
     suggest_dialog.cpp
-    timeseries_qwt.cpp
+#    timeseries_qwt.cpp
     tabbedplotwidget.cpp
     tab_widget.h
     tree_completer.h
@@ -100,7 +100,7 @@ target_link_libraries(plotjuggler
     lua_static
     qt_advanced_docking
     plotjuggler_qwt
-    plotjuggler_plugin_base
+    plotjuggler_base
     )
 
 if(COMPILING_WITH_CATKIN)

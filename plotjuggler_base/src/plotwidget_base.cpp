@@ -1,27 +1,369 @@
 #include "PlotJuggler/plotwidget_base.h"
+#include "timeseries_qwt.h"
+
+#include "plotmagnifier.h"
+#include "plotzoomer.h"
+#include "plotlegend.h"
+
+#include "qwt_axis.h"
+#include "qwt_legend.h"
+#include "qwt_plot.h"
+#include "qwt_plot_curve.h"
+#include "qwt_plot_grid.h"
+#include "qwt_plot_canvas.h"
+#include "qwt_plot_curve.h"
+#include "qwt_plot_opengl_canvas.h"
+#include "qwt_plot_rescaler.h"
+#include "qwt_plot_panner.h"
+#include "qwt_plot_legenditem.h"
+#include "qwt_plot_marker.h"
+#include "qwt_plot_layout.h"
+#include "qwt_scale_engine.h"
+#include "qwt_scale_map.h"
+#include "qwt_scale_draw.h"
+#include "qwt_scale_widget.h"
+#include "qwt_symbol.h"
+#include "qwt_text.h"
+
 #include <QBoxLayout>
 #include <QMessageBox>
+#include <QSettings>
+#include <QDebug>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 
-PJ::PlotWidgetBase::PlotWidgetBase(PJ::PlotDataMapRef &datamap, QWidget *parent)
-  :_mapped_data ( datamap )
+static int _global_color_index_ = 0;
+
+class PlotWidgetBase::QwtPlotPimpl: public QwtPlot
 {
+public:
+  PlotLegend* legend;
+  PlotMagnifier* magnifier;
+  QwtPlotPanner* panner1;
+  QwtPlotPanner* panner2;
+  PlotZoomer* zoomer;
+  std::function<void(const QRectF&)> resized_callback;
+  std::function<void(QEvent*)> event_callback;
+  PlotWidgetBase *parent;
 
-}
-
-PJ::PlotWidgetBase::~PlotWidgetBase()
-{
-
-}
-
-PJ::PlotWidgetBase::CurveInfo *PJ::PlotWidgetBase::addCurve(
-    const std::string &name, QColor color)
-{
- /* auto it = _mapped_data.numeric.find(name);
-  if (it == _mapped_data.numeric.end())
+  QwtPlotPimpl(PlotWidgetBase *parentObject,
+               QWidget* canvas,
+               std::function<void(const QRectF&)> resizedViewCallback,
+               std::function<void(QEvent*)> eventCallback):
+    QwtPlot(nullptr),
+    resized_callback(resizedViewCallback),
+    event_callback(eventCallback),
+    parent( parentObject )
   {
-    return nullptr;
+    this->setCanvas( canvas );
+
+    legend = new PlotLegend(this);
+    magnifier = new PlotMagnifier(this->canvas());
+    panner1 = new QwtPlotPanner(this->canvas());
+    panner2 = new QwtPlotPanner(this->canvas());
+    zoomer = new PlotZoomer(this->canvas());
+
+    zoomer->setRubberBandPen(QColor(Qt::red, 1, Qt::DotLine));
+    zoomer->setTrackerPen(QColor(Qt::green, 1, Qt::DotLine));
+    zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+                            Qt::LeftButton,
+                            Qt::NoModifier);
+
+    magnifier->setAxisEnabled(QwtPlot::xTop, false);
+    magnifier->setAxisEnabled(QwtPlot::yRight, false);
+
+    magnifier->setZoomInKey(Qt::Key_Plus, Qt::ControlModifier);
+    magnifier->setZoomOutKey(Qt::Key_Minus, Qt::ControlModifier);
+
+    // disable right button. keep mouse wheel
+    magnifier->setMouseButton(Qt::NoButton);
+
+    panner1->setMouseButton(Qt::LeftButton, Qt::ControlModifier);
+    panner2->setMouseButton(Qt::MiddleButton, Qt::NoModifier);
+
+    connect(zoomer, &PlotZoomer::zoomed,
+            this, [this](const QRectF& r) { resized_callback(r); } );
+
+    connect(magnifier, &PlotMagnifier::rescaled,
+            this, [this](const QRectF& r) {
+      resized_callback(r);
+      replot();
+    } );
+
+    connect(panner1, &QwtPlotPanner::panned,
+            this, [this]() {
+      resized_callback(canvasBoundingRect()); } );
+
+    connect(panner2, &QwtPlotPanner::panned,
+            this, [this]() {
+      resized_callback(canvasBoundingRect()); } );
+
+    QwtScaleWidget* bottomAxis = axisWidget( QwtPlot::xBottom );
+    QwtScaleWidget* leftAxis = axisWidget( QwtPlot::yLeft );
+
+    bottomAxis->installEventFilter(parent);
+    leftAxis->installEventFilter(parent);
+    this->canvas()->installEventFilter(parent);
   }
 
+  ~QwtPlotPimpl() override
+  {
+    QwtScaleWidget* bottomAxis = axisWidget( QwtPlot::xBottom );
+    QwtScaleWidget* leftAxis = axisWidget( QwtPlot::yLeft );
+
+    bottomAxis->installEventFilter(parent);
+    leftAxis->removeEventFilter(parent);
+    canvas()->removeEventFilter( parent );
+
+    setCanvas(nullptr);
+  }
+
+  QRectF canvasBoundingRect() const
+  {
+    QRectF rect;
+    rect.setBottom(canvasMap(QwtPlot::yLeft).s1());
+    rect.setTop(canvasMap(QwtPlot::yLeft).s2());
+    rect.setLeft(canvasMap(QwtPlot::xBottom).s1());
+    rect.setRight(canvasMap(QwtPlot::xBottom).s2());
+    return rect;
+  }
+
+  virtual void resizeEvent(QResizeEvent* ev) override
+  {
+    QwtPlot::resizeEvent(ev);
+    resized_callback(canvasBoundingRect());
+  }
+
+  std::list<CurveInfo> curve_list;
+
+  CurveStyle curve_style = LINES;
+
+  bool zoom_enabled = true;
+
+  void dragEnterEvent(QDragEnterEvent* event) override
+  {
+    event_callback(event);
+  }
+
+  void dropEvent(QDropEvent* event) override
+  {
+     event_callback(event);
+  }
+
+};
+
+namespace PJ
+{
+
+QwtPlot *PlotWidgetBase::qwtPlot()
+{
+  return p;
+}
+
+const QwtPlot *PlotWidgetBase::qwtPlot() const
+{
+  return p;
+}
+
+QWidget* PlotWidgetBase::widget()
+{
+  return qwtPlot();
+}
+
+const QWidget* PlotWidgetBase::widget() const
+{
+  return qwtPlot();
+}
+
+void PlotWidgetBase::resetZoom()
+{
+  QRectF rect(0, 1, 1, -1);
+  if (curveList().size() > 0)
+  {
+    auto rangeX = getMaximumRangeX();
+    rect.setLeft(rangeX.min);
+    rect.setRight(rangeX.max);
+
+    auto rangeY = getMaximumRangeY(rangeX);
+    rect.setBottom(rangeY.min);
+    rect.setTop(rangeY.max);
+  }
+
+  magnifier()->setAxisLimits(QwtPlot::xBottom, rect.left(), rect.right());
+  magnifier()->setAxisLimits(QwtPlot::yLeft, rect.bottom(), rect.top());
+
+  QRectF current_rect = p->canvasBoundingRect();
+  if (current_rect == rect)
+  {
+    return;
+  }
+  qwtPlot()->setAxisScale(QwtPlot::yLeft,
+                     std::min(rect.bottom(), rect.top()),
+                     std::max(rect.bottom(), rect.top()));
+  qwtPlot()->setAxisScale(QwtPlot::xBottom,
+                     std::min(rect.left(), rect.right()),
+                     std::max(rect.left(), rect.right()));
+  qwtPlot()->updateAxes();
+
+  replot();
+}
+
+Range PlotWidgetBase::getMaximumRangeX() const
+{
+  double left = std::numeric_limits<double>::max();
+  double right = -std::numeric_limits<double>::max();
+
+  for (auto& it : curveList())
+  {
+    if (!it.curve->isVisible())
+      continue;
+
+    auto series = dynamic_cast<QwtSeriesWrapper*>(it.curve->data());
+    const auto max_range_X = series->getVisualizationRangeX();
+    if (!max_range_X)
+      continue;
+
+    left = std::min(max_range_X->min, left);
+    right = std::max(max_range_X->max, right);
+  }
+
+  if (left > right)
+  {
+    left = 0;
+    right = 0;
+  }
+  return Range({ left, right });
+}
+
+Range PlotWidgetBase::getMaximumRangeY(Range range_X) const
+{
+  double top = -std::numeric_limits<double>::max();
+  double bottom = std::numeric_limits<double>::max();
+
+  for (auto& it : curveList())
+  {
+    if (!it.curve->isVisible())
+      continue;
+
+    auto series = dynamic_cast<QwtSeriesWrapper*>(it.curve->data());
+
+    const auto max_range_X = series->getVisualizationRangeX();
+    if (!max_range_X){
+      continue;
+    }
+
+    double left = std::max(max_range_X->min, range_X.min);
+    double right = std::min(max_range_X->max, range_X.max);
+    left = std::nextafter(left, right);
+    right = std::nextafter(right, left);
+
+    auto range_Y = series->getVisualizationRangeY({ left, right });
+    if (!range_Y)
+    {
+      qDebug() << " invalid range_Y in PlotWidget::maximumRangeY";
+      continue;
+    }
+    if (top < range_Y->max){
+      top = range_Y->max;
+    }
+    if (bottom > range_Y->min){
+      bottom = range_Y->min;
+    }
+  }
+
+  double margin = 0.1;
+
+  if (bottom > top)
+  {
+    bottom = 0;
+    top = 0;
+  }
+
+  if (top - bottom > std::numeric_limits<double>::epsilon())
+  {
+    margin = (top - bottom) * 0.025;
+  }
+
+  top += margin;
+  bottom -= margin;
+
+  return Range({ bottom, top });
+}
+
+
+PlotWidgetBase::PlotWidgetBase(QWidget *parent)
+{
+  auto onViewResized = [this](const QRectF& r) { emit viewResized(r); };
+
+  auto onEvent = [this](QEvent* event)
+  {
+    if( auto ev = dynamic_cast<QDragEnterEvent*>(event) )
+    {
+      emit dragEnterSignal(ev);
+    }
+    else if( auto ev = dynamic_cast<QDropEvent*>(event) )
+    {
+      emit dropSignal(ev);
+    }
+  };
+
+  QSettings settings;
+  bool use_opengl = settings.value("Preferences::use_opengl", true).toBool();
+
+  QWidget* abs_canvas;
+  if( use_opengl )
+  {
+    auto canvas = new QwtPlotOpenGLCanvas();
+    canvas->setFrameStyle(QFrame::NoFrame);
+    canvas->setFrameStyle( QFrame::Box | QFrame::Plain );
+    canvas->setLineWidth( 1 );
+    canvas->setPalette( Qt::white );
+    abs_canvas = canvas;
+  }
+  else{
+    auto canvas = new QwtPlotCanvas();
+    canvas->setFrameStyle(QFrame::NoFrame);
+    canvas->setFrameStyle( QFrame::Box | QFrame::Plain );
+    canvas->setLineWidth( 1 );
+    canvas->setPalette( Qt::white );
+    canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
+    abs_canvas = canvas;
+  }
+
+  p = new QwtPlotPimpl(this, abs_canvas, onViewResized, onEvent);
+
+  qwtPlot()->setMinimumWidth(100);
+  qwtPlot()->setMinimumHeight(100);
+
+  qwtPlot()->sizePolicy().setHorizontalPolicy(QSizePolicy::Expanding);
+  qwtPlot()->sizePolicy().setVerticalPolicy(QSizePolicy::Expanding);
+
+  qwtPlot()->canvas()->setMouseTracking(true);
+
+  qwtPlot()->setCanvasBackground(Qt::white);
+  qwtPlot()->setAxisAutoScale(QwtPlot::yLeft, true);
+  qwtPlot()->setAxisAutoScale(QwtPlot::xBottom, true);
+
+  qwtPlot()->axisScaleEngine(QwtPlot::xBottom)->setAttribute(QwtScaleEngine::Floating, true);
+  qwtPlot()->plotLayout()->setAlignCanvasToScales(true);
+
+  qwtPlot()->setAxisScale(QwtPlot::xBottom, 0.0, 1.0);
+  qwtPlot()->setAxisScale(QwtPlot::yLeft, 0.0, 1.0);
+}
+
+PlotWidgetBase::~PlotWidgetBase()
+{
+  if( p ){
+    delete p;
+    p = nullptr;
+  }
+}
+
+PlotWidgetBase::CurveInfo *PlotWidgetBase::addCurve(
+    const std::string &name,
+    PlotData& data,
+    QColor color)
+{
   const auto qname = QString::fromStdString(name);
 
   // title is the same of src_name, unless a transform was applied
@@ -30,8 +372,6 @@ PJ::PlotWidgetBase::CurveInfo *PJ::PlotWidgetBase::addCurve(
   {
     return nullptr; //TODO FIXME
   }
-
-  PlotData& data = it->second;
 
   auto curve = new QwtPlotCurve(qname);
   try
@@ -44,32 +384,264 @@ PJ::PlotWidgetBase::CurveInfo *PJ::PlotWidgetBase::addCurve(
   }
   catch (std::exception& ex)
   {
-    QMessageBox::warning(this, "Exception!", ex.what());
+    QMessageBox::warning( qwtPlot(), "Exception!", ex.what());
     return nullptr;
   }
 
   if( color == Qt::transparent ){
     color = getColorHint(&data);
   }
-  curve->setPen(color, (_curve_style == QwtPlotCurve::Dots) ? 4.0 : 1.3);
-  curve->setStyle(_curve_style);
+
+  curve->setPen(color);
+  setStyle( curve, p->curve_style );
 
   curve->setRenderHint(QwtPlotItem::RenderAntialiased, true);
 
-  curve->attach(this);
+  curve->attach( qwtPlot() );
 
   auto marker = new QwtPlotMarker;
-  marker->attach(this);
-  marker->setVisible(isXYPlot());
+  marker->attach( qwtPlot() );
+  marker->setVisible(false);
 
-  QwtSymbol* sym = new QwtSymbol(QwtSymbol::Ellipse, Qt::red, QPen(Qt::black), QSize(8, 8));
+  QwtSymbol* sym = new QwtSymbol(QwtSymbol::Ellipse,
+                                 Qt::red,
+                                 QPen(Qt::black),
+                                 QSize(8, 8));
   marker->setSymbol(sym);
 
   CurveInfo curve_info;
   curve_info.curve = curve;
   curve_info.marker = marker;
   curve_info.src_name = name;
-  _curve_list.push_back( curve_info );
-*/
-  return &(_curve_list.back());
+
+  p->curve_list.push_back( curve_info );
+
+  return &(p->curve_list.back());
+}
+
+bool PlotWidgetBase::isEmpty() const
+{
+  return p->curve_list.empty();
+}
+
+void PlotWidgetBase::removeCurve(const QString &title)
+{
+  auto it = std::find_if(p->curve_list.begin(), p->curve_list.end(),
+                         [&title](const PlotWidgetBase::CurveInfo& info)
+  {
+    return info.curve->title() == title;
+  });
+
+  if (it != p->curve_list.end())
+  {
+    it->curve->detach();
+    it->marker->detach();
+    p->curve_list.erase(it);
+
+    emit curveListChanged();
+  }
+}
+
+const std::list<PlotWidgetBase::CurveInfo> &PlotWidgetBase::curveList() const
+{
+  return p->curve_list;
+}
+
+std::list<PlotWidgetBase::CurveInfo> &PlotWidgetBase::curveList()
+{
+  return p->curve_list;
+}
+
+QwtSeriesWrapper* PlotWidgetBase::createTimeSeries(const QString& transform_ID,
+                                               const PlotData* data)
+{
+  TransformedTimeseries* output = new TransformedTimeseries(data);
+  output->setTransform(transform_ID);
+  output->updateCache(true);
+  return output;
+}
+
+
+PlotWidgetBase::CurveStyle PlotWidgetBase::curveStyle() const
+{
+  return p->curve_style;
+}
+
+QColor PlotWidgetBase::getColorHint(PlotData* data)
+{
+  QSettings settings;
+  bool remember_color =
+      settings.value("Preferences::remember_color", true).toBool();
+
+  if (data )
+  {
+    auto colorHint = data->attribute("color_hint");
+    if( remember_color && colorHint.isValid())
+    {
+      return colorHint.value<QColor>();
+    }
+  }
+  QColor color;
+  bool use_plot_color_index = settings.value("Preferences::use_plot_color_index", false).toBool();
+  int index = p->curve_list.size();
+
+  if (!use_plot_color_index)
+  {
+    index = (_global_color_index_++);
+  }
+
+  // https://matplotlib.org/3.1.1/users/dflt_style_changes.html
+  switch (index % 8)
+  {
+    case 0:
+      color = QColor("#1f77b4");
+      break;
+    case 1:
+      color = QColor("#d62728");
+      break;
+    case 2:
+      color = QColor("#1ac938");
+      break;
+    case 3:
+      color = QColor("#ff7f0e");
+      break;
+
+    case 4:
+      color = QColor("#f14cc1");
+      break;
+    case 5:
+      color = QColor("#9467bd");
+      break;
+    case 6:
+      color = QColor("#17becf");
+      break;
+    case 7:
+      color = QColor("#bcbd22");
+      break;
+  }
+  if (data)
+  {
+    data->setAttribute( "color_hint", color );
+  }
+
+  return color;
+}
+
+std::map<QString, QColor> PlotWidgetBase::getCurveColors() const
+{
+  std::map<QString, QColor> color_by_name;
+
+  for (auto& it : p->curve_list)
+  {
+    color_by_name.insert( {it.curve->title().text(), it.curve->pen().color()} );
+  }
+  return color_by_name;
+}
+
+
+void PlotWidgetBase::setStyle( QwtPlotCurve* curve, CurveStyle style )
+{
+  curve->setPen(curve->pen().color(),
+                (style == DOTS) ? 4.0 : 1.3);
+
+  switch (style) {
+    case LINES: curve->setStyle( QwtPlotCurve::Lines );
+    break;
+    case LINES_AND_DOTS: curve->setStyle( QwtPlotCurve::LinesAndDots );
+    break;
+    case DOTS: curve->setStyle( QwtPlotCurve::Dots );
+    break;
+  }
+}
+
+
+void PlotWidgetBase::changeCurvesStyle(CurveStyle style)
+{
+  p->curve_style = style;
+  for (auto& it : p->curve_list)
+  {
+    setStyle( it.curve, style );
+  }
+  replot();
+}
+
+PlotWidgetBase::CurveInfo *PlotWidgetBase::curveFromTitle(const QString &title)
+{
+  for(auto& info: p->curve_list )
+  {
+    if( info.curve->title() == title )
+    {
+      return &info;
+    }
+    if( info.src_name == title.toStdString() )
+    {
+      return &info;
+    }
+  }
+  return nullptr;
+}
+
+void PlotWidgetBase::setLegendSize(int size)
+{
+  auto font = p->legend->font();
+  font.setPointSize(size);
+  p->legend->setFont(font);
+  replot();
+}
+
+
+void PlotWidgetBase::setLegendAlignment(Qt::Alignment alignment)
+{
+  p->legend->setAlignmentInCanvas(Qt::Alignment(Qt::AlignTop | alignment));
+}
+
+void PlotWidgetBase::setZoomEnabled(bool enabled)
+{
+  p->zoom_enabled = enabled;
+  p->zoomer->setEnabled(enabled);
+  p->magnifier->setEnabled(enabled);
+  p->panner1->setEnabled(enabled);
+  p->panner2->setEnabled(enabled);
+}
+
+bool PlotWidgetBase::isZoomEnabled() const
+{
+  return p->zoom_enabled;
+}
+
+void PlotWidgetBase::replot()
+{
+  if( p->zoomer ){
+    p->zoomer->setZoomBase(false);
+  }
+  qwtPlot()->replot();
+}
+
+void PlotWidgetBase::removeAllCurves()
+{
+  for (auto& it : curveList())
+  {
+    it.curve->detach();
+    it.marker->detach();
+  }
+
+  curveList().clear();
+  emit curveListChanged();
+  replot();
+}
+
+PlotLegend* PlotWidgetBase::legend()
+{
+  return p->legend;
+}
+PlotZoomer* PlotWidgetBase::zoomer()
+{
+  return p->zoomer;
+}
+
+PlotMagnifier* PlotWidgetBase::magnifier()
+{
+  return p->magnifier;
+}
+
 }

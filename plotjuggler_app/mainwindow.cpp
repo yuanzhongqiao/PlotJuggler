@@ -720,6 +720,17 @@ QStringList MainWindow::initializePlugins(QString directory_name)
                  this, [=]() {
           ui->widgetStack->setCurrentIndex(0);
         });
+
+        connect( toolbox, &ToolboxPlugin::plotCreated,
+                 this, [=](QString name, bool custom) {
+          if( custom )
+          {
+            _curvelist_widget->addCustom( name );
+          }
+          else{
+            _curvelist_widget->addCurve( name.toStdString() );
+          }
+        });
       }
     }
     else
@@ -834,7 +845,8 @@ void MainWindow::onPlotAdded(PlotWidget* plot)
     this->forEachWidget(visitor);
   });
 
-  connect(plot, &PlotWidget::rectChanged, this, &MainWindow::onPlotZoomChanged);
+  connect(plot, &PlotWidget::rectChanged,
+          this, &MainWindow::onPlotZoomChanged);
 
   plot->on_changeTimeOffset(_time_offset.get());
   plot->on_changeDateTimeScale(ui->pushButtonUseDateTime->isChecked());
@@ -1673,7 +1685,7 @@ std::tuple<double, double, int> MainWindow::calculateVisibleRangeX()
   double max_time = -std::numeric_limits<double>::max();
   int max_steps = 0;
 
-  forEachWidget([&](PlotWidget* widget) {
+  forEachWidget([&](const PlotWidget* widget) {
     for (auto& it : widget->curveList())
     {
       const auto& curve_name = it.src_name;
@@ -2029,12 +2041,10 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
 
   const bool is_streaming_active = isStreamingActive();
 
-  for (auto& custom_it : _transform_functions)
+  // TODO 3.3
+  for (auto& [id, function] : _transform_functions)
   {
-    auto* dst_plot = &_mapped_plot_data.numeric.at(custom_it.first);
-    custom_it.second->setDataSource( &_mapped_plot_data );
-    std::vector<PlotData*> dst_vector = {dst_plot};
-    custom_it.second->calculate( dst_vector );
+    function->calculate();
   }
 
   forEachWidget([](PlotWidget* plot) {
@@ -2411,14 +2421,10 @@ void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
   // update plots
   forEachWidget([&](PlotWidget* plot) {
 
-    const auto& curves = plot->curveList();
-    auto it = std::find_if(curves.begin(), curves.end(),
-                           [&curve_name](const PlotWidget::CurveInfo& info)
-    {
-      return info.src_name == curve_name;
-    });
+    PlotWidgetBase::CurveInfo* info =  plot->curveFromTitle(
+          QString::fromStdString( curve_name ) );
 
-    if (it != curves.end())
+    if (info)
     {
       plot->updateCurves();
       plot->replot();

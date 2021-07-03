@@ -12,8 +12,7 @@ public:
 
   void initEngine() override;
 
-  void calculatePoints(const PlotData& src_data,
-                       const std::vector<const PlotData*>& channels_data,
+  void calculatePoints(const std::vector<const PlotData*>& channels_data,
                        size_t point_index,
                        std::vector<PlotData::Point> &points) override;
 

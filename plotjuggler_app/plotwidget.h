@@ -18,28 +18,17 @@
 #include "qwt_plot_panner.h"
 #include "qwt_plot_legenditem.h"
 
-#include "PlotJuggler/plotmagnifier.h"
-#include "PlotJuggler/plotzoomer.h"
-#include "PlotJuggler/plotlegend.h"
-
-#include "timeseries_qwt.h"
+#include "PlotJuggler/plotwidget_base.h"
 #include "customtracker.h"
 
 #include "transforms/transform_selector.h"
 #include "transforms/custom_function.h"
 
-class PlotWidget : public QwtPlot
+class PlotWidget : public PlotWidgetBase
 {
   Q_OBJECT
 
 public:
-
-  struct CurveInfo
-  {
-    std::string src_name;
-    QwtPlotCurve* curve;
-    QwtPlotMarker* marker;
-  };
 
   PlotWidget(PlotDataMapRef& datamap, QWidget* parent = nullptr);
 
@@ -47,23 +36,13 @@ public:
 
   virtual ~PlotWidget() override;
 
-  bool isEmpty() const;
-
-  const std::list<CurveInfo> &curveList() const;
-
-  std::list<CurveInfo> &curveList();
-
-  CurveInfo* curveFromTitle(const QString &title);
-
-  const CurveInfo* curveFromTitle(const QString &title) const;
-
   QDomElement xmlSaveState(QDomDocument& doc) const;
 
   bool xmlLoadState(QDomElement& element);
 
-  Range getMaximumRangeX() const;
+  Range getMaximumRangeX() const override;
 
-  Range getMaximumRangeY(Range range_X) const;
+  Range getMaximumRangeY(Range range_X) const override;
 
   void setZoomRectangle(QRectF rect, bool emit_signal);
 
@@ -73,64 +52,41 @@ public:
 
   void changeBackgroundColor(QColor color);
 
-  const PlotLegend* legend() const
-  {
-    return _legend;
-  }
-
-  CurveInfo* addCurve(const std::string& name, QColor color = Qt::transparent);
-
-  void setLegendSize(int size);
-
-  void setLegendAlignment(Qt::Alignment alignment);
-
-  void setZoomEnabled(bool enabled);
-
-  bool isZoomEnabled() const;
-
   QRectF canvasBoundingRect() const;
 
-  virtual void resizeEvent(QResizeEvent* ev) override;
-
-  virtual void updateLayout() override;
-
   void setConstantRatioXY(bool active);
-
-  PlotDataMapRef& datamap()
-  {
-    return _mapped_data;
-  }
 
   double timeOffset() const
   {
     return _time_offset;
   }
 
-  void changeCurveStyle(QwtPlotCurve::CurveStyle style);
-
-  QwtPlotCurve::CurveStyle curveStyle() const
+  PlotDataMapRef& datamap()
   {
-    return _curve_style;
+    return _mapped_data;
   }
 
-  std::map<QString, QColor> getCurveColors() const;
+  CurveInfo* addCurveXY(std::string name_x,
+                        std::string name_y,
+                        QString curve_name = "");
+
+  CurveInfo* addCurve(const std::string& name,
+                      QColor color = Qt::transparent);
 
   void setCustomAxisLimits(Range range);
 
   Range customAxisLimit() const;
 
-  void removeCurve(const QString& title);
+  void removeCurve(const QString& title) override;
 
 protected:
-  void dragEnterEvent(QDragEnterEvent* event) override;
-  void dropEvent(QDropEvent* event) override;
+  PlotDataMapRef& _mapped_data;
+
   bool eventFilter(QObject* obj, QEvent* event) override;
-  void dragLeaveEvent(QDragLeaveEvent* event) override;
+  void onDragEnterEvent(QDragEnterEvent* event);
+  void onDropEvent(QDropEvent* event);
 
   bool canvasEventFilter(QEvent* event);
-
-  QColor getColorHint(PlotData* data);
-
 
 signals:
   void swapWidgetsRequested(PlotWidget* source, PlotWidget* destination);
@@ -145,13 +101,11 @@ signals:
 
 public slots:
 
-  void replot() override;
-
   void updateCurves();
 
   void onSourceDataRemoved(const std::string &src_name);
 
-  void removeAllCurves();
+  void removeAllCurves() override;
 
   void on_panned(int dx, int dy);
 
@@ -197,12 +151,9 @@ private slots:
 
   void canvasContextMenuTriggered(const QPoint& pos);
 
-  void on_showPoints_triggered();
-
   void on_externallyResized(const QRectF& new_rect);
 
 private:
-  std::list<CurveInfo> _curve_list;
 
   QAction* _action_removeAllCurves;
   QAction* _action_edit;
@@ -218,21 +169,10 @@ private:
   QAction* _action_paste;
   QAction* _action_image_to_clipboard;
 
-  PlotZoomer* _zoomer;
-  PlotMagnifier* _magnifier;
-  QwtPlotPanner* _panner1;
-  QwtPlotPanner* _panner2;
-
   CurveTracker* _tracker;
-  PlotLegend* _legend;
   QwtPlotGrid* _grid;
 
   bool _use_date_time_scale;
-
-  int _color_index;
-  static int global_color_index;
-
-  PlotDataMapRef& _mapped_data;
 
   struct DragInfo
   {
@@ -248,19 +188,17 @@ private:
 
   DragInfo _dragging;
 
-  CurveInfo* addCurveXY(std::string name_x, std::string name_y, QString curve_name = "");
 
   void buildActions();
 
   void updateAvailableTransformers();
 
-  QwtPlotCurve::CurveStyle _curve_style;
-
   void setDefaultRangeX();
 
   QwtSeriesWrapper* createCurveXY(const PlotData* data_x, const PlotData* data_y);
 
-  QwtSeriesWrapper* createTimeSeries(const QString& transform_ID, const PlotData* data);
+  QwtSeriesWrapper* createTimeSeries(const QString& transform_ID,
+                                     const PlotData* data) override;
 
   double _time_offset;
 
@@ -272,15 +210,12 @@ private:
 
   SnippetsMap _snippets;
 
-  bool _zoom_enabled;
-
   bool _keep_aspect_ratio;
 
   QRectF _max_zoom_rect;
 
   bool _context_menu_enabled;
 
-  void transformCustomCurves();
   void updateMaximumZoomArea();
   void rescaleEqualAxisScaling();
   void overrideCursonMove();

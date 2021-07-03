@@ -1,8 +1,8 @@
 #ifndef TIMESERIES_QWT_H
 #define TIMESERIES_QWT_H
 
-#include "PlotJuggler/plotdata.h"
 #include "qwt_series_data.h"
+#include "PlotJuggler/plotdata.h"
 #include "PlotJuggler/transform_function.h"
 
 using namespace PJ;
