@@ -136,6 +136,8 @@ include_directories(
 
 #########################  BASE library  ####################################
 
+add_subdirectory( 3rdparty/qwt/src )
+
 qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/dataloader_base.h
   plotjuggler_base/include/PlotJuggler/statepublisher_base.h
@@ -156,6 +158,7 @@ add_library( plotjuggler_base SHARED
      plotjuggler_base/src/plotlegend.cpp
      plotjuggler_base/src/timeseries_qwt.cpp
      )
+# target_link_libraries(plotjuggler_base plotjuggler_qwt)
 
 #########################  INSTALL  ####################################
 
@@ -173,7 +176,10 @@ elseif(COMPILING_WITH_AMENT)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(PJ_PLUGIN_INSTALL_DIRECTORY lib/${PROJECT_NAME} )
 
-    ament_export_targets(export_plotjuggler_base HAS_LIBRARY_TARGET)
+    ament_export_targets(
+        export_plotjuggler_base
+        export_plotjuggler_qwt
+        HAS_LIBRARY_TARGET)
     ament_package()
 
 else()
@@ -194,7 +200,9 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
         DESTINATION ${DESKTOP_ICON_DIR}  )
 
 install(
-     TARGETS plotjuggler_base
+     TARGETS
+        plotjuggler_base
+        plotjuggler_qwt
      EXPORT export_plotjuggler_base
      LIBRARY DESTINATION lib
      ARCHIVE DESTINATION lib
@@ -211,7 +219,7 @@ endif()
 
 add_subdirectory( 3rdparty/color_widgets )
 add_subdirectory( 3rdparty/Qt-Advanced-Docking )
-add_subdirectory( 3rdparty/qwt/src )
+#add_subdirectory( 3rdparty/qwt/src )
 add_subdirectory( 3rdparty/lua-5.4.1 )
 
 add_subdirectory( plotjuggler_app )
