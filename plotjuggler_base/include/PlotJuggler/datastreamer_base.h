@@ -16,7 +16,7 @@ namespace PJ {
  * dataMap(), which share its elements with the main application, must be protected
  * using the mutex().
  */
-class DataStreamer : public QObject, public PlotJugglerPlugin
+class DataStreamer : public PlotJugglerPlugin
 {
   Q_OBJECT
 public:

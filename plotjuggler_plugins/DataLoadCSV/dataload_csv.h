@@ -6,7 +6,7 @@
 
 using namespace PJ;
 
-class DataLoadCSV : public QObject, public DataLoader
+class DataLoadCSV : public DataLoader
 {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID "facontidavide.PlotJuggler3.DataLoader")
