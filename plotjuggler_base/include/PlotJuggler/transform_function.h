@@ -49,17 +49,21 @@ public:
     return _data;
   }
 
-  virtual void setDataSource( PlotDataMapRef* data );
+  std::vector<const PlotData*>& dataSources();
 
-  virtual void setDataSource(const std::vector<const PlotData*>& src_data);
+  virtual void setData(
+      PlotDataMapRef* data,
+      const std::vector<const PlotData*>& src_vect,
+      std::vector<PlotData*>& dst_vect);
 
-  virtual void calculate(std::vector<PlotData*>& dst_data) = 0;
+  virtual void calculate() = 0;
 
 signals:
   void parametersChanged();
 
 protected:
   std::vector<const PlotData*> _src_vector;
+  std::vector<PlotData*> _dst_vector;
   PlotDataMapRef* _data;
 
 };
@@ -84,15 +88,16 @@ public:
     return 1;
   }
 
-  void calculate(std::vector<PlotData*>& dst_vector) override;
+  void calculate() override;
 
   /// Method to be implemented by the user to apply a statefull function to each point.
   /// Index will increase monotonically, unless reset() is used.
   virtual std::optional<PlotData::Point> calculateNextPoint(size_t index) = 0;
 
+  const PlotData* dataSource() const;
+
 protected:
 
-  const PlotData* dataSource();
   double _last_timestamp;
 };
 

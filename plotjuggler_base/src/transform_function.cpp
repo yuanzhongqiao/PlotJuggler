@@ -8,55 +8,54 @@ TransformFunction::TransformFunction():
   reset();
 }
 
-void TransformFunction::setDataSource(PlotDataMapRef *data)
+std::vector<const PlotData *> &TransformFunction::dataSources()
 {
-  if( numInputs() > 0 )
-  {
-    throw std::runtime_error("When numInputs() > 0, the method "
-                             "setDataSource(const std::vector<const PlotData*>&) "
-                             "should be used.");
-  }
-  _data = data;
+  return _src_vector;
 }
 
-void TransformFunction::setDataSource(const std::vector<const PlotData *> &src_data)
+void TransformFunction::setData(
+    PlotDataMapRef *data,
+    const std::vector<const PlotData *> &src_vect,
+    std::vector<PlotData*>& dst_vect)
 {
-  if( src_data.size() != numInputs() )
+  if( numInputs() >= 0 && src_vect.size() != numInputs() )
   {
     throw std::runtime_error("Wrong number of input data sources "
                              "in setDataSource");
   }
-  _src_vector = src_data;
+  if( dst_vect.size() != numOutputs() )
+  {
+    throw std::runtime_error("Wrong number of output data destinations");
+  }
+  _data = data;
+  _src_vector = src_vect;
+  _dst_vector = dst_vect;
 }
 
 void TransformFunction_SISO::reset() {
   _last_timestamp = - std::numeric_limits<double>::max();
 }
 
-void TransformFunction_SISO::calculate(std::vector<PlotData *> &dst_vector)
+void TransformFunction_SISO::calculate()
 {
-  if( dst_vector.size() != numOutputs() )
-  {
-    throw std::runtime_error("Wrong number of output data destinations");
-  }
-
-  PlotData* dst_data = dst_vector.front();
-  if (dataSource()->size() == 0)
+  const PlotData* src_data = _src_vector.front();
+  PlotData* dst_data = _dst_vector.front();
+  if (src_data->size() == 0)
   {
     return;
   }
-  dst_data->setMaximumRangeX( dataSource()->maximumRangeX() );
+  dst_data->setMaximumRangeX( src_data->maximumRangeX() );
   if (dst_data->size() != 0)
   {
     _last_timestamp = dst_data->back().x;
   }
 
-  int pos = dataSource()->getIndexFromX( _last_timestamp );
+  int pos = src_data->getIndexFromX( _last_timestamp );
   size_t index = pos < 0 ? 0 : static_cast<size_t>(pos);
 
-  while(index < dataSource()->size())
+  while(index < src_data->size())
   {
-    const auto& in_point = dataSource()->at(index);
+    const auto& in_point = src_data->at(index);
 
     if (in_point.x >= _last_timestamp)
     {
@@ -71,14 +70,6 @@ void TransformFunction_SISO::calculate(std::vector<PlotData *> &dst_vector)
   }
 }
 
-const PlotData *TransformFunction_SISO::dataSource()
-{
-  if( _src_vector.empty() )
-  {
-    return nullptr;
-  }
-  return _src_vector.front();
-}
 
 TransformFunction::Ptr TransformFactory::create(const std::string &name)
 {
@@ -106,8 +97,18 @@ TransformFactory *PJ::TransformFactory::instance()
   return _ptr;
 }
 
-const std::set<std::string> &TransformFactory::registeredTransforms() {
+const std::set<std::string> &TransformFactory::registeredTransforms()
+{
   return instance()->names_;
+}
+
+const PlotData *TransformFunction_SISO::dataSource() const
+{
+  if( _src_vector.empty() )
+  {
+    return nullptr;
+  }
+  return _src_vector.front();
 }
 
 

@@ -71,7 +71,8 @@ void TransformedTimeseries::setTransform(QString transform_ID)
   else{
     _dst_data.clear();
     _transform = TransformFactory::create(transform_ID.toStdString());
-    _transform->setDataSource( {_src_data} );
+    std::vector<PlotData*> dest = {&_dst_data};
+    _transform->setData( nullptr, {_src_data}, dest );
   }
 }
 
@@ -85,7 +86,7 @@ bool TransformedTimeseries::updateCache(bool reset_old_data)
       _transform->reset();
     }
     std::vector<PlotData*> dest = {&_dst_data};
-    _transform->calculate( dest );
+    _transform->calculate( );
   }
   else{
     // TODO: optimize ??

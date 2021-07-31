@@ -26,21 +26,20 @@ void LuaCustomFunction::initEngine()
   _lua_function = (*_lua_engine)["calc"];
 }
 
-void LuaCustomFunction::calculatePoints(const PlotData &src_data,
-                                        const std::vector<const PlotData *> &channels_data,
+void LuaCustomFunction::calculatePoints(const std::vector<const PlotData *> &src_data,
                                         size_t point_index,
                                         std::vector<PlotData::Point> &points)
 {
   std::unique_lock<std::mutex> lk(mutex_);
 
-  _chan_values.resize( channels_data.size());
+  _chan_values.resize( src_data.size() );
 
-  const PlotData::Point& old_point = src_data.at(point_index);
+  const PlotData::Point& old_point = src_data.front()->at(point_index);
 
-  for (size_t chan_index = 0; chan_index < channels_data.size(); chan_index++)
+  for (size_t chan_index = 0; chan_index < src_data.size(); chan_index++)
   {
     double value;
-    const PlotData* chan_data = channels_data[chan_index];
+    const PlotData* chan_data = src_data[chan_index];
     int index = chan_data->getIndexFromX(old_point.x);
     if (index != -1)
     {
@@ -58,31 +57,23 @@ void LuaCustomFunction::calculatePoints(const PlotData &src_data,
   // ugly code, sorry
   switch( _snippet.additional_sources.size() )
   {
-  case 0: result = _lua_function(old_point.x, old_point.y);
+  case 0: result = _lua_function(old_point.x, v[0]);
     break;
-  case 1: result = _lua_function(old_point.x, old_point.y,
-                                 v[0]);
+  case 1: result = _lua_function(old_point.x, v[0], v[1]);
     break;
-  case 2: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1]);
+  case 2: result = _lua_function(old_point.x,v[0], v[1], v[2]);
     break;
-  case 3: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2]);
+  case 3: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3]);
     break;
-  case 4: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2], v[3]);
+  case 4: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3], v[4]);
     break;
-  case 5: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2], v[3], v[4]);
+  case 5: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3], v[4], v[5]);
     break;
-  case 6: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2], v[3], v[4], v[5]);
+  case 6: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
     break;
-  case 7: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2], v[3], v[4], v[5], v[6]);
+  case 7: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
     break;
-  case 8: result = _lua_function(old_point.x, old_point.y,
-                                 v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
+  case 8: result = _lua_function(old_point.x, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8]);
     break;
   default:
     throw std::runtime_error("Lua Engine : maximum number of additional source is 8");

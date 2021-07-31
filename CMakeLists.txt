@@ -16,6 +16,7 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fs
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 include_directories( plotjuggler_base/include )
+include_directories( plotjuggler_base/src )
 
 add_definitions( -DFMT_HEADER_ONLY )
 
@@ -31,7 +32,7 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
 
     catkin_package(
         INCLUDE_DIRS  plotjuggler_base/include
-        LIBRARIES  plotjuggler_plugin_base
+        LIBRARIES  plotjuggler_base
         CATKIN_DEPENDS roslib
     )
 
@@ -142,12 +143,9 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/datastreamer_base.h
   plotjuggler_base/include/PlotJuggler/transform_function.h
   plotjuggler_base/include/PlotJuggler/plotwidget_base.h
-  plotjuggler_base/include/PlotJuggler/plotzoomer.h
-  plotjuggler_base/include/PlotJuggler/plotmagnifier.h
-  plotjuggler_base/include/PlotJuggler/plotlegend.h
 )
 
-add_library( plotjuggler_plugin_base SHARED
+add_library( plotjuggler_base SHARED
     ${PLOTJUGGLER_BASE_MOCS}
      plotjuggler_base/src/plotdata.cpp
      plotjuggler_base/src/datastreamer_base.cpp
@@ -156,6 +154,7 @@ add_library( plotjuggler_plugin_base SHARED
      plotjuggler_base/src/plotzoomer.cpp
      plotjuggler_base/src/plotmagnifier.cpp
      plotjuggler_base/src/plotlegend.cpp
+     plotjuggler_base/src/timeseries_qwt.cpp
      )
 
 #########################  INSTALL  ####################################
@@ -174,7 +173,7 @@ elseif(COMPILING_WITH_AMENT)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(PJ_PLUGIN_INSTALL_DIRECTORY lib/${PROJECT_NAME} )
 
-    ament_export_targets(export_plotjuggler_plugin_base HAS_LIBRARY_TARGET)
+    ament_export_targets(export_plotjuggler_base HAS_LIBRARY_TARGET)
     ament_package()
 
 else()
@@ -195,8 +194,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
         DESTINATION ${DESKTOP_ICON_DIR}  )
 
 install(
-     TARGETS plotjuggler_plugin_base
-     EXPORT export_plotjuggler_plugin_base
+     TARGETS plotjuggler_base
+     EXPORT export_plotjuggler_base
      LIBRARY DESTINATION lib
      ARCHIVE DESTINATION lib
      RUNTIME DESTINATION bin

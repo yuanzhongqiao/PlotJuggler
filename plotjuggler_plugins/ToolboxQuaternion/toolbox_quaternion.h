@@ -18,6 +18,8 @@ class ToolboxQuaternion : public PJ::ToolboxPlugin
 public:
   ToolboxQuaternion();
 
+  ~ToolboxQuaternion() override;
+
   const char* name() const override
   {
     return "Quaternion to RPY";
@@ -32,6 +34,12 @@ public slots:
 
   bool onShowWidget() override;
 
+private slots:
+
+  void on_pushButtonSave_clicked();
+
+  void onParametersChanged();
+
 private:
   QWidget* _widget;
   Ui::quaternion_to_RPY *ui;
@@ -42,11 +50,12 @@ private:
 
    void autoFill(QString prefix);
 
-   PJ::PlotWidgetBase* _plot_widget;
+   PJ::PlotWidgetBase* _plot_widget = nullptr;
 
    PJ::PlotDataMapRef* _plot_data = nullptr;
 
    PJ::TransformsMap* _transforms = nullptr;
 
+   void generateRPY();
 };
 

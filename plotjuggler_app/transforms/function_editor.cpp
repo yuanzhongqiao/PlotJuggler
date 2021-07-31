@@ -105,7 +105,7 @@ FunctionEditorWidget::FunctionEditorWidget(PlotDataMapRef& plotMapData,
 
   auto preview_layout = new QHBoxLayout( ui->framePlotPreview);
   preview_layout->setMargin(6);
-  preview_layout->addWidget(_preview_widget);
+  preview_layout->addWidget(_preview_widget->widget());
 
   _preview_widget->setContextMenuEnabled(false);
 
@@ -119,6 +119,8 @@ FunctionEditorWidget::FunctionEditorWidget(PlotDataMapRef& plotMapData,
 
 FunctionEditorWidget::~FunctionEditorWidget()
 {
+  delete _preview_widget;
+
   QSettings settings;
   settings.setValue("AddCustomPlotDialog.recentSnippetsXML", exportSnippets());
   settings.setValue("AddCustomPlotDialog.geometry", saveGeometry());
@@ -687,11 +689,12 @@ void FunctionEditorWidget::on_updatePreview()
   {
     try {
       std::string name = new_plot_name.empty() ? "no_name" : new_plot_name;
-      PlotData& out_data = _local_plot_data.addNumeric(name)->second;
+      PlotData& out_data = _local_plot_data.getOrCreateNumeric(name);
       out_data.clear();
-      lua_function->setDataSource( &_plot_map_data );
+
       std::vector<PlotData*> out_vector = {&out_data};
-      lua_function->calculate(out_vector);
+      lua_function->setData( &_plot_map_data, {}, out_vector );
+      lua_function->calculate();
 
       _preview_widget->removeAllCurves();
       _preview_widget->addCurve(name, Qt::blue);
