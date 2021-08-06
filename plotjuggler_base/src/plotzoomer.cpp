@@ -12,7 +12,7 @@ PlotZoomer::PlotZoomer(QWidget* canvas)
   : QwtPlotZoomer(canvas, false)
   , _mouse_pressed(false)
   , _zoom_enabled(false)
-  , _keep_aspect_ratio(true)
+  , _keep_aspect_ratio(false)
 {
   this->setTrackerMode(AlwaysOff);
 }
