@@ -99,8 +99,8 @@ target_link_libraries(plotjuggler
     colorwidgets
     lua_static
     qt_advanced_docking
-    plotjuggler_qwt
     plotjuggler_base
+    plotjuggler_qwt
     )
 
 if(COMPILING_WITH_CATKIN)

@@ -26,7 +26,8 @@ public:
   enum CurveStyle {
     LINES,
     DOTS,
-    LINES_AND_DOTS
+    LINES_AND_DOTS,
+    HISTOGRAM
   };
 
   struct CurveInfo
@@ -44,7 +45,6 @@ public:
                               PlotData &src_data,
                               QColor color = Qt::transparent);
 
-
   virtual void removeCurve(const QString& title);
 
   const std::list<CurveInfo> &curveList() const;
@@ -61,6 +61,14 @@ public:
       const QString& transform_ID,
       const PlotData* data);
 
+  virtual void resetZoom();
+
+  virtual PJ::Range getVisualizationRangeX() const;
+
+  virtual PJ::Range getVisualizationRangeY(PJ::Range range_X) const;
+
+  virtual void setModeXY(bool enable);
+
   void setLegendSize(int size);
 
   void setLegendAlignment(Qt::Alignment alignment);
@@ -71,16 +79,23 @@ public:
 
   void changeCurvesStyle(CurveStyle style);
 
-  CurveStyle curveStyle() const;
+  bool isXYPlot() const;
+
+  QRectF canvasBoundingRect() const;
+
+  QRectF maxZoomRect() const;
 
   QWidget* widget();
+
   const QWidget* widget() const;
 
-  void resetZoom();
+  CurveStyle curveStyle() const;
 
-  virtual PJ::Range getMaximumRangeX() const;
+  bool keepRatioXY() const;
 
-  virtual PJ::Range getMaximumRangeY(PJ::Range range_X) const;
+  void setKeepRatioXY(bool active);
+
+  void setAcceptDrops(bool accept);
 
 public slots:
 
@@ -114,6 +129,14 @@ protected:
   PlotZoomer* zoomer();
   PlotMagnifier* magnifier();
 
+  void updateMaximumZoomArea();
+
+private:
+  bool _xy_mode;
+
+  QRectF _max_zoom_rect;
+
+  bool _keep_aspect_ratio;
 };
 
 }

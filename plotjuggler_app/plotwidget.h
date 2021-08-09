@@ -40,21 +40,13 @@ public:
 
   bool xmlLoadState(QDomElement& element);
 
-  Range getMaximumRangeX() const override;
-
-  Range getMaximumRangeY(Range range_X) const override;
+  Range getVisualizationRangeY(Range range_X) const override;
 
   void setZoomRectangle(QRectF rect, bool emit_signal);
 
   void reloadPlotData();
 
-  bool isXYPlot() const;
-
   void changeBackgroundColor(QColor color);
-
-  QRectF canvasBoundingRect() const;
-
-  void setConstantRatioXY(bool active);
 
   double timeOffset() const
   {
@@ -137,7 +129,7 @@ private slots:
 
   //void on_changeToBuiltinTransforms(QString new_transform);
 
-  void setModeXY(bool enable);
+  void setModeXY(bool enable) override;
 
   void on_savePlotToFile();
 
@@ -202,21 +194,15 @@ private:
 
   double _time_offset;
 
-  bool _xy_mode;
-
   Range _custom_Y_limits;
 
   TransformSelector* _transform_select_dialog;
 
   SnippetsMap _snippets;
 
-  bool _keep_aspect_ratio;
-
-  QRectF _max_zoom_rect;
-
   bool _context_menu_enabled;
 
-  void updateMaximumZoomArea();
+  //void updateMaximumZoomArea();
   void rescaleEqualAxisScaling();
   void overrideCursonMove();
 };

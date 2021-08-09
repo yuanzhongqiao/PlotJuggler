@@ -12,7 +12,7 @@ namespace PJ {
  * Contrariwise to other plugins, multiple instances of the this class might be created.
  * For this reason, a TransformFactory is also defined
  */
-class TransformFunction : public QObject, public PlotJugglerPlugin
+class TransformFunction : public PlotJugglerPlugin
 {
   Q_OBJECT
 

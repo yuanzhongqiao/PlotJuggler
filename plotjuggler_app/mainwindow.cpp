@@ -566,6 +566,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       else if (message_parser){
         plugin_name = message_parser->name();
       }
+      else if (toolbox){
+        plugin_name = toolbox->name();
+      }
 
       if (loaded_plugins.find(plugin_name) == loaded_plugins.end())
       {
@@ -699,6 +702,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if(toolbox)
       {
+        qDebug() << filename << ": is a Toolbox plugin";
         toolbox->init( _mapped_plot_data, _transform_functions );
 
         auto action = ui->menuTools->addAction( toolbox->name() );
@@ -846,6 +850,7 @@ void MainWindow::onPlotAdded(PlotWidget* plot)
   plot->on_changeDateTimeScale(ui->pushButtonUseDateTime->isChecked());
   plot->activateGrid(ui->pushButtonActivateGrid->isChecked());
   plot->enableTracker(!isStreamingActive());
+  plot->setKeepRatioXY(ui->pushButtonRatio->isChecked());
   plot->configureTracker(_tracker_param);
 }
 
@@ -2161,7 +2166,7 @@ void MainWindow::on_pushButtonActivateGrid_toggled(bool checked)
 void MainWindow::on_pushButtonRatio_toggled(bool checked)
 {
   forEachWidget([checked](PlotWidget* plot) {
-    plot->setConstantRatioXY(checked);
+    plot->setKeepRatioXY(checked);
     plot->replot();
   });
 }

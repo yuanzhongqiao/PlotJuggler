@@ -64,8 +64,8 @@ PlotwidgetEditor::PlotwidgetEditor(PlotWidget *plotwidget, QWidget *parent) :
   ui->lineLimitMin->setValidator(new QDoubleValidator(this));
 
   auto ylimits = _plotwidget->customAxisLimit();
-  auto range_x = _plotwidget->getMaximumRangeX();
-  Range suggested_limits = _plotwidget->getMaximumRangeY(range_x);
+  auto range_x = _plotwidget->getVisualizationRangeX();
+  Range suggested_limits = _plotwidget->getVisualizationRangeY(range_x);
 
   if( ylimits.min != -MAX_DOUBLE)
   {
@@ -302,8 +302,8 @@ void PlotwidgetEditor::on_pushButtonReset_clicked()
 
   _plotwidget->setCustomAxisLimits(no_limits);
 
-  auto range_x = _plotwidget->getMaximumRangeX();
-  Range limits = _plotwidget->getMaximumRangeY(range_x);
+  auto range_x = _plotwidget->getVisualizationRangeX();
+  Range limits = _plotwidget->getVisualizationRangeY(range_x);
 
   ui->lineLimitMin->setText(QString::number(limits.min));
   ui->lineLimitMax->setText(QString::number(limits.max));
