@@ -134,8 +134,6 @@ public:
     resized_callback(canvasBoundingRect());
   }
 
-
-
   std::list<CurveInfo> curve_list;
 
   CurveStyle curve_style = LINES;
@@ -504,6 +502,11 @@ void PlotWidgetBase::setKeepRatioXY(bool active)
   }
 }
 
+void PlotWidgetBase::setAcceptDrops(bool accept)
+{
+  qwtPlot()->setAcceptDrops(accept);
+}
+
 
 QColor PlotWidgetBase::getColorHint(PlotData* data)
 {
@@ -589,6 +592,7 @@ void PlotWidgetBase::setStyle( QwtPlotCurve* curve, CurveStyle style )
     break;
     case DOTS: curve->setStyle( QwtPlotCurve::Dots );
     break;
+    case HISTOGRAM: curve->setStyle( QwtPlotCurve::Sticks );
   }
 }
 

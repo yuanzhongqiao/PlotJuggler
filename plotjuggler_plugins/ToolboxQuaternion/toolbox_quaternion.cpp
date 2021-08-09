@@ -225,7 +225,7 @@ void ToolboxQuaternion::init(PJ::PlotDataMapRef &src_data,
 
   auto preview_layout = new QHBoxLayout( ui->framePlotPreview );
   preview_layout->setMargin(6);
-  preview_layout->addWidget(_plot_widget->widget());
+  preview_layout->addWidget( _plot_widget->widget() );
 
 }
 

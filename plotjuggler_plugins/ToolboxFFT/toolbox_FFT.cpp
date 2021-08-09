@@ -4,6 +4,7 @@
 #include <QDialogButtonBox>
 #include <QEvent>
 #include <QMimeData>
+#include <QDebug>
 #include <QDragEnterEvent>
 
 #include "PlotJuggler/transform_function.h"
@@ -16,15 +17,16 @@ ToolboxFFT::ToolboxFFT()
 
   ui->setupUi(_widget);
 
-  ui->lineEdit->installEventFilter(this);
-
   connect( ui->buttonBox, &QDialogButtonBox::rejected,
            this, &ToolboxPlugin::closed );
+
+  connect( ui->radioZoomed, &QRadioButton::toggled,
+          this, &ToolboxFFT::onRadioZoomedToggled );
 }
 
 ToolboxFFT::~ToolboxFFT()
 {
-
+  delete ui;
 }
 
 void ToolboxFFT::init(PJ::PlotDataMapRef &src_data,
@@ -43,6 +45,17 @@ void ToolboxFFT::init(PJ::PlotDataMapRef &src_data,
   auto preview_layout_B = new QHBoxLayout( ui->frameB );
   preview_layout_B->setMargin(6);
   preview_layout_B->addWidget( _plot_widget_B->widget() );
+
+  _plot_widget_A->setAcceptDrops(true);
+
+  connect( _plot_widget_A, &PlotWidgetBase::dragEnterSignal,
+          this, &ToolboxFFT::onDragEnterEvent);
+
+  connect( _plot_widget_A, &PlotWidgetBase::dropSignal,
+          this, &ToolboxFFT::onDropEvent);
+
+  connect( _plot_widget_A, &PlotWidgetBase::viewResized,
+          this, &ToolboxFFT::onViewResized );
 }
 
 std::pair<QWidget*, PJ::ToolboxPlugin::WidgetType>
@@ -56,18 +69,34 @@ bool ToolboxFFT::onShowWidget()
   return true;
 }
 
-void ToolboxFFT::addCurve(std::string curve_id)
+void ToolboxFFT::updateCurveFFT(double min, double max)
 {
-  PlotData& curve_data = _plot_data->getOrCreateNumeric(curve_id);
-  const int N = curve_data.size();
-  if( N < 2 ) {
+  const std::string& curve_id = _original_curve;
+
+  if( _original_curve.empty() ) {
     return;
   }
-  _plot_widget_A->removeAllCurves();
-  _plot_widget_A->addCurve( curve_id, curve_data );
-  _plot_widget_A->resetZoom();
+  auto it = _plot_data->numeric.find( _original_curve );
+  if( it == _plot_data->numeric.end() ) {
+    return;
+  }
+  PlotData& curve_data = it->second;
 
-  float dT = float(curve_data.back().x - curve_data.front().x ) /
+  int min_index = curve_data.getIndexFromX( min );
+  int max_index = curve_data.getIndexFromX( max );
+
+  int N = 1 + max_index - min_index;
+  if( N < 4 || min_index < 0 || max_index < 0 ) {
+    return;
+  }
+
+  if( N & 1 ) { // if not even, make it even
+    N--;
+    max_index--;
+  }
+
+  float dT = float(curve_data.at(max_index).x -
+                   curve_data.at(min_index).x ) /
              float(N-1);
 
   std::vector<kiss_fft_scalar> input;
@@ -94,9 +123,8 @@ void ToolboxFFT::addCurve(std::string curve_id)
   auto config = kiss_fftr_alloc(N, false, nullptr, nullptr);
   kiss_fftr( config, input.data(), out.data() );
 
-
   auto& curver_fft = _local_data.getOrCreateNumeric( curve_id + "/fft_freq" );
-
+  curver_fft.clear();
   for ( int i=0; i<N/2; i++)
   {
     kiss_fft_scalar Hz = i * ( 1.0 / dT) / double(N);
@@ -105,71 +133,89 @@ void ToolboxFFT::addCurve(std::string curve_id)
   }
 
   _plot_widget_B->removeAllCurves();
-  _plot_widget_B->addCurve( curve_id + "/fft_freq", curver_fft );
+  _plot_widget_B->addCurve( curve_id + "/fft_freq", curver_fft, Qt::blue );
+  _plot_widget_B->changeCurvesStyle( PlotWidgetBase::HISTOGRAM );
   _plot_widget_B->resetZoom();
+
+  free(config);
 }
 
-bool ToolboxFFT::eventFilter(QObject *obj, QEvent *ev)
+void ToolboxFFT::addCurve(std::string curve_id)
 {
-  if( ev->type() == QEvent::DragEnter )
+  PlotData& curve_data = _plot_data->getOrCreateNumeric(curve_id);
+  const int N = curve_data.size();
+  if( N < 2 ) {
+    return;
+  }
+  _plot_widget_A->removeAllCurves();
+  _plot_widget_A->addCurve( curve_id, curve_data );
+  _plot_widget_A->resetZoom();
+
+  _original_curve = curve_id;
+
+  auto MAX = std::numeric_limits<double>::max();
+  _view_rectangle.setLeft( -MAX/2 );
+  _view_rectangle.setWidth( MAX );
+  updateCurveFFT( -MAX/2, MAX/2 );
+}
+
+void ToolboxFFT::onDragEnterEvent(QDragEnterEvent *event)
+{
+  const QMimeData* mimeData = event->mimeData();
+  QStringList mimeFormats = mimeData->formats();
+
+  for(const QString& format : mimeFormats)
   {
-    auto event = static_cast<QDragEnterEvent*>(ev);
-    const QMimeData* mimeData = event->mimeData();
-    QStringList mimeFormats = mimeData->formats();
+    QByteArray encoded = mimeData->data(format);
+    QDataStream stream(&encoded, QIODevice::ReadOnly);
 
-    for(const QString& format : mimeFormats)
+    if (format != "curveslist/add_curve") {
+      return;
+    }
+
+    QStringList curves;
+    while (!stream.atEnd())
     {
-      QByteArray encoded = mimeData->data(format);
-      QDataStream stream(&encoded, QIODevice::ReadOnly);
-
-      if (format != "curveslist/add_curve") {
-        return false;
-      }
-
-      QStringList curves;
-      while (!stream.atEnd())
+      QString curve_name;
+      stream >> curve_name;
+      if (!curve_name.isEmpty())
       {
-        QString curve_name;
-        stream >> curve_name;
-        if (!curve_name.isEmpty())
-        {
-          curves.push_back(curve_name);
-        }
-      }
-      if( curves.size() != 1 )
-      {
-        return false;
-      }
-
-      _dragging_curve = curves.front();
-
-      if( obj == ui->lineEdit )
-      {
-        event->acceptProposedAction();
-        return true;
+        curves.push_back(curve_name);
       }
     }
-  }
-  else if ( ev->type() == QEvent::Drop ) {
-    auto lineEdit = qobject_cast<QLineEdit*>( obj );
-
-    if ( !lineEdit )
-    {
-      return false;
-    }
-    lineEdit->setText( _dragging_curve );
-    std::string curve_id = _dragging_curve.toStdString();
-    addCurve(curve_id);
-  }
-
-  return false;
-}
-
-
-void ToolboxFFT::onParametersChanged()
-{
-    if( ui->lineEdit->text().isEmpty() )
+    if( curves.size() != 1 )
     {
       return;
     }
+
+    _dragging_curve = curves.front();
+    event->acceptProposedAction();
+  }
+}
+
+void ToolboxFFT::onDropEvent(QDropEvent *)
+{
+  std::string curve_id = _dragging_curve.toStdString();
+  addCurve(curve_id);
+  _dragging_curve.clear();
+}
+
+void ToolboxFFT::onViewResized(const QRectF &rect)
+{
+  _view_rectangle = rect;
+
+  if( ui->radioZoomed->isChecked() ) {
+    updateCurveFFT( rect.left(), rect.right() );
+  }
+}
+
+void ToolboxFFT::onRadioZoomedToggled(bool checked)
+{
+  if( checked ) {
+    updateCurveFFT( _view_rectangle.left(), _view_rectangle.right() );
+  }
+  else {
+    auto MAX = std::numeric_limits<double>::max();
+    updateCurveFFT( -MAX/2, MAX/2 );
+  }
 }

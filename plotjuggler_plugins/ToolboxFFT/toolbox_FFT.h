@@ -36,15 +36,11 @@ public slots:
 
   bool onShowWidget() override;
 
-private slots:
-
-  void onParametersChanged();
-
 private:
   QWidget* _widget;
   Ui::toolbox_fft *ui;
 
-  bool eventFilter(QObject *obj, QEvent *event) override;
+  //bool eventFilter(QObject *obj, QEvent *event) override;
 
   QString _dragging_curve;
 
@@ -56,5 +52,17 @@ private:
 
   PJ::PlotDataMapRef _local_data;
 
+  void updateCurveFFT(double min, double max);
+
+  std::string _original_curve;
+
+  QRectF _view_rectangle;
+
+private slots:
+
+  void onDragEnterEvent(QDragEnterEvent* event);
+  void onDropEvent(QDropEvent* event);
+  void onViewResized(const QRectF& rect);
+  void onRadioZoomedToggled(bool checked);
 };
 

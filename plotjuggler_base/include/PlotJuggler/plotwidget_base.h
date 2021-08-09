@@ -26,7 +26,8 @@ public:
   enum CurveStyle {
     LINES,
     DOTS,
-    LINES_AND_DOTS
+    LINES_AND_DOTS,
+    HISTOGRAM
   };
 
   struct CurveInfo
@@ -93,6 +94,8 @@ public:
   bool keepRatioXY() const;
 
   void setKeepRatioXY(bool active);
+
+  void setAcceptDrops(bool accept);
 
 public slots:
 
