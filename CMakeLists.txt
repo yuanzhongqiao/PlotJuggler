@@ -135,9 +135,6 @@ include_directories(
 )
 
 #########################  BASE library  ####################################
-
-add_subdirectory( 3rdparty/qwt/src )
-
 qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/dataloader_base.h
   plotjuggler_base/include/PlotJuggler/statepublisher_base.h
@@ -199,10 +196,13 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/PlotJuggler.desktop
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
         DESTINATION ${DESKTOP_ICON_DIR}  )
 
+
+add_subdirectory( 3rdparty/qwt/src )
+
+
 install(
      TARGETS
         plotjuggler_base
-        plotjuggler_qwt
      EXPORT export_plotjuggler_base
      LIBRARY DESTINATION lib
      ARCHIVE DESTINATION lib
