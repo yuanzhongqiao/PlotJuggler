@@ -861,7 +861,8 @@ void MainWindow::onPlotZoomChanged(PlotWidget* modified_plot, QRectF new_range)
     auto visitor = [=](PlotWidget* plot){
       if(plot != modified_plot &&
          !plot->isEmpty() &&
-         !plot->isXYPlot())
+         !plot->isXYPlot() &&
+         plot->isZoomLinkEnabled() )
       {
         QRectF bound_act = plot->canvasBoundingRect();
         bound_act.setLeft(new_range.left());

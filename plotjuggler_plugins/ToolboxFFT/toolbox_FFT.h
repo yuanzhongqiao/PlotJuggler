@@ -54,9 +54,11 @@ private:
 
   void updateCurveFFT(double min, double max);
 
-  std::string _original_curve;
+  std::string _curve_name;
 
-  QRectF _view_rectangle;
+  Range _zoom_range;
+
+  Range _prev_range;
 
 private slots:
 
@@ -64,5 +66,6 @@ private slots:
   void onDropEvent(QDropEvent* event);
   void onViewResized(const QRectF& rect);
   void onRadioZoomedToggled(bool checked);
+  void onSaveCurve();
 };
 

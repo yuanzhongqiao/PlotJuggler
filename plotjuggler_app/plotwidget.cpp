@@ -460,7 +460,7 @@ void PlotWidget::onDropEvent(QDropEvent*)
   bool curves_changed = false;
 
   if (_dragging.mode == DragInfo::CURVES)
-  {
+  {   
     if ( isXYPlot() && !curveList().empty())
     {
       _dragging.mode = DragInfo::NONE;
@@ -1008,7 +1008,7 @@ void PlotWidget::on_externallyResized(const QRectF& rect)
     }
     emit undoableChange();
   }
-  else
+  else if( isZoomLinkEnabled() )
   {
     emit rectChanged(this, rect);
   }
@@ -1287,6 +1287,19 @@ void PlotWidget::overrideCursonMove()
   QString theme = settings.value("Preferences::theme", "light").toString();
   QPixmap pixmap(tr(":/style_%1/move.png").arg(theme));
   QApplication::setOverrideCursor(QCursor(pixmap.scaled(24, 24)));
+}
+
+bool PlotWidget::isZoomLinkEnabled() const
+{
+  for(const auto& it: curveList() )
+  {
+    auto series = dynamic_cast<QwtSeriesWrapper*>(it.curve->data());
+    if( series->plotData()->attribute("disable_linked_zoom") == "true")
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool PlotWidget::canvasEventFilter(QEvent* event)

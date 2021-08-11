@@ -83,7 +83,6 @@ void CurveListPanel::clear()
 
 void CurveListPanel::addCurve(const std::string &plot_name)
 {
-
   QString group_name;
 
   auto FindInPlotData = [&](auto& plot_data, const std::string &plot_name)

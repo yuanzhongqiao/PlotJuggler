@@ -71,6 +71,8 @@ public:
 
   void removeCurve(const QString& title) override;
 
+  bool isZoomLinkEnabled() const;
+
 protected:
   PlotDataMapRef& _mapped_data;
 
@@ -205,6 +207,7 @@ private:
   //void updateMaximumZoomArea();
   void rescaleEqualAxisScaling();
   void overrideCursonMove();
+
 };
 
 #endif

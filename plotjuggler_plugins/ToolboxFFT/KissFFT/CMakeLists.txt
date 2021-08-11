@@ -6,15 +6,8 @@ project(kissfft)
 # CMake configuration options
 # Principal datatype: double, float (default), int16_t, int32_t, simd
 
-set(KISSFFT_DATATYPE "float" CACHE STRING "Principal datatype of kissfft: double, float (default), int16_t, int32_t, simd")
-
-if (NOT KISSFFT_DATATYPE MATCHES "^double$" AND
-    NOT KISSFFT_DATATYPE MATCHES "^float$" AND
-    NOT KISSFFT_DATATYPE MATCHES "^int16_t$" AND
-    NOT KISSFFT_DATATYPE MATCHES "^int32_t$" AND
-    NOT KISSFFT_DATATYPE MATCHES "^simd$")
-    message(FATAL_ERROR "Incorrect value of KISSFFT_DATATYPE! It can be one of: double, float, int16_t, int32_t, simd")
-endif()
+# Principal datatype of kissfft: double, float (default), int16_t, int32_t, simd
+set(KISSFFT_DATATYPE "float")
 
 #
 # Print principal datatype
