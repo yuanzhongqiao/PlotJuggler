@@ -1255,6 +1255,11 @@ bool PlotWidget::eventFilter(QObject* obj, QEvent* event)
     return true;
   }
 
+  if( event->type() == QEvent::Destroy )
+  {
+    return false;
+  }
+
   if (obj == qwtPlot()->canvas())
   {
     return canvasEventFilter(event);
