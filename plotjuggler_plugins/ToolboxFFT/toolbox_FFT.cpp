@@ -20,8 +20,8 @@ ToolboxFFT::ToolboxFFT()
   connect( ui->buttonBox, &QDialogButtonBox::rejected,
            this, &ToolboxPlugin::closed );
 
-  connect( ui->radioZoomed, &QRadioButton::toggled,
-          this, &ToolboxFFT::onRadioZoomedToggled );
+  connect( ui->pushButtonCalculate, &QPushButton::clicked,
+          this, &ToolboxFFT::calculateCurveFFT );
 
   connect( ui->pushButtonSave, &QPushButton::clicked,
           this, &ToolboxFFT::onSaveCurve );
@@ -38,14 +38,14 @@ void ToolboxFFT::init(PJ::PlotDataMapRef &src_data,
   _plot_data = &src_data;
   _transforms = &transform_map;
 
-  _plot_widget_A = new PJ::PlotWidgetBase(ui->frameA);
-  _plot_widget_B = new PJ::PlotWidgetBase(ui->frameB);
+  _plot_widget_A = new PJ::PlotWidgetBase(ui->framePlotPreviewA);
+  _plot_widget_B = new PJ::PlotWidgetBase(ui->framePlotPreviewB);
 
-  auto preview_layout_A = new QHBoxLayout( ui->frameA );
+  auto preview_layout_A = new QHBoxLayout( ui->framePlotPreviewA );
   preview_layout_A->setMargin(6);
   preview_layout_A->addWidget( _plot_widget_A->widget() );
 
-  auto preview_layout_B = new QHBoxLayout( ui->frameB );
+  auto preview_layout_B = new QHBoxLayout( ui->framePlotPreviewB );
   preview_layout_B->setMargin(6);
   preview_layout_B->addWidget( _plot_widget_B->widget() );
 
@@ -72,7 +72,7 @@ bool ToolboxFFT::onShowWidget()
   return true;
 }
 
-void ToolboxFFT::updateCurveFFT(double min, double max)
+void ToolboxFFT::calculateCurveFFT()
 {
   const std::string& curve_id = _curve_name;
 
@@ -85,30 +85,27 @@ void ToolboxFFT::updateCurveFFT(double min, double max)
   }
   PlotData& curve_data = it->second;
 
-  int min_index = curve_data.getIndexFromX( min );
-  int max_index = curve_data.getIndexFromX( max );
+  int min_index = 0;
+  int max_index = curve_data.size() - 1;
+
+  if( ui->radioZoomed->isChecked() )
+  {
+    min_index = curve_data.getIndexFromX( _zoom_range.min );
+    max_index = curve_data.getIndexFromX( _zoom_range.max );
+  }
 
   double min_t = curve_data.at(min_index).x;
   double max_t = curve_data.at(max_index).x;
 
-  const double EPS = std::numeric_limits<double>::epsilon();
-  if ( std::abs(min_t - _prev_range.min) <= EPS &&
-       std::abs(max_t - _prev_range.max) <= EPS )
-  {
-    return;
-  }
-
-  _prev_range.min = min_t;
-  _prev_range.max = max_t;
-
   int N = 1 + max_index - min_index;
-  if( N < 4 || min_index < 0 || max_index < 0 ) {
-    return;
-  }
 
   if( N & 1 ) { // if not even, make it even
     N--;
     max_index--;
+  }
+
+  if( N < 8 || min_index < 0 || max_index < 0 ) {
+    return;
   }
 
   double dT = (curve_data.at(max_index).x -
@@ -154,7 +151,7 @@ void ToolboxFFT::updateCurveFFT(double min, double max)
 
   _plot_widget_B->removeAllCurves();
   _plot_widget_B->addCurve( curve_id + "/fft_freq", curver_fft, Qt::blue );
-  _plot_widget_B->changeCurvesStyle( PlotWidgetBase::HISTOGRAM );
+  _plot_widget_B->changeCurvesStyle( PlotWidgetBase::STICKS );
   _plot_widget_B->resetZoom();
 
   free(config);
@@ -163,8 +160,7 @@ void ToolboxFFT::updateCurveFFT(double min, double max)
 void ToolboxFFT::addCurve(std::string curve_id)
 {
   PlotData& curve_data = _plot_data->getOrCreateNumeric(curve_id);
-  const int N = curve_data.size();
-  if( N < 2 ) {
+  if( curve_data.size() < 10 ) {
     return;
   }
   _plot_widget_A->removeAllCurves();
@@ -173,11 +169,16 @@ void ToolboxFFT::addCurve(std::string curve_id)
 
   _curve_name = curve_id;
 
+  ui->pushButtonSave->setEnabled(true);
+  ui->pushButtonCalculate->setEnabled(true);
+  ui->lineEditDT->setEnabled(true);
+  ui->lineEditStdDev->setEnabled(true);
+
+  ui->lineEditSaveName->setEnabled(true);
+  ui->lineEditSaveName->setText( QString::fromStdString(_curve_name + "_FFT") );
+
   _zoom_range.min = curve_data.front().x;
   _zoom_range.max = curve_data.back().x;
-  updateCurveFFT( _zoom_range.min, _zoom_range.max );
-
-  ui->pushButtonSave->setEnabled( true );
 }
 
 void ToolboxFFT::onDragEnterEvent(QDragEnterEvent *event)
@@ -225,21 +226,6 @@ void ToolboxFFT::onViewResized(const QRectF &rect)
 {
   _zoom_range.min = rect.left();
   _zoom_range.max = rect.right();
-
-  if( ui->radioZoomed->isChecked() ) {
-    updateCurveFFT( rect.left(), rect.right() );
-  }
-}
-
-void ToolboxFFT::onRadioZoomedToggled(bool checked)
-{
-  if( checked ) {
-    updateCurveFFT( _zoom_range.min, _zoom_range.max );
-  }
-  else {
-    auto MAX = std::numeric_limits<double>::max();
-    updateCurveFFT( -MAX/2, MAX/2 );
-  }
 }
 
 void ToolboxFFT::onSaveCurve()
@@ -249,11 +235,12 @@ void ToolboxFFT::onSaveCurve()
     return;
   }
 
-  auto& out_data = _plot_data->getOrCreateNumeric( _curve_name + "_FFT" );
+  auto name = ui->lineEditSaveName->text().toStdString();
+  auto& out_data = _plot_data->getOrCreateNumeric( name );
   out_data.clone( it->second );
 
   out_data.setAttribute( "disable_linked_zoom", "true" );
 
-  emit plotCreated( _curve_name + "_FFT" );
+  emit plotCreated( name );
   emit closed();
 }

@@ -56,6 +56,10 @@ PlotwidgetEditor::PlotwidgetEditor(PlotWidget *plotwidget, QWidget *parent) :
   {
     ui->radioPoints->setChecked(true);
   }
+  else if( _plotwidget->curveStyle() == PlotWidgetBase::STICKS)
+  {
+    ui->radioSticks->setChecked(true);
+  }
   else {
     ui->radioBoth->setChecked(true);
   }
@@ -281,6 +285,15 @@ void PlotwidgetEditor::on_radioBoth_toggled(bool checked)
     _plotwidget->changeCurvesStyle( PlotWidgetBase::LINES_AND_DOTS );
   }
 }
+
+void PlotwidgetEditor::on_radioSticks_toggled(bool checked)
+{
+  if(checked)
+  {
+    _plotwidget->changeCurvesStyle( PlotWidgetBase::STICKS );
+  }
+}
+
 
 void PlotwidgetEditor::on_checkBoxMax_toggled(bool checked)
 {

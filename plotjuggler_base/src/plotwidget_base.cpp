@@ -346,6 +346,7 @@ PlotWidgetBase::PlotWidgetBase(QWidget *parent):
     canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
     abs_canvas = canvas;
   }
+  abs_canvas->setObjectName("qwtCanvas");
 
   p = new QwtPlotPimpl(this, abs_canvas, onViewResized, onEvent);
 
@@ -507,6 +508,44 @@ void PlotWidgetBase::setAcceptDrops(bool accept)
   qwtPlot()->setAcceptDrops(accept);
 }
 
+bool PlotWidgetBase::eventFilter(QObject* obj, QEvent* event)
+{
+  if( event->type() == QEvent::Destroy )
+  {
+    return false;
+  }
+
+  QwtScaleWidget* bottomAxis = qwtPlot()->axisWidget(QwtPlot::xBottom);
+  QwtScaleWidget* leftAxis = qwtPlot()->axisWidget(QwtPlot::yLeft);
+
+  if (magnifier() &&
+      (obj == bottomAxis || obj == leftAxis)
+      && !(isXYPlot()
+      && keepRatioXY()))
+  {
+    if (event->type() == QEvent::Wheel)
+    {
+      auto wheel_event = dynamic_cast<QWheelEvent*>(event);
+      if (obj == bottomAxis)
+      {
+        magnifier()->setDefaultMode(PlotMagnifier::X_AXIS);
+      }
+      else
+      {
+        magnifier()->setDefaultMode(PlotMagnifier::Y_AXIS);
+      }
+      magnifier()->widgetWheelEvent(wheel_event);
+    }
+  }
+  if (obj == qwtPlot()->canvas())
+  {
+    if (magnifier())
+    {
+      magnifier()->setDefaultMode(PlotMagnifier::BOTH_AXES);
+    }
+  }
+  return false;
+}
 
 QColor PlotWidgetBase::getColorHint(PlotData* data)
 {
@@ -592,7 +631,7 @@ void PlotWidgetBase::setStyle( QwtPlotCurve* curve, CurveStyle style )
     break;
     case DOTS: curve->setStyle( QwtPlotCurve::Dots );
     break;
-    case HISTOGRAM: curve->setStyle( QwtPlotCurve::Sticks );
+    case STICKS: curve->setStyle( QwtPlotCurve::Sticks );
   }
 }
 

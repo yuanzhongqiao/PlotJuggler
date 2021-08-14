@@ -13,7 +13,24 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1,0,0">
+   <item>
+    <widget class="QLabel" name="label_7">
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>FFT Toolbox</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
@@ -30,9 +47,9 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QFrame" name="frameA">
+      <widget class="QFrame" name="framePlotPreviewA">
        <property name="autoFillBackground">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="frameShape">
         <enum>QFrame::Box</enum>
@@ -52,7 +69,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEditDT"/>
+        <widget class="QLineEdit" name="lineEditDT">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_5">
@@ -62,7 +86,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEditStdDev"/>
+        <widget class="QLineEdit" name="lineEditStdDev">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_6">
@@ -84,7 +115,17 @@
        <item>
         <widget class="QRadioButton" name="radioZoomed">
          <property name="text">
-          <string>Zoom Area</string>
+          <string>Only data in zoomed area</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonCalculate">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Calculate</string>
          </property>
         </widget>
        </item>
@@ -152,7 +193,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QFrame" name="frameB">
+    <widget class="QFrame" name="framePlotPreviewB">
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
@@ -185,7 +226,20 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Save Fequency Curve</string>
+        <string>Save Curve as:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEditSaveName">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>500</width>
+         <height>0</height>
+        </size>
        </property>
       </widget>
      </item>

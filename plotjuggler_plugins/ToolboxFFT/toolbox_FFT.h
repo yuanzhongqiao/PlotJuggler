@@ -52,20 +52,16 @@ private:
 
   PJ::PlotDataMapRef _local_data;
 
-  void updateCurveFFT(double min, double max);
-
-  std::string _curve_name;
-
   Range _zoom_range;
 
-  Range _prev_range;
+  std::string _curve_name;
 
 private slots:
 
   void onDragEnterEvent(QDragEnterEvent* event);
   void onDropEvent(QDropEvent* event);
   void onViewResized(const QRectF& rect);
-  void onRadioZoomedToggled(bool checked);
   void onSaveCurve();
+  void calculateCurveFFT();
 };
 

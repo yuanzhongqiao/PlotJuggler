@@ -27,7 +27,7 @@ public:
     LINES,
     DOTS,
     LINES_AND_DOTS,
-    HISTOGRAM
+    STICKS
   };
 
   struct CurveInfo
@@ -130,6 +130,8 @@ protected:
   PlotMagnifier* magnifier();
 
   void updateMaximumZoomArea();
+
+  bool eventFilter(QObject* obj, QEvent* event);
 
 private:
   bool _xy_mode;

@@ -75,6 +75,8 @@ private slots:
 
   void on_lineLimitMax_textChanged(const QString &text);
 
+  void on_radioSticks_toggled(bool checked);
+
 private:
   Ui::PlotWidgetEditor *ui;
 

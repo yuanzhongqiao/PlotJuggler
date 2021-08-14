@@ -552,6 +552,10 @@ QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
   {
     plot_el.setAttribute("style", "Dots");
   }
+  else if (curveStyle() == PlotWidgetBase::STICKS)
+  {
+    plot_el.setAttribute("style", "Sticks");
+  }
 
   for (auto& it : curveList())
   {
@@ -722,6 +726,10 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
     else if (style == "Dots")
     {
       changeCurvesStyle( PlotWidgetBase::DOTS );
+    }
+    else if (style == "Sticks" )
+    {
+      changeCurvesStyle( PlotWidgetBase::STICKS );
     }
   }
 
@@ -1242,42 +1250,15 @@ void PlotWidget::on_pasteAction_triggered()
 
 bool PlotWidget::eventFilter(QObject* obj, QEvent* event)
 {
-  if( event->type() == QEvent::Destroy )
+  if( PlotWidgetBase::eventFilter(obj, event) )
   {
-    return false;
-  }
-  QwtScaleWidget* bottomAxis = qwtPlot()->axisWidget(QwtPlot::xBottom);
-  QwtScaleWidget* leftAxis = qwtPlot()->axisWidget(QwtPlot::yLeft);
-
-  if (magnifier() &&
-      (obj == bottomAxis || obj == leftAxis)
-      && !(isXYPlot()
-      && keepRatioXY()))
-  {
-    if (event->type() == QEvent::Wheel)
-    {
-      auto wheel_event = dynamic_cast<QWheelEvent*>(event);
-      if (obj == bottomAxis)
-      {
-        magnifier()->setDefaultMode(PlotMagnifier::X_AXIS);
-      }
-      else
-      {
-        magnifier()->setDefaultMode(PlotMagnifier::Y_AXIS);
-      }
-      magnifier()->widgetWheelEvent(wheel_event);
-    }
+    return true;
   }
 
   if (obj == qwtPlot()->canvas())
   {
-    if (magnifier())
-    {
-      magnifier()->setDefaultMode(PlotMagnifier::BOTH_AXES);
-    }
     return canvasEventFilter(event);
   }
-
   return false;
 }
 

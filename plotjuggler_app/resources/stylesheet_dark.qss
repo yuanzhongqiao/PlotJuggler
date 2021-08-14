@@ -21,12 +21,10 @@ item_selection_background: #148CD2
 
 QWidget {
   background: transparent;
-  border: 0px solid ${border_default};
   padding: 0px;
   color: ${default_text};
   font-size: 10pt;
 }
-
 
 QWidget:disabled{
   color: ${disabled_text};
@@ -802,7 +800,10 @@ QSplitter#mainSplitter::handle:horizontal::hover {
         stop:0.6 #cc00cc, stop:1.0 #1177ff);
 }
 
-QWidget#framePlotPreview{
+QFrame#framePlotPreview,
+QFrame#framePlotPreviewA,
+QFrame#framePlotPreviewB,
+QFrame#framePlotPreviewC {
    background-color: ${widget_background};
    border: 1px solid ${border_default};
    margin: 0px;
@@ -828,6 +829,11 @@ ads--CDockWidget {
 }
 
 QwtPlot {
+   background: ${widget_background};
+   border: 0px;
+}
+
+QWidget#qwtCanvas {
    background: ${widget_background};
    border: 0px;
 }
