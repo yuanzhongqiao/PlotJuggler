@@ -38,6 +38,7 @@
 #include "PlotJuggler/plotdata.h"
 #include "qwt_plot_canvas.h"
 #include "transforms/function_editor.h"
+#include "transforms/lua_custom_function.h"
 #include "utils.h"
 #include "PlotJuggler/svg_util.h"
 #include "stylesheet.h"
@@ -68,6 +69,7 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   , _streaming_shortcut(QKeySequence(Qt::CTRL + Qt::Key_Space), this)
   , _playback_shotcut(Qt::Key_Space, this)
   , _minimized(false)
+  , _message_parser_factory( new MessageParserFactory )
   , _active_streamer_plugin(nullptr)
   , _disable_undo_logging(false)
   , _tracker_time(0)
@@ -81,7 +83,7 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _test_option = commandline_parser.isSet("test");
   _autostart_publishers = commandline_parser.isSet("publish");
 
-  _curvelist_widget = new CurveListPanel(_mapped_plot_data, _custom_plots, this);
+  _curvelist_widget = new CurveListPanel(_mapped_plot_data, _transform_functions, this);
 
   ui->setupUi(this);
 
@@ -295,7 +297,7 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   auto editor_layout = new QVBoxLayout();
   editor_layout->setMargin(0);
   ui->formulaPage->setLayout(editor_layout);
-  _function_editor = new FunctionEditorWidget( _mapped_plot_data, _custom_plots, this);
+  _function_editor = new FunctionEditorWidget( _mapped_plot_data, _transform_functions, this);
   editor_layout->addWidget(_function_editor);
 
   connect(_function_editor, &FunctionEditorWidget::closed,
@@ -316,10 +318,10 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   loadStyleSheet(tr(":/resources/stylesheet_%1.qss").arg(theme));
 
   // builtin messageParsers
-  _message_parser_factory.insert( {"JSON", std::make_shared<JSON_ParserCreator>() });
-  _message_parser_factory.insert( {"CBOR", std::make_shared<CBOR_ParserCreator>() });
-  _message_parser_factory.insert( {"BSON", std::make_shared<BSON_ParserCreator>() });
-  _message_parser_factory.insert( {"MessagePack", std::make_shared<MessagePack_ParserCreator>() });
+  _message_parser_factory->insert( {"JSON", std::make_shared<JSON_ParserCreator>() });
+  _message_parser_factory->insert( {"CBOR", std::make_shared<CBOR_ParserCreator>() });
+  _message_parser_factory->insert( {"BSON", std::make_shared<BSON_ParserCreator>() });
+  _message_parser_factory->insert( {"MessagePack", std::make_shared<MessagePack_ParserCreator>() });
 
 }
 
@@ -548,6 +550,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       StatePublisher* publisher = qobject_cast<StatePublisher*>(plugin);
       DataStreamer* streamer = qobject_cast<DataStreamer*>(plugin);
       MessageParserCreator* message_parser =  qobject_cast<MessageParserCreator*>(plugin);
+      ToolboxPlugin* toolbox = qobject_cast<ToolboxPlugin*>(plugin);
 
       QString plugin_name;
 
@@ -562,6 +565,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if (message_parser){
         plugin_name = message_parser->name();
+      }
+      else if (toolbox){
+        plugin_name = toolbox->name();
       }
 
       if (loaded_plugins.find(plugin_name) == loaded_plugins.end())
@@ -601,7 +607,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
           ui->layoutPublishers->setColumnStretch(0, 1.0);
 
-          int row = _state_publisher.size() -1;
+          int row = _state_publisher.size() - 1;
           auto label = new QLabel(plugin_name, ui->framePublishers);
           ui->layoutPublishers->addWidget(label, row, 0);
 
@@ -612,8 +618,8 @@ QStringList MainWindow::initializePlugins(QString directory_name)
           connect(start_checkbox, &QCheckBox::toggled, this,
                   [=](bool enable) { publisher->setEnabled(enable); });
 
-          connect(publisher, &StatePublisher::closed, start_checkbox,
-                  [=]() {start_checkbox->setChecked(false);} );
+          connect(publisher, &StatePublisher::closed,
+                  start_checkbox, [=]() {start_checkbox->setChecked(false);} );
 
           if( publisher->availableActions().empty() )
           {
@@ -652,7 +658,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if (message_parser)
       {
-        _message_parser_factory.insert( std::make_pair(plugin_name, message_parser ) );
+        _message_parser_factory->insert( std::make_pair(plugin_name, message_parser ) );
       }
       else if (streamer)
       {
@@ -665,7 +671,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
         {
           _data_streamer.insert(std::make_pair(plugin_name, streamer));
 
-          streamer->setAvailableParsers( &_message_parser_factory );
+          streamer->setAvailableParsers( _message_parser_factory );
 
           connect(streamer, &DataStreamer::closed, this,
                   [this]() { this->stopStreamingPlugin(); } );
@@ -693,6 +699,36 @@ QStringList MainWindow::initializePlugins(QString directory_name)
             }
           });
         }
+      }
+      else if(toolbox)
+      {
+        qDebug() << filename << ": is a Toolbox plugin";
+        toolbox->init( _mapped_plot_data, _transform_functions );
+
+        auto action = ui->menuTools->addAction( toolbox->name() );
+
+        int new_index = ui->widgetStack->count();
+        auto provided =  toolbox->providedWidget();
+        auto widget =  provided.first;
+        ui->widgetStack->addWidget( widget );
+
+        connect( action, &QAction::triggered,
+                 toolbox, &ToolboxPlugin::onShowWidget );
+
+        connect( action, &QAction::triggered,
+                 this, [=]() {
+          ui->widgetStack->setCurrentIndex(new_index);
+        });
+
+        connect( toolbox, &ToolboxPlugin::closed,
+                 this, [=]() {
+          ui->widgetStack->setCurrentIndex(0);
+        });
+
+        connect( toolbox, &ToolboxPlugin::plotCreated,
+                 this, [=](std::string name) {
+          _curvelist_widget->addCurve( name );
+        });
       }
     }
     else
@@ -807,12 +843,14 @@ void MainWindow::onPlotAdded(PlotWidget* plot)
     this->forEachWidget(visitor);
   });
 
-  connect(plot, &PlotWidget::rectChanged, this, &MainWindow::onPlotZoomChanged);
+  connect(plot, &PlotWidget::rectChanged,
+          this, &MainWindow::onPlotZoomChanged);
 
   plot->on_changeTimeOffset(_time_offset.get());
   plot->on_changeDateTimeScale(ui->pushButtonUseDateTime->isChecked());
   plot->activateGrid(ui->pushButtonActivateGrid->isChecked());
   plot->enableTracker(!isStreamingActive());
+  plot->setKeepRatioXY(ui->pushButtonRatio->isChecked());
   plot->configureTracker(_tracker_param);
 }
 
@@ -823,7 +861,8 @@ void MainWindow::onPlotZoomChanged(PlotWidget* modified_plot, QRectF new_range)
     auto visitor = [=](PlotWidget* plot){
       if(plot != modified_plot &&
          !plot->isEmpty() &&
-         !plot->isXYPlot())
+         !plot->isXYPlot() &&
+         plot->isZoomLinkEnabled() )
       {
         QRectF bound_act = plot->canvasBoundingRect();
         bound_act.setLeft(new_range.left());
@@ -1099,7 +1138,7 @@ void MainWindow::deleteAllData()
   forEachWidget([](PlotWidget* plot) { plot->removeAllCurves(); });
 
   _mapped_plot_data.clear();
-  _custom_plots.clear();
+  _transform_functions.clear();
   _curvelist_widget->clear();
   _loaded_datafiles.clear();
   _undo_states.clear();
@@ -1199,22 +1238,17 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
     msgbox.exec();
   }
 
-  char prefix_ch = 'A';
   QStringList loaded_filenames;
 
   for (int i = 0; i < filenames.size(); i++)
   {
     FileLoadInfo info;
     info.filename = filenames[i];
-    if (filenames.size() > 1)
-    {
-      info.prefix = prefix_ch;
-    }
+    info.prefix = QFileInfo( info.filename ).baseName();
 
     if (loadDataFromFile(info))
     {
       loaded_filenames.push_back(filenames[i]);
-      prefix_ch++;
     }
   }
   if (loaded_filenames.size() > 0)
@@ -1347,14 +1381,14 @@ bool MainWindow::loadDataFromFile(const FileLoadInfo& info)
   _curvelist_widget->updateFilter();
 
   // clean the custom plot. Function updateDataAndReplot will update them
-  for (auto& custom_it : _custom_plots)
+  for (auto& custom_it : _transform_functions)
   {
     auto dst_data_it = _mapped_plot_data.numeric.find( custom_it.first );
     if (dst_data_it != _mapped_plot_data.numeric.end())
     {
       dst_data_it->second.clear();
     }
-    custom_it.second->clear();
+    custom_it.second->reset();
   }
 
   updateDataAndReplot(true);
@@ -1646,7 +1680,7 @@ std::tuple<double, double, int> MainWindow::calculateVisibleRangeX()
   double max_time = -std::numeric_limits<double>::max();
   int max_steps = 0;
 
-  forEachWidget([&](PlotWidget* widget) {
+  forEachWidget([&](const PlotWidget* widget) {
     for (auto& it : widget->curveList())
     {
       const auto& curve_name = it.src_name;
@@ -1831,21 +1865,27 @@ bool MainWindow::loadLayoutFromFile(QString filename)
   {
     if (!custom_equations.isNull())
     {
-      for (QDomElement custom_eq = custom_equations.firstChildElement("snippet"); custom_eq.isNull() == false;
+      for (QDomElement custom_eq = custom_equations.firstChildElement("snippet");
+           custom_eq.isNull() == false;
            custom_eq = custom_eq.nextSiblingElement("snippet"))
       {
-        CustomPlotPtr new_custom_plot = CustomFunction::createFromXML(custom_eq);
-        const auto& name = new_custom_plot->name();
-        _custom_plots[name] = new_custom_plot;
+        auto snippet = GetSnippetFromXML(custom_eq);
+        CustomPlotPtr new_custom_plot = std::make_shared<LuaCustomFunction>(snippet);
+        new_custom_plot->xmlLoadState( custom_eq );
+
         new_custom_plot->calculateAndAdd(_mapped_plot_data);
-        _curvelist_widget->addCustom(QString::fromStdString(name));
+        const auto& alias_name = new_custom_plot->aliasName();
+        _curvelist_widget->addCustom(alias_name);
+
+        _transform_functions.insert( {alias_name.toStdString(), new_custom_plot } );
       }
       _curvelist_widget->refreshColumns();
     }
   }
   catch (std::runtime_error& err)
   {
-    QMessageBox::warning(this, tr("Exception"), tr("Failed to refresh a customMathEquation \n\n %1\n").arg(err.what()));
+    QMessageBox::warning(this, tr("Exception"),
+                         tr("Failed to refresh a customMathEquation \n\n %1\n").arg(err.what()));
   }
 
   QByteArray snippets_saved_xml = settings.value("AddCustomPlotDialog.savedXML", QByteArray()).toByteArray();
@@ -1863,7 +1903,7 @@ bool MainWindow::loadLayoutFromFile(QString filename)
 
       if (prev_it == snippets_previous.end() ||
           prev_it->second.function != snippet_it.second.function ||
-          prev_it->second.globalVars != snippet_it.second.globalVars)
+          prev_it->second.global_vars != snippet_it.second.global_vars)
       {
         snippets_are_different = true;
         break;
@@ -1996,10 +2036,10 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
 
   const bool is_streaming_active = isStreamingActive();
 
-  for (auto& custom_it : _custom_plots)
+  // TODO 3.3
+  for (auto& [id, function] : _transform_functions)
   {
-    auto* dst_plot = &_mapped_plot_data.numeric.at(custom_it.first);
-    custom_it.second->calculate(_mapped_plot_data, dst_plot);
+    function->calculate();
   }
 
   forEachWidget([](PlotWidget* plot) {
@@ -2122,7 +2162,7 @@ void MainWindow::on_pushButtonActivateGrid_toggled(bool checked)
 void MainWindow::on_pushButtonRatio_toggled(bool checked)
 {
   forEachWidget([checked](PlotWidget* plot) {
-    plot->setConstantRatioXY(checked);
+    plot->setKeepRatioXY(checked);
     plot->replot();
   });
 }
@@ -2157,9 +2197,9 @@ void MainWindow::on_actionClearBuffer_triggered()
     it.second.clear();
   }
 
-  for (auto& it : _custom_plots)
+  for (auto& it : _transform_functions)
   {
-    it.second->clear();
+    it.second->reset();
   }
 
   forEachWidget([](PlotWidget* plot) {
@@ -2264,27 +2304,28 @@ void MainWindow::onAddCustomPlot(const std::string& plot_name)
 void MainWindow::onEditCustomPlot(const std::string& plot_name)
 {
   ui->widgetStack->setCurrentIndex(1);
-  auto custom_it = _custom_plots.find(plot_name);
-  if (custom_it == _custom_plots.end())
+  auto custom_it = _transform_functions.find(plot_name);
+  if (custom_it == _transform_functions.end())
   {
     qWarning("failed to find custom equation");
     return;
   }
-  _function_editor->editExistingPlot(custom_it->second);
+  _function_editor->editExistingPlot(
+      std::dynamic_pointer_cast<LuaCustomFunction>(custom_it->second)
+      );
 }
 
 void MainWindow::onRefreshCustomPlot(const std::string& plot_name)
 {
   try
   {
-    auto custom_it = _custom_plots.find(plot_name);
-    if (custom_it == _custom_plots.end())
+    auto custom_it = _transform_functions.find(plot_name);
+    if (custom_it == _transform_functions.end())
     {
       qWarning("failed to find custom equation");
       return;
     }
-    CustomPlotPtr ce = custom_it->second;
-
+    CustomPlotPtr ce = std::dynamic_pointer_cast<LuaCustomFunction>(custom_it->second);
     ce->calculateAndAdd(_mapped_plot_data);
 
     onUpdateLeftTableValues();
@@ -2334,10 +2375,10 @@ void MainWindow::onPlaybackLoop()
 
 void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
 {
-  const std::string& name = custom_plot->name();
+  const std::string& curve_name = custom_plot->aliasName().toStdString();
 
   // clear already existing data first
-  auto data_it = _mapped_plot_data.numeric.find(name);
+  auto data_it = _mapped_plot_data.numeric.find(curve_name);
   if (data_it != _mapped_plot_data.numeric.end())
   {
     data_it->second.clear();
@@ -2350,7 +2391,8 @@ void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
   catch (std::exception& ex)
   {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Failed to create the custom timeseries. Error:\n\n%1").arg(ex.what()));
+                         tr("Failed to create the custom timeseries. "
+                            "Error:\n\n%1").arg(ex.what()));
 
     return;
   }
@@ -2358,11 +2400,11 @@ void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
   _function_editor->clear();
 
   // keep data for reference
-  auto custom_it = _custom_plots.find(name);
-  if (custom_it == _custom_plots.end())
+  auto custom_it = _transform_functions.find(curve_name);
+  if (custom_it == _transform_functions.end())
   {
-    _custom_plots.insert({ name, custom_plot });
-    _curvelist_widget->addCustom( QString::fromStdString(name) );
+    _transform_functions.insert({ curve_name, custom_plot });
+    _curvelist_widget->addCustom( QString::fromStdString(curve_name) );
     onUpdateLeftTableValues();
   }
   else{
@@ -2374,14 +2416,10 @@ void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
   // update plots
   forEachWidget([&](PlotWidget* plot) {
 
-    const auto& curves = plot->curveList();
-    auto it = std::find_if(curves.begin(), curves.end(),
-                           [&name](const PlotWidget::CurveInfo& info)
-    {
-      return info.src_name == name;
-    });
+    PlotWidgetBase::CurveInfo* info =  plot->curveFromTitle(
+          QString::fromStdString( curve_name ) );
 
-    if (it != curves.end())
+    if (info)
     {
       plot->updateCurves();
       plot->replot();
@@ -2697,10 +2735,10 @@ void MainWindow::on_pushButtonSaveLayout_clicked()
   if (checkbox_snippets->isChecked())
   {
     QDomElement custom_equations = doc.createElement("customMathEquations");
-    for (const auto& custom_it : _custom_plots)
+    for (const auto& custom_it : _transform_functions)
     {
       const auto& custom_plot = custom_it.second;
-      custom_equations.appendChild(custom_plot->xmlSaveState(doc));
+      custom_plot->xmlSaveState(doc, custom_equations);
     }
     root.appendChild(custom_equations);
 

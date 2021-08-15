@@ -21,10 +21,9 @@ item_selection_background: #62c5ff
 
 QWidget {
   background: transparent;
-  border: 0px solid ${border_default};
   padding: 0px;
   color: ${default_text};
-  font-size: 10pt;
+  font-size: 11pt;
 }
 
 QWidget:disabled{
@@ -812,11 +811,15 @@ QSplitter#mainSplitter::handle:horizontal::hover {
         stop:0.6 #cc00cc, stop:1.0 #1177ff);
 }
 
-QWidget#framePlotPreview{
+QFrame#framePlotPreview,
+QFrame#framePlotPreviewA,
+QFrame#framePlotPreviewB,
+QFrame#framePlotPreviewC {
    background-color: ${widget_background};
    border: 1px solid ${border_default};
    margin: 0px;
 }
+
 
 QWidget#formulaPage{
    background-color: ${main_background};
@@ -838,6 +841,11 @@ ads--CDockWidget {
 }
 
 QwtPlot {
+   background: ${widget_background};
+   border: 0px;
+}
+
+QWidget#qwtCanvas {
    background: ${widget_background};
    border: 0px;
 }
