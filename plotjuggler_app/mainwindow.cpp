@@ -1238,22 +1238,17 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
     msgbox.exec();
   }
 
-  char prefix_ch = 'A';
   QStringList loaded_filenames;
 
   for (int i = 0; i < filenames.size(); i++)
   {
     FileLoadInfo info;
     info.filename = filenames[i];
-    if (filenames.size() > 1)
-    {
-      info.prefix = prefix_ch;
-    }
+    info.prefix = QFileInfo( info.filename ).baseName();
 
     if (loadDataFromFile(info))
     {
       loaded_filenames.push_back(filenames[i]);
-      prefix_ch++;
     }
   }
   if (loaded_filenames.size() > 0)
