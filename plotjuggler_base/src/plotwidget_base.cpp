@@ -555,7 +555,7 @@ QColor PlotWidgetBase::getColorHint(PlotData* data)
 
   if (data )
   {
-    auto colorHint = data->attribute("color_hint");
+    auto colorHint = data->attribute("ColorHint");
     if( remember_color && colorHint.isValid())
     {
       return colorHint.value<QColor>();
@@ -601,7 +601,7 @@ QColor PlotWidgetBase::getColorHint(PlotData* data)
   }
   if (data)
   {
-    data->setAttribute( "color_hint", color );
+    data->setAttribute( "ColorHint", color );
   }
 
   return color;

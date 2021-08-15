@@ -239,7 +239,7 @@ void ToolboxFFT::onSaveCurve()
   auto& out_data = _plot_data->getOrCreateNumeric( name );
   out_data.clone( it->second );
 
-  out_data.setAttribute( "disable_linked_zoom", "true" );
+  out_data.setAttribute( PJ::DISABLE_LINKED_ZOOM, true );
 
   emit plotCreated( name );
   emit closed();

@@ -1280,7 +1280,7 @@ bool PlotWidget::isZoomLinkEnabled() const
   for(const auto& it: curveList() )
   {
     auto series = dynamic_cast<QwtSeriesWrapper*>(it.curve->data());
-    if( series->plotData()->attribute("disable_linked_zoom") == "true")
+    if( series->plotData()->attribute( PJ::DISABLE_LINKED_ZOOM).toBool() )
     {
       return false;
     }
