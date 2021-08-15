@@ -8,6 +8,8 @@ class QuaternionToRollPitchYaw: public PJ::TransformFunction
 {
 public:
 
+  QuaternionToRollPitchYaw();
+
   const char* name() const override {
     return "quaternion_to_RPY";
   }

@@ -1,6 +1,11 @@
 #include "quaternion_to_rpy.h"
 
 
+QuaternionToRollPitchYaw::QuaternionToRollPitchYaw()
+{
+  reset();
+}
+
 void QuaternionToRollPitchYaw::reset()
 {
   _prev_roll = 0;

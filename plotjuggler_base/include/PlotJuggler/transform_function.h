@@ -98,7 +98,7 @@ public:
 
 protected:
 
-  double _last_timestamp;
+  double _last_timestamp = - std::numeric_limits<double>::max();
 };
 
 ///------ The factory to create instances of a SeriesTransform -------------

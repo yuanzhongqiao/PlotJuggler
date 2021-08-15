@@ -5,7 +5,7 @@ namespace PJ {
 TransformFunction::TransformFunction():
   _data(nullptr)
 {
-  reset();
+
 }
 
 std::vector<const PlotData *> &TransformFunction::dataSources()

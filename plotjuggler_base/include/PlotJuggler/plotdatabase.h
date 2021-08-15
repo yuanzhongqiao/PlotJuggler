@@ -51,6 +51,7 @@ inline const char* ToStr(const PlotAttribute& attr){
     case TOOL_TIP: return "ToolTip";
     case DISABLE_LINKED_ZOOM: return "DisableLinkedZoom";
   }
+  return "";
 }
 
 /**
