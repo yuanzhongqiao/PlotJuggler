@@ -30,8 +30,6 @@ public:
 
   std::pair<QWidget*, WidgetType> providedWidget() const override;
 
-  void addCurve(std::string curve_id);
-  
 public slots:
 
   bool onShowWidget() override;
@@ -42,7 +40,7 @@ private:
 
   //bool eventFilter(QObject *obj, QEvent *event) override;
 
-  QString _dragging_curve;
+  QStringList _dragging_curves;
 
   PJ::PlotWidgetBase* _plot_widget_A = nullptr;
   PJ::PlotWidgetBase* _plot_widget_B = nullptr;
@@ -54,7 +52,7 @@ private:
 
   Range _zoom_range;
 
-  std::string _curve_name;
+  std::vector<std::string> _curve_names;
 
 private slots:
 
@@ -63,5 +61,6 @@ private slots:
   void onViewResized(const QRectF& rect);
   void onSaveCurve();
   void calculateCurveFFT();
+  void onClearCurves();
 };
 
