@@ -849,7 +849,7 @@ void PlotWidget::reloadPlotData()
 
 void PlotWidget::activateLegend(bool activate)
 {
-  qwtPlot()->legend()->setVisible(activate);
+   legend()->setVisible(activate);
 }
 
 
