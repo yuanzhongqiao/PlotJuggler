@@ -206,3 +206,11 @@ install(
     TARGETS plotjuggler_qwt
     EXPORT export_plotjuggler_qwt
     DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY} )
+
+install(
+     TARGETS
+        plotjuggler_qwt
+     LIBRARY DESTINATION lib
+     ARCHIVE DESTINATION lib
+     RUNTIME DESTINATION bin
+     INCLUDES DESTINATION include )
