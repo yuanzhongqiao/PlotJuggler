@@ -469,12 +469,12 @@ bool DraggableToolbar::eventFilter(QObject *object, QEvent *event)
 
 void DraggableToolbar::on_stylesheetChanged(QString theme)
 {
-  _expand_icon = LoadSvgIcon(":/resources/svg/expand.svg", theme);
-  _collapse_icon = LoadSvgIcon(":/resources/svg/collapse.svg", theme);
+  _expand_icon = LoadSvg(":/resources/svg/expand.svg", theme);
+  _collapse_icon = LoadSvg(":/resources/svg/collapse.svg", theme);
   setButtonIcon(ui->buttonFullscreen, _fullscreen_mode ? _collapse_icon : _expand_icon );
-  setButtonIcon(ui->buttonClose, LoadSvgIcon( ":/resources/svg/close-button.svg", theme));
-  setButtonIcon(ui->buttonSplitHorizontal,  LoadSvgIcon(":/resources/svg/add_column.svg", theme));
-  setButtonIcon(ui->buttonSplitVertical,  LoadSvgIcon(":/resources/svg/add_row.svg", theme));
+  setButtonIcon(ui->buttonClose, LoadSvg( ":/resources/svg/close-button.svg", theme));
+  setButtonIcon(ui->buttonSplitHorizontal,  LoadSvg(":/resources/svg/add_column.svg", theme));
+  setButtonIcon(ui->buttonSplitVertical,  LoadSvg(":/resources/svg/add_row.svg", theme));
 }
 
 void DraggableToolbar::leaveEvent(QEvent *ev)

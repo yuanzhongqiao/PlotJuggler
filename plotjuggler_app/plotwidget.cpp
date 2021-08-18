@@ -207,18 +207,18 @@ void PlotWidget::canvasContextMenuTriggered(const QPoint& pos)
   QSettings settings;
   QString theme = settings.value("StyleSheet::theme", "light").toString();
 
-  _action_removeAllCurves->setIcon( LoadSvgIcon(":/resources/svg/remove_red.svg", theme) );
-  _action_edit->setIcon( LoadSvgIcon(":/resources/svg/pencil-edit.svg", theme) );
-  _action_formula->setIcon( LoadSvgIcon(":/resources/svg/Fx.svg", theme) );
-  _action_split_horizontal->setIcon( LoadSvgIcon(":/resources/svg/add_column.svg", theme) );
-  _action_split_vertical->setIcon( LoadSvgIcon(":/resources/svg/add_row.svg", theme) );
-  _action_zoomOutMaximum->setIcon( LoadSvgIcon(":/resources/svg/zoom_max.svg", theme) );
-  _action_zoomOutHorizontally->setIcon( LoadSvgIcon(":/resources/svg/zoom_horizontal.svg", theme) );
-  _action_zoomOutVertically->setIcon( LoadSvgIcon(":/resources/svg/zoom_vertical.svg", theme) );
-  _action_copy->setIcon( LoadSvgIcon(":/resources/svg/copy.svg", theme) );
-  _action_paste->setIcon( LoadSvgIcon(":/resources/svg/paste.svg", theme) );
-  _action_saveToFile->setIcon( LoadSvgIcon(":/resources/svg/save.svg", theme) );
-  _action_image_to_clipboard->setIcon( LoadSvgIcon(":/resources/svg/plot_image.svg", theme) );
+  _action_removeAllCurves->setIcon( LoadSvg(":/resources/svg/remove_red.svg", theme) );
+  _action_edit->setIcon( LoadSvg(":/resources/svg/pencil-edit.svg", theme) );
+  _action_formula->setIcon( LoadSvg(":/resources/svg/Fx.svg", theme) );
+  _action_split_horizontal->setIcon( LoadSvg(":/resources/svg/add_column.svg", theme) );
+  _action_split_vertical->setIcon( LoadSvg(":/resources/svg/add_row.svg", theme) );
+  _action_zoomOutMaximum->setIcon( LoadSvg(":/resources/svg/zoom_max.svg", theme) );
+  _action_zoomOutHorizontally->setIcon( LoadSvg(":/resources/svg/zoom_horizontal.svg", theme) );
+  _action_zoomOutVertically->setIcon( LoadSvg(":/resources/svg/zoom_vertical.svg", theme) );
+  _action_copy->setIcon( LoadSvg(":/resources/svg/copy.svg", theme) );
+  _action_paste->setIcon( LoadSvg(":/resources/svg/paste.svg", theme) );
+  _action_saveToFile->setIcon( LoadSvg(":/resources/svg/save.svg", theme) );
+  _action_image_to_clipboard->setIcon( LoadSvg(":/resources/svg/plot_image.svg", theme) );
 
   QMenu menu(qwtPlot());
 
@@ -1271,7 +1271,7 @@ void PlotWidget::overrideCursonMove()
 {
   QSettings settings;
   QString theme = settings.value("Preferences::theme", "light").toString();
-  QPixmap pixmap(tr(":/style_%1/move.png").arg(theme));
+  auto pixmap = LoadSvg(":/resources/svg/move_view.svg", theme);
   QApplication::setOverrideCursor(QCursor(pixmap.scaled(24, 24)));
 }
 
@@ -1292,37 +1292,6 @@ bool PlotWidget::canvasEventFilter(QEvent* event)
 {
   switch (event->type())
   {
-    case QEvent::Wheel: {
-      auto mouse_event = dynamic_cast<QWheelEvent*>(event);
-
-      bool ctrl_modifier = mouse_event->modifiers() == Qt::ControlModifier;
-      auto legend_rect = legend()->geometry( qwtPlot()->canvas()->rect());
-
-      if (ctrl_modifier)
-      {
-        if (legend_rect.contains(mouse_event->pos()) && legend()->isVisible())
-        {
-          int prev_size = legend()->font().pointSize();
-          int new_size = prev_size;
-          if (mouse_event->angleDelta().y() > 0)
-          {
-            new_size = std::min(13, prev_size+1);
-          }
-          if (mouse_event->angleDelta().y() < 0)
-          {
-            new_size = std::max(7, prev_size-1);
-          }
-          if( new_size != prev_size)
-          {
-            setLegendSize(new_size);
-            emit legendSizeChanged(new_size);
-          }
-          return true;
-        }
-      }
-      return false;
-    }
-
     case QEvent::MouseButtonPress: {
       if (_dragging.mode != DragInfo::NONE)
       {
@@ -1346,27 +1315,10 @@ bool PlotWidget::canvasEventFilter(QEvent* event)
         {
           overrideCursonMove();
         }
-        else
-        {
-          auto clicked_item = legend()->processMousePressEvent(mouse_event);
-          if (clicked_item)
-          {
-            for (auto& it : curveList())
-            {
-              if (clicked_item == it.curve)
-              {
-                it.curve->setVisible(!it.curve->isVisible());
-                _tracker->redraw();
-                on_zoomOutVertical_triggered();
-                replot();
-                return true;
-              }
-            }
-          }
-        }
         return false;  // send to canvas()
       }
-      else if (mouse_event->buttons() == Qt::MiddleButton && mouse_event->modifiers() == Qt::NoModifier)
+      else if (mouse_event->buttons() == Qt::MiddleButton &&
+               mouse_event->modifiers() == Qt::NoModifier)
       {
         overrideCursonMove();
         return false;
@@ -1390,7 +1342,8 @@ bool PlotWidget::canvasEventFilter(QEvent* event)
 
       QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
 
-      if (mouse_event->buttons() == Qt::LeftButton && mouse_event->modifiers() == Qt::ShiftModifier)
+      if (mouse_event->buttons() == Qt::LeftButton &&
+          mouse_event->modifiers() == Qt::ShiftModifier)
       {
         const QPoint point = mouse_event->pos();
         QPointF pointF(

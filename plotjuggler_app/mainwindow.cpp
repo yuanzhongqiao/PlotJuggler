@@ -633,7 +633,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
             options_button->setFixedSize({24,24});
             ui->layoutPublishers->addWidget(options_button, row, 2);
 
-            options_button->setIcon( LoadSvgIcon(":/resources/svg/settings_cog.svg", "light"));
+            options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", "light"));
             options_button->setIconSize( {16,16} );
 
             auto optionsMenu = [=]()
@@ -651,7 +651,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
             connect( this, &MainWindow::stylesheetChanged,
                      options_button, [=](QString style)
             {
-              options_button->setIcon( LoadSvgIcon(":/resources/svg/settings_cog.svg", style));
+              options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", style));
             });
           }
         }
@@ -1563,27 +1563,27 @@ void MainWindow::loadStyleSheet(QString file_path)
 
 void MainWindow::on_stylesheetChanged(QString theme)
 {
-  ui->pushButtonLoadDatafile->setIcon(LoadSvgIcon(":/resources/svg/import.svg", theme));
-  ui->buttonStreamingPause->setIcon(LoadSvgIcon(":/resources/svg/pause.svg", theme));
+  ui->pushButtonLoadDatafile->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
+  ui->buttonStreamingPause->setIcon(LoadSvg(":/resources/svg/pause.svg", theme));
 
-  ui->buttonRecentData->setIcon(LoadSvgIcon(":/resources/svg/right-arrow.svg", theme));
-  ui->buttonRecentLayout->setIcon(LoadSvgIcon(":/resources/svg/right-arrow.svg", theme));
+  ui->buttonRecentData->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
+  ui->buttonRecentLayout->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
 
-  ui->pushButtonZoomOut->setIcon(LoadSvgIcon(":/resources/svg/zoom_max.svg", theme));
-  ui->playbackLoop->setIcon(LoadSvgIcon(":/resources/svg/loop.svg", theme));
-  ui->pushButtonPlay->setIcon(LoadSvgIcon(":/resources/svg/play_arrow.svg", theme));
-  ui->pushButtonUseDateTime->setIcon(LoadSvgIcon(":/resources/svg/datetime.svg", theme));
-  ui->pushButtonActivateGrid->setIcon(LoadSvgIcon(":/resources/svg/grid.svg", theme));
-  ui->pushButtonRatio->setIcon(LoadSvgIcon(":/resources/svg/ratio.svg", theme));
+  ui->pushButtonZoomOut->setIcon(LoadSvg(":/resources/svg/zoom_max.svg", theme));
+  ui->playbackLoop->setIcon(LoadSvg(":/resources/svg/loop.svg", theme));
+  ui->pushButtonPlay->setIcon(LoadSvg(":/resources/svg/play_arrow.svg", theme));
+  ui->pushButtonUseDateTime->setIcon(LoadSvg(":/resources/svg/datetime.svg", theme));
+  ui->pushButtonActivateGrid->setIcon(LoadSvg(":/resources/svg/grid.svg", theme));
+  ui->pushButtonRatio->setIcon(LoadSvg(":/resources/svg/ratio.svg", theme));
 
-  ui->pushButtonLoadLayout->setIcon(LoadSvgIcon(":/resources/svg/import.svg", theme));
-  ui->pushButtonSaveLayout->setIcon(LoadSvgIcon(":/resources/svg/export.svg", theme));
+  ui->pushButtonLoadLayout->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
+  ui->pushButtonSaveLayout->setIcon(LoadSvg(":/resources/svg/export.svg", theme));
 
-  ui->pushButtonLink->setIcon(LoadSvgIcon(":/resources/svg/link.svg", theme));
-  ui->pushButtonRemoveTimeOffset->setIcon(LoadSvgIcon(":/resources/svg/t0.svg", theme));
-  ui->pushButtonLegend->setIcon(LoadSvgIcon(":/resources/svg/legend.svg", theme));
+  ui->pushButtonLink->setIcon(LoadSvg(":/resources/svg/link.svg", theme));
+  ui->pushButtonRemoveTimeOffset->setIcon(LoadSvg(":/resources/svg/t0.svg", theme));
+  ui->pushButtonLegend->setIcon(LoadSvg(":/resources/svg/legend.svg", theme));
 
-  ui->buttonStreamingOptions->setIcon(LoadSvgIcon(":/resources/svg/settings_cog.svg", theme));
+  ui->buttonStreamingOptions->setIcon(LoadSvg(":/resources/svg/settings_cog.svg", theme));
 }
 
 void MainWindow::loadPluginState(const QDomElement& root)

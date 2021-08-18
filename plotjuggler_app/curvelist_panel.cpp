@@ -523,9 +523,9 @@ void CurveListPanel::clearSelections()
 void CurveListPanel::on_stylesheetChanged(QString theme)
 {
   _style_dir = theme;
-  ui->buttonAddCustom->setIcon(LoadSvgIcon(":/resources/svg/add_tab.svg", theme));
-  ui->buttonEditCustom->setIcon(LoadSvgIcon(":/resources/svg/pencil-edit.svg", theme));
-  ui->pushButtonTrash->setIcon(LoadSvgIcon(":/resources/svg/trash.svg", theme));
+  ui->buttonAddCustom->setIcon(LoadSvg(":/resources/svg/add_tab.svg", theme));
+  ui->buttonEditCustom->setIcon(LoadSvg(":/resources/svg/pencil-edit.svg", theme));
+  ui->pushButtonTrash->setIcon(LoadSvg(":/resources/svg/trash.svg", theme));
 }
 
 void CurveListPanel::on_checkBoxShowValues_toggled(bool show)

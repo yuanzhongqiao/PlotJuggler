@@ -77,7 +77,7 @@ bool ToolboxFFT::onShowWidget()
   QSettings settings;
   QString theme = settings.value("StyleSheet::theme", "light").toString();
 
-  ui->pushButtonClear->setIcon(LoadSvgIcon(":/resources/svg/clear.svg", theme));
+  ui->pushButtonClear->setIcon(LoadSvg(":/resources/svg/clear.svg", theme));
   return true;
 }
 
@@ -123,7 +123,7 @@ void ToolboxFFT::calculateCurveFFT()
     std::vector<kiss_fft_scalar> input;
     input.reserve( curve_data.size() );
 
-    double std_dev = 0.0;
+    //double std_dev = 0.0;
 
     for(size_t i=0; i<N; i++ ) {
       const auto& p = curve_data[i];
@@ -132,13 +132,10 @@ void ToolboxFFT::calculateCurveFFT()
       if( i != 0) {
         double dTi = ( p.x - curve_data[i-1].x );
         double diff = dTi - dT;
-        std_dev += diff*diff;
+        //std_dev += diff*diff;
       }
     }
-    std_dev = sqrt(std_dev / double(N-1) );
-
-    ui->lineEditDT->setText( QString::number( dT, 'f' ) );
-    ui->lineEditStdDev->setText( QString::number( std_dev, 'f' ) );
+    //std_dev = sqrt(std_dev / double(N-1) );
 
     std::vector<kiss_fft_cpx> out( N/2+1 );
 
@@ -164,7 +161,7 @@ void ToolboxFFT::calculateCurveFFT()
       color = colorHint.value<QColor>();
     }
 
-    _plot_widget_B->addCurve( curve_id + "/fft_freq", curver_fft, color );
+    _plot_widget_B->addCurve( curve_id + "_FFT", curver_fft, color );
 
     free(config);
   }
@@ -183,8 +180,6 @@ void ToolboxFFT::onClearCurves()
 
   ui->pushButtonSave->setEnabled(false);
   ui->pushButtonCalculate->setEnabled(false);
-  ui->lineEditDT->setEnabled(false);
-  ui->lineEditStdDev->setEnabled(false);
 
   ui->lineEditSuffix->setEnabled(false);
   ui->lineEditSuffix->setText( "_FFT" );
@@ -239,9 +234,6 @@ void ToolboxFFT::onDropEvent(QDropEvent *)
 
   ui->pushButtonSave->setEnabled(true);
   ui->pushButtonCalculate->setEnabled(true);
-  ui->lineEditDT->setEnabled(true);
-  ui->lineEditStdDev->setEnabled(true);
-
   ui->lineEditSuffix->setEnabled(true);
 
   _dragging_curves.clear();

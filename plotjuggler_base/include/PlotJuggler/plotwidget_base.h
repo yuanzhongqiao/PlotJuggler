@@ -113,6 +113,8 @@ signals:
 
   void dropSignal(QDropEvent* event);
 
+  void legendSizeChanged(int new_size);
+
 protected:
 
   class QwtPlotPimpl;

@@ -89,7 +89,6 @@ signals:
   void trackerMoved(QPointF pos);
   void curveListChanged();
   void curvesDropped();
-  void legendSizeChanged(int new_size);
   void splitHorizontal();
   void splitVertical();
 

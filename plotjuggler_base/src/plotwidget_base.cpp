@@ -543,6 +543,62 @@ bool PlotWidgetBase::eventFilter(QObject* obj, QEvent* event)
     {
       magnifier()->setDefaultMode(PlotMagnifier::BOTH_AXES);
     }
+    switch (event->type())
+    {
+      case QEvent::Wheel: {
+        auto mouse_event = dynamic_cast<QWheelEvent*>(event);
+
+        bool ctrl_modifier = mouse_event->modifiers() == Qt::ControlModifier;
+        auto legend_rect = legend()->geometry( qwtPlot()->canvas()->rect());
+
+        if (ctrl_modifier)
+        {
+          if (legend_rect.contains(mouse_event->pos()) && legend()->isVisible())
+          {
+            int prev_size = legend()->font().pointSize();
+            int new_size = prev_size;
+            if (mouse_event->angleDelta().y() > 0)
+            {
+              new_size = std::min(13, prev_size+1);
+            }
+            if (mouse_event->angleDelta().y() < 0)
+            {
+              new_size = std::max(7, prev_size-1);
+            }
+            if( new_size != prev_size)
+            {
+              setLegendSize(new_size);
+              emit legendSizeChanged(new_size);
+            }
+            return true;
+          }
+        }
+        return false;
+      }
+      //-------------------
+      case QEvent::MouseButtonPress: {
+        QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+        if (mouse_event->button() == Qt::LeftButton &&
+            mouse_event->modifiers() == Qt::NoModifier)
+        {
+          auto clicked_item = legend()->processMousePressEvent(mouse_event);
+          if (clicked_item)
+          {
+            for (auto& it : curveList())
+            {
+              if (clicked_item == it.curve)
+              {
+                it.curve->setVisible(!it.curve->isVisible());
+                //_tracker->redraw();
+                resetZoom();
+                replot();
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
   }
   return false;
 }
