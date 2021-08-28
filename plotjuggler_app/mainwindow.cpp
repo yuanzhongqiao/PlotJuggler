@@ -83,6 +83,35 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _test_option = commandline_parser.isSet("test");
   _autostart_publishers = commandline_parser.isSet("publish");
 
+  _skin_path ="://resources/skin";
+  if( commandline_parser.isSet("skin_path") )
+  {
+    QDir path( commandline_parser.value("skin_path") );
+    if( path.exists() )
+    {
+      _skin_path = path.absolutePath();
+    }
+  }
+  QFile fileTitle( _skin_path + "/mainwindow_title.txt");
+  if(fileTitle.open(QIODevice::ReadOnly)) {
+    QString title = fileTitle.readAll();
+    setWindowTitle(title);
+  }
+
+  if ( commandline_parser.isSet("enabled_plugins"))
+  {
+    _enabled_plugins  = commandline_parser.value("enabled_plugins").split(";", QString::SkipEmptyParts);
+    // Treat the command-line parameter  '--enabled_plugins *' to mean all plugings are enabled
+    if (  (_enabled_plugins.size() == 1) && (_enabled_plugins.contains("*")) )
+    {
+      _enabled_plugins.clear();
+    }
+  }
+  if ( commandline_parser.isSet("disabled_plugins"))
+  {
+    _disabled_plugins = commandline_parser.value("disabled_plugins").split(";", QString::SkipEmptyParts);
+  }
+
   _curvelist_widget = new CurveListPanel(_mapped_plot_data, _transform_functions, this);
 
   ui->setupUi(this);
@@ -539,7 +568,6 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
     QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(filename), this);
 
-
     QObject* plugin = pluginLoader.instance();
     if (plugin)
     {
@@ -553,22 +581,48 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       ToolboxPlugin* toolbox = qobject_cast<ToolboxPlugin*>(plugin);
 
       QString plugin_name;
+      QString plugin_type;
+      bool is_debug_plugin = dynamic_cast<PlotJugglerPlugin*>(plugin)->isDebugPlugin();
 
       if (loader){
         plugin_name = loader->name();
+        plugin_type = "DataLoader";
       }
       else if (publisher){
         plugin_name = publisher->name();
+        plugin_type = "StatePublisher";
       }
       else if (streamer){
         plugin_name = streamer->name();
+        plugin_type = "DataStreamer";
       }
       else if (message_parser){
         plugin_name = message_parser->name();
+        plugin_type = "MessageParser";
       }
       else if (toolbox){
         plugin_name = toolbox->name();
+        plugin_type = "MessageParser";
       }
+
+      QString message = QString("%1 is a %2 plugin").arg(filename).arg(plugin_type);
+
+      if ( (_enabled_plugins.size() > 0) && (_enabled_plugins.contains(fileinfo.baseName()) == false) )
+      {
+        qDebug() << message << " ...skipping because it is not explicitly enabled";
+        continue;
+      }
+      if ( (_disabled_plugins.size() > 0) && (_disabled_plugins.contains(fileinfo.baseName()) == true) )
+      {
+        qDebug() << message << " ...skipping because it is explicitly disabled";
+        continue;
+      }
+      if ( !_test_option && is_debug_plugin )
+      {
+        qDebug() << message << " ...disabled unless option -t is used";
+        continue;
+      }
+      qDebug() << message;
 
       if (loaded_plugins.find(plugin_name) == loaded_plugins.end())
       {
@@ -583,77 +637,61 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
       if (loader)
       {
-        qDebug() << filename << ": is a DataLoader plugin";
-        if (!_test_option && loader->isDebugPlugin())
-        {
-          qDebug() << filename << "...but will be ignored unless the argument -t is used.";
-        }
-        else
-        {
-          _data_loader.insert(std::make_pair(plugin_name, loader));
-        }
+        _data_loader.insert(std::make_pair(plugin_name, loader));
       }
       else if (publisher)
       {
         publisher->setDataMap(&_mapped_plot_data);
-        qDebug() << filename << ": is a StatePublisher plugin";
-        if (!_test_option && publisher->isDebugPlugin())
+        _state_publisher.insert(std::make_pair(plugin_name, publisher));
+
+        ui->layoutPublishers->setColumnStretch(0, 1.0);
+
+        int row = _state_publisher.size() - 1;
+        auto label = new QLabel(plugin_name, ui->framePublishers);
+        ui->layoutPublishers->addWidget(label, row, 0);
+
+        auto start_checkbox = new QCheckBox(ui->framePublishers);
+        ui->layoutPublishers->addWidget(start_checkbox, row, 1);
+        start_checkbox->setFocusPolicy( Qt::FocusPolicy::NoFocus );
+
+        connect(start_checkbox, &QCheckBox::toggled, this,
+                [=](bool enable) { publisher->setEnabled(enable); });
+
+        connect(publisher, &StatePublisher::closed,
+                start_checkbox, [=]() {start_checkbox->setChecked(false);} );
+
+        if( publisher->availableActions().empty() )
         {
-          qDebug() << filename << "...but will be ignored unless the argument -t is used.";
+          QFrame* empty = new QFrame(ui->framePublishers);
+          empty->setFixedSize({22,22});
+          ui->layoutPublishers->addWidget(empty, row, 2);
         }
-        else
-        {
-          _state_publisher.insert(std::make_pair(plugin_name, publisher));
+        else{
+          auto options_button = new QPushButton(ui->framePublishers);
+          options_button->setFlat(true);
+          options_button->setFixedSize({24,24});
+          ui->layoutPublishers->addWidget(options_button, row, 2);
 
-          ui->layoutPublishers->setColumnStretch(0, 1.0);
+          options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", "light"));
+          options_button->setIconSize( {16,16} );
 
-          int row = _state_publisher.size() - 1;
-          auto label = new QLabel(plugin_name, ui->framePublishers);
-          ui->layoutPublishers->addWidget(label, row, 0);
-
-          auto start_checkbox = new QCheckBox(ui->framePublishers);
-          ui->layoutPublishers->addWidget(start_checkbox, row, 1);
-          start_checkbox->setFocusPolicy( Qt::FocusPolicy::NoFocus );
-
-          connect(start_checkbox, &QCheckBox::toggled, this,
-                  [=](bool enable) { publisher->setEnabled(enable); });
-
-          connect(publisher, &StatePublisher::closed,
-                  start_checkbox, [=]() {start_checkbox->setChecked(false);} );
-
-          if( publisher->availableActions().empty() )
+          auto optionsMenu = [=]()
           {
-            QFrame* empty = new QFrame(ui->framePublishers);
-            empty->setFixedSize({22,22});
-            ui->layoutPublishers->addWidget(empty, row, 2);
-          }
-          else{
-            auto options_button = new QPushButton(ui->framePublishers);
-            options_button->setFlat(true);
-            options_button->setFixedSize({24,24});
-            ui->layoutPublishers->addWidget(options_button, row, 2);
+            PopupMenu* menu = new PopupMenu(options_button, this);
+            for(auto action: publisher->availableActions()) {
+              menu->addAction(action);
+            }
+            menu->exec();
+          };
 
-            options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", "light"));
-            options_button->setIconSize( {16,16} );
+          connect( options_button, &QPushButton::clicked,
+                  options_button, optionsMenu);
 
-            auto optionsMenu = [=]()
-            {
-              PopupMenu* menu = new PopupMenu(options_button, this);
-              for(auto action: publisher->availableActions()) {
-                menu->addAction(action);
-              }
-              menu->exec();
-            };
-
-            connect( options_button, &QPushButton::clicked,
-                     options_button, optionsMenu);
-
-            connect( this, &MainWindow::stylesheetChanged,
-                     options_button, [=](QString style)
-            {
-              options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", style));
-            });
-          }
+          connect( this, &MainWindow::stylesheetChanged,
+                  options_button, [=](QString style)
+                  {
+                    options_button->setIcon( LoadSvg(":/resources/svg/settings_cog.svg", style));
+                  });
         }
       }
       else if (message_parser)
@@ -662,47 +700,38 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if (streamer)
       {
-        qDebug() << filename << ": is a DataStreamer plugin";
-        if (!_test_option && streamer->isDebugPlugin())
-        {
-          qDebug() << filename << "...but will be ignored unless the argument -t is used.";
-        }
-        else
-        {
-          _data_streamer.insert(std::make_pair(plugin_name, streamer));
+        _data_streamer.insert(std::make_pair(plugin_name, streamer));
 
-          streamer->setAvailableParsers( _message_parser_factory );
+        streamer->setAvailableParsers( _message_parser_factory );
 
-          connect(streamer, &DataStreamer::closed, this,
-                  [this]() { this->stopStreamingPlugin(); } );
+        connect(streamer, &DataStreamer::closed, this,
+                [this]() { this->stopStreamingPlugin(); } );
 
-          connect(streamer, &DataStreamer::clearBuffers,
-                  this, &MainWindow::on_actionClearBuffer_triggered);
+        connect(streamer, &DataStreamer::clearBuffers,
+                this, &MainWindow::on_actionClearBuffer_triggered);
 
-          connect(streamer, &DataStreamer::dataReceived,
-                  _animated_streaming_movie, [this]()
-          {
-            _animated_streaming_movie->start();
-            _animated_streaming_timer->start(500);
-          });
+        connect(streamer, &DataStreamer::dataReceived,
+                _animated_streaming_movie, [this]()
+                {
+                  _animated_streaming_movie->start();
+                  _animated_streaming_timer->start(500);
+                });
 
-          connect(streamer, &DataStreamer::removeGroup,
-                  this, &MainWindow::on_deleteSerieFromGroup );
+        connect(streamer, &DataStreamer::removeGroup,
+                this, &MainWindow::on_deleteSerieFromGroup );
 
-          connect(streamer, &DataStreamer::dataReceived,
-                  this, [this]()
-          {
-            if( isStreamingActive() && !_replot_timer->isActive() )
-            {
-              _replot_timer->setSingleShot(true);
-              _replot_timer->start( 40 );
-            }
-          });
-        }
+        connect(streamer, &DataStreamer::dataReceived,
+                this, [this]()
+                {
+                  if( isStreamingActive() && !_replot_timer->isActive() )
+                  {
+                    _replot_timer->setSingleShot(true);
+                    _replot_timer->start( 40 );
+                  }
+                });
       }
       else if(toolbox)
       {
-        qDebug() << filename << ": is a Toolbox plugin";
         toolbox->init( _mapped_plot_data, _transform_functions );
 
         auto action = ui->menuTools->addAction( toolbox->name() );
@@ -2443,8 +2472,18 @@ void MainWindow::on_actionAbout_triggered()
   auto ui = new Ui::AboutDialog();
   ui->setupUi(dialog);
 
-  ui->label_version->setText(QApplication::applicationVersion());
+  ui->label_version->setText(QString("version: ") + QApplication::applicationVersion());
   dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  QFile fileTitle( _skin_path + "/about_window_title.html");
+  if(fileTitle.open(QIODevice::ReadOnly)) {
+    ui->titleTextBrowser->setHtml( fileTitle.readAll() );
+  }
+
+  QFile fileBody( _skin_path + "/about_window_body.html");
+  if(fileBody.open(QIODevice::ReadOnly)) {
+    ui->bodyTextBrowser->setHtml( fileBody.readAll() );
+  }
 
   dialog->exec();
 }

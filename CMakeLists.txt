@@ -9,8 +9,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 add_definitions(
     -DPJ_MAJOR_VERSION="3"
-    -DPJ_MINOR_VERSION="2"
+    -DPJ_MINOR_VERSION="3"
     -DPJ_PATCH_VERSION="0" )
+
+# You can add some command line arguments at compilation time
+# Use _0x3b_ instead of semicolon
+
+#set(PJ_DEFAULT_ARGS "-n --enabled_plugins=libDataLoadCSV_0x3b_libDataStreamSample")
+#add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
 
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
@@ -219,7 +225,6 @@ endif()
 
 add_subdirectory( 3rdparty/color_widgets )
 add_subdirectory( 3rdparty/Qt-Advanced-Docking )
-#add_subdirectory( 3rdparty/qwt/src )
 add_subdirectory( 3rdparty/lua-5.4.1 )
 
 add_subdirectory( plotjuggler_app )

@@ -129,6 +129,9 @@ private:
 
   double _tracker_time;
 
+  QStringList _enabled_plugins;
+  QStringList _disabled_plugins;
+
   std::vector<FileLoadInfo> _loaded_datafiles;
   CurveTracker::Parameter _tracker_param;
 
@@ -146,8 +149,6 @@ private:
 
   QMovie* _animated_streaming_movie;
   QTimer* _animated_streaming_timer;
-  
-  
 
   enum LabelStatus
   {
@@ -160,6 +161,8 @@ private:
 
   QMenu* _recent_data_files;
   QMenu* _recent_layout_files;
+
+  QString _skin_path;
 
   void initializeActions();
   QStringList initializePlugins(QString subdir_name);
