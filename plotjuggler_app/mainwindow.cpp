@@ -729,6 +729,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
                     _replot_timer->start( 40 );
                   }
                 });
+
+        connect(streamer, &DataStreamer::notificationsChanged,
+                this, &MainWindow::on_streamingNotificationsChanged );
       }
       else if(toolbox)
       {
@@ -1426,6 +1429,16 @@ bool MainWindow::loadDataFromFile(const FileLoadInfo& info)
   return true;
 }
 
+void MainWindow::on_buttonStreamingNotifications_clicked()
+{
+  auto streamer = _data_streamer.at( ui->comboStreaming->currentText() );
+  QAction* notification_button_action = streamer->notificationAction().first;
+  if (notification_button_action != nullptr) 
+  {
+    notification_button_action->trigger();
+  }
+}
+
 
 void MainWindow::on_buttonStreamingPause_toggled(bool paused)
 {
@@ -1473,6 +1486,8 @@ void MainWindow::stopStreamingPlugin()
   ui->buttonStreamingStart->setText("Start");
   ui->buttonStreamingPause->setEnabled(false);
   ui->labelStreamingAnimation->setHidden(true);
+  enableStreamingNotificationsButton(false);
+
 
   // force the cleanups typically done in on_buttonStreamingPause_toggled
   if(  ui->buttonStreamingPause->isChecked() )
@@ -1539,6 +1554,8 @@ void MainWindow::startStreamingPlugin(QString streamer_name)
     _active_streamer_plugin = nullptr;
     return;
   }
+
+  // The attemp to start the plugin may have succeded or failed
   if (started)
   {
     {
@@ -1569,6 +1586,22 @@ void MainWindow::startStreamingPlugin(QString streamer_name)
   }
 }
 
+void MainWindow::enableStreamingNotificationsButton(bool enabled)
+{
+  ui->buttonStreamingNotifications->setEnabled(enabled);
+
+  QSettings settings;
+  QString theme = settings.value("Preferences::theme", "light").toString();
+
+  if( enabled )
+  {
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell-active.svg", theme));
+  }
+  else{
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
+  }
+}
+
 void MainWindow::loadStyleSheet(QString file_path)
 {
   QFile styleFile(file_path);
@@ -1594,6 +1627,7 @@ void MainWindow::on_stylesheetChanged(QString theme)
 {
   ui->pushButtonLoadDatafile->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
   ui->buttonStreamingPause->setIcon(LoadSvg(":/resources/svg/pause.svg", theme));
+  ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
 
   ui->buttonRecentData->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
   ui->buttonRecentLayout->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
@@ -2259,6 +2293,25 @@ void MainWindow::on_deleteSerieFromGroup(std::string group_name )
   onDeleteMultipleCurves(names);
 }
 
+void MainWindow::on_streamingNotificationsChanged(int active_count)
+{
+  if ( active_count > 0 && _active_streamer_plugin )
+  {
+    enableStreamingNotificationsButton(true);
+
+    QString tooltipText = QString("%1 has %2 outstanding notitication%3")
+                              .arg(_active_streamer_plugin->name())
+                              .arg(active_count)
+                              .arg( active_count > 1 ? "s":"");
+    ui->buttonStreamingNotifications->setToolTip(tooltipText);
+  }
+  else 
+  {
+    enableStreamingNotificationsButton(false);
+    ui->buttonStreamingNotifications->setToolTip("View streaming alerts");
+  }
+}
+
 void MainWindow::on_pushButtonUseDateTime_toggled(bool checked)
 {
   static bool first = true;
@@ -2485,6 +2538,7 @@ void MainWindow::on_actionAbout_triggered()
     ui->bodyTextBrowser->setHtml( fileBody.readAll() );
   }
 
+  dialog->setAttribute(Qt::WA_DeleteOnClose);
   dialog->exec();
 }
 
@@ -2956,6 +3010,16 @@ void MainWindow::on_comboStreaming_currentIndexChanged(const QString &current_te
   settings.setValue("MainWindow.previousStreamingPlugin", current_text );
   auto streamer = _data_streamer.at( current_text );
   ui->buttonStreamingOptions->setEnabled( !streamer->availableActions().empty() );
+
+  std::pair<QAction*, int> notifications_pair = streamer->notificationAction();
+  if (notifications_pair.first == nullptr)
+  {
+    ui->buttonStreamingNotifications->setEnabled(false);
+  }
+  else 
+  {
+    on_streamingNotificationsChanged(notifications_pair.second);
+  }
 }
 
 void MainWindow::on_buttonStreamingStart_clicked()

@@ -45,6 +45,14 @@ public:
    */
   virtual bool isRunning() const = 0;
 
+  /**
+   * @brief Gets the action to execute when clicking the 'notifications' button and
+   * the current number of outstanding notifications.
+   */
+  virtual std::pair<QAction*, int> notificationAction() 
+  {
+    return {nullptr, 0};
+  } 
 
   std::mutex& mutex() {
     return _mutex;
@@ -85,6 +93,10 @@ signals:
   /// The method shutdown () is used by the main app to stop streaming.
   /// When the plugin stops itself, this signal must be emitted.
   void closed();
+
+  // Plugin notifications.
+  // PJ modifies the "notifications" button to indicate whether there are any
+  void notificationsChanged(int active_notification_count);
 
 private:
   std::mutex _mutex;

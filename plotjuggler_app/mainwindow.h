@@ -43,6 +43,7 @@ public:
 
   void stopStreamingPlugin();
   void startStreamingPlugin(QString streamer_name);
+  void enableStreamingNotificationsButton(bool enabled);
 
 public slots:
 
@@ -56,6 +57,7 @@ public slots:
   void on_streamingToggled();
 
   void on_buttonStreamingPause_toggled(bool paused);
+  void on_buttonStreamingNotifications_clicked();
 
   void on_streamingSpinBox_valueChanged(int value);
 
@@ -217,6 +219,8 @@ public slots:
 
   void on_deleteSerieFromGroup(std::string group_name );
 
+  void on_streamingNotificationsChanged(int active_notifications_count);
+
   void onActionFullscreenTriggered();
 
   void on_actionReportBug_triggered();
@@ -234,6 +238,8 @@ public slots:
   void on_pushButtonTimeTracker_pressed();
   void on_pushButtonRemoveTimeOffset_toggled(bool checked);
 
+  void on_buttonStreamingStart_clicked();
+
 private slots:
   void on_stylesheetChanged(QString style_name);
   void on_actionPreferences_triggered();
@@ -243,7 +249,6 @@ private slots:
   void on_pushButtonLegend_clicked();
   void on_pushButtonZoomOut_clicked();
 
-  void on_buttonStreamingStart_clicked();
   void on_buttonStreamingOptions_clicked();
   void on_buttonHideFileFrame_clicked();
   void on_buttonHideStreamingFrame_clicked();
