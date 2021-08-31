@@ -30,7 +30,7 @@
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Appearence</string>
+       <string>Appearance</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
        <item row="1" column="1">
