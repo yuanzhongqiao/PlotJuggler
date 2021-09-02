@@ -113,7 +113,7 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   }
   QFile fileTitle( _skin_path + "/mainwindow_title.txt");
   if(fileTitle.open(QIODevice::ReadOnly)) {
-    QString title = fileTitle.readAll();
+    QString title = fileTitle.readAll().trimmed();
     setWindowTitle(title);
   }
 
