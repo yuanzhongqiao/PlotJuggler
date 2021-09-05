@@ -24,11 +24,15 @@ DataLoadCSV::DataLoadCSV()
   connect ( _ui->radioButtonSelect, &QRadioButton::toggled,
           this, [this]( bool checked ) {
             _ui->listWidgetSeries->setEnabled( checked );
+            auto selected = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
+            bool box_enabled = !checked || selected.size() == 1;
+            _ui->buttonBox->setEnabled( box_enabled );
           });
   connect ( _ui->listWidgetSeries, &QListWidget::itemSelectionChanged,
           this, [this]() {
-            QModelIndexList indexes = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
-            _ui->buttonBox->setEnabled( indexes.size() == 1 );
+            auto selected = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
+            bool box_enabled = _ui->radioButtonIndex->isChecked() || selected.size() == 1;
+            _ui->buttonBox->setEnabled( box_enabled );
           });
 
   connect ( _ui->listWidgetSeries, &QListWidget::itemDoubleClicked,
@@ -258,20 +262,13 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   }
 
   //-----------------------------------
-
-  file.open(QFile::ReadOnly);
-  QTextStream in(&file);
-
-  std::vector<PlotData*> plots_vector;
-
   bool interrupted = false;
-
   int linecount = 0;
 
   // count the number of lines first
   int tot_lines = 0;
   {
-    QFile file(info->filename);
+    file.open(QFile::ReadOnly);
     QTextStream in(&file);
     while (!in.atEnd())
     {
@@ -289,14 +286,12 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   progress_dialog.setAutoReset(true);
   progress_dialog.show();
 
-  // remove first line (header)
-  in.readLine();
-
   //---- build plots_vector from header  ------
+
+  std::vector<PlotData*> plots_vector;
   for (unsigned i = 0; i < column_names.size(); i++)
   {
     const std::string& field_name = (column_names[i]);
-
     auto it = plot_data.addNumeric(field_name);
     plots_vector.push_back(&(it->second));
   }
@@ -320,10 +315,14 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     return val;
   };
 
+  file.open(QFile::ReadOnly);
+  QTextStream in(&file);
+  // remove first line (header)
+  in.readLine();
+
   while (!in.atEnd())
   {
     QString line = in.readLine();
-
     QStringList string_items = line.split( _separator );
 
     if (string_items.size() != column_names.size())
@@ -367,17 +366,15 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
       prev_time = t;
     }
 
-    int index = 0;
-    for (int i = 0; i < string_items.size(); i++)
+    for (unsigned i = 0; i < string_items.size(); i++)
     {
       bool is_number = false;
       double y = ParseNumber( string_items[i], is_number);
       if (is_number)
       {
         PlotData::Point point(t, y);
-        plots_vector[index]->pushBack(point);
+        plots_vector[i]->pushBack(point);
       }
-      index++;
     }
 
     if (linecount++ % 100 == 0)
@@ -391,7 +388,6 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
       }
     }
   }
-  file.close();
 
   if (interrupted)
   {
@@ -399,7 +395,9 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     plot_data.clear();
   }
 
-  _default_time_axis = column_names[ time_index ];
+  if( time_index >= 0){
+    _default_time_axis = column_names[ time_index ];
+  }
   return true;
 }
 
