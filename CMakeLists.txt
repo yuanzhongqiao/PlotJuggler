@@ -207,15 +207,6 @@ add_subdirectory( 3rdparty/qwt/src )
 
 install(
      TARGETS
-        plotjuggler_qwt
-     EXPORT export_plotjuggler_qwt
-     LIBRARY DESTINATION lib
-     ARCHIVE DESTINATION lib
-     RUNTIME DESTINATION bin
-     INCLUDES DESTINATION include )
-
-install(
-     TARGETS
         plotjuggler_base
      EXPORT export_plotjuggler_base
      LIBRARY DESTINATION lib

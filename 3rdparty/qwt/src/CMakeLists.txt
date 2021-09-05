@@ -206,12 +206,12 @@ target_compile_definitions(plotjuggler_qwt PUBLIC QWT_MOC_INCLUDE)
 #    TARGETS plotjuggler_qwt
 #    EXPORT export_plotjuggler_qwt)
 
-#install(
-#     TARGETS
-#        plotjuggler_qwt
-#     EXPORT export_plotjuggler_qwt
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-#     RUNTIME DESTINATION bin
-#     INCLUDES DESTINATION include )
+install(
+     TARGETS
+        plotjuggler_qwt
+     EXPORT export_plotjuggler_qwt
+     LIBRARY DESTINATION lib
+     ARCHIVE DESTINATION lib
+     RUNTIME DESTINATION bin
+     INCLUDES DESTINATION include )
 
