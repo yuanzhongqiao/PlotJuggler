@@ -83,21 +83,6 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _test_option = commandline_parser.isSet("test");
   _autostart_publishers = commandline_parser.isSet("publish");
 
-  _skin_path ="://resources/skin";
-  if( commandline_parser.isSet("skin_path") )
-  {
-    QDir path( commandline_parser.value("skin_path") );
-    if( path.exists() )
-    {
-      _skin_path = path.absolutePath();
-    }
-  }
-  QFile fileTitle( _skin_path + "/mainwindow_title.txt");
-  if(fileTitle.open(QIODevice::ReadOnly)) {
-    QString title = fileTitle.readAll();
-    setWindowTitle(title);
-  }
-
   if ( commandline_parser.isSet("enabled_plugins"))
   {
     _enabled_plugins  = commandline_parser.value("enabled_plugins").split(";", QString::SkipEmptyParts);
@@ -115,6 +100,22 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _curvelist_widget = new CurveListPanel(_mapped_plot_data, _transform_functions, this);
 
   ui->setupUi(this);
+
+  // setupUi() sets the windowTitle so the skin-based setting must be done after
+    _skin_path ="://resources/skin";
+  if( commandline_parser.isSet("skin_path") )
+  {
+    QDir path( commandline_parser.value("skin_path") );
+    if( path.exists() )
+    {
+      _skin_path = path.absolutePath();
+    }
+  }
+  QFile fileTitle( _skin_path + "/mainwindow_title.txt");
+  if(fileTitle.open(QIODevice::ReadOnly)) {
+    QString title = fileTitle.readAll().trimmed();
+    setWindowTitle(title);
+  }
 
   QSettings settings;
 

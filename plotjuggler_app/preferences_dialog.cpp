@@ -100,7 +100,7 @@ void PreferencesDialog::on_pushButtonRemove_clicked()
   }
 }
 
-void PreferencesDialog::on_listWidget_itemSelectionChanged()
+void PreferencesDialog::on_listWidgetCustom_itemSelectionChanged()
 {
    ui->pushButtonRemove->setEnabled( !ui->listWidgetCustom->selectedItems().isEmpty() );
 }

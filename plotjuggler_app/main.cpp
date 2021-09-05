@@ -96,16 +96,14 @@ std::pair<int,char**> MergeArguments(int argc, char* argv[])
   static char *new_argv[100];
 
   // preserve arg[0] => executable path
-  for (int i=0; i< argc; ++i ) {
-    new_argv[i] = argv[i];
-  }
+  new_argv[0] = argv[0];
 
   // Add the remain arguments, replacing escaped characters if necessary.
   // Escaping needed because some chars cannot be entered easily in the -DPJ_DEFAULT_ARGS
   // preprocessor directive
   //   _0x20_   -->   ' '   (space)
   //   _0x3b_   -->   ';'   (semicolon)
-  int index = argc;
+  int index = 1;
   for ( auto cmdline_arg : default_cmdline_args  )
   {
     // replace(const QString &before, const QString &after, Qt::CaseSensitivity cs = Qt::CaseSensitive)
@@ -113,6 +111,13 @@ std::pair<int,char**> MergeArguments(int argc, char* argv[])
     cmdline_arg = cmdline_arg.replace("_0x3b_", ";", Qt::CaseSensitive);
     new_argv[index++] = strdup(cmdline_arg.toLocal8Bit().data());
   }
+
+  // If an argument appears repeated, the second value overrides previous one. 
+  // Do this after adding default_cmdline_args so the command-line overide default
+  for (int i=1; i< argc; ++i ) {
+    new_argv[index++] = argv[i];
+  }
+
   return {new_argc, new_argv};
 
 #else
