@@ -18,8 +18,10 @@ add_definitions(
 #set(PJ_DEFAULT_ARGS "-n --enabled_plugins=libDataLoadCSV_0x3b_libDataStreamSample")
 #add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
 
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+IF (NOT WIN32)
+  set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+endif()
 
 include_directories( plotjuggler_base/include )
 include_directories( plotjuggler_base/src )
@@ -150,7 +152,7 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/plotwidget_base.h
 )
 
-add_library( plotjuggler_base SHARED
+add_library( plotjuggler_base STATIC
     ${PLOTJUGGLER_BASE_MOCS}
      plotjuggler_base/src/plotdata.cpp
      plotjuggler_base/src/datastreamer_base.cpp
@@ -161,7 +163,7 @@ add_library( plotjuggler_base SHARED
      plotjuggler_base/src/plotlegend.cpp
      plotjuggler_base/src/timeseries_qwt.cpp
      )
-# target_link_libraries(plotjuggler_base plotjuggler_qwt)
+target_link_libraries(plotjuggler_base PUBLIC plotjuggler_qwt)
 
 #########################  INSTALL  ####################################
 
@@ -181,7 +183,6 @@ elseif(COMPILING_WITH_AMENT)
 
     ament_export_targets(
         export_plotjuggler_base
-        export_plotjuggler_qwt
         HAS_LIBRARY_TARGET)
     ament_package()
 
