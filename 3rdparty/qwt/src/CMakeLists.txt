@@ -202,16 +202,16 @@ target_link_libraries(plotjuggler_qwt
 target_compile_definitions(plotjuggler_qwt PUBLIC QWT_MOC_INCLUDE)
 #target_compile_definitions(plotjuggler_qwt PUBLIC QWT_DLL QWT_MAKEDLL )
 
-
 #install(
 #    TARGETS plotjuggler_qwt
-#    EXPORT export_plotjuggler_qwt
-#    DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY} )
+#    EXPORT export_plotjuggler_qwt)
 
 #install(
 #     TARGETS
 #        plotjuggler_qwt
+#     EXPORT export_plotjuggler_qwt
 #     LIBRARY DESTINATION lib
 #     ARCHIVE DESTINATION lib
 #     RUNTIME DESTINATION bin
 #     INCLUDES DESTINATION include )
+
