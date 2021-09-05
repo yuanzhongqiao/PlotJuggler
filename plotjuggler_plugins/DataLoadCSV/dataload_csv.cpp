@@ -11,10 +11,80 @@
 const int TIME_INDEX_NOT_DEFINED = -2;
 const int TIME_INDEX_GENERATED = -1;
 
+
+QStringList SpliLine(const QString& line, QChar separator)
+{
+  QStringList parts;
+  bool inside_quotes = false;
+  bool quoted_word = false;
+  int start_pos = 0;
+
+  int quote_start = 0;
+  int quote_end = 0;
+
+  for( int pos = 0; pos < line.size(); pos++ )
+  {
+    if( line[pos] == '"' )
+    {
+      if( inside_quotes )
+      {
+        quoted_word = true;
+        quote_end = pos-1;
+      }
+      else{
+        quote_start = pos+1;
+      }
+      inside_quotes = !inside_quotes;
+    }
+
+    bool part_completed = false;
+    bool add_empty = false;
+    int end_pos = pos;
+
+    if( (!inside_quotes && line[pos] == separator) )
+    {
+      part_completed = true;
+    }
+    if( pos+1 == line.size() )
+    {
+      part_completed = true;
+      end_pos = pos+1;
+      // special case
+      if( line[pos] == separator )
+      {
+        end_pos = pos;
+        add_empty = true;
+      }
+    }
+
+    if( part_completed )
+    {
+      QString part;
+      if ( quoted_word ) {
+        part = line.mid(quote_start, quote_end - quote_start + 1 );
+      }
+      else{
+        part = line.mid(start_pos, end_pos - start_pos );
+      }
+
+      parts.push_back( part.trimmed() );
+      start_pos = pos+1;
+      quoted_word = false;
+      inside_quotes = false;
+    }
+    if( add_empty )
+    {
+      parts.push_back( QString() );
+    }
+  }
+
+  return parts;
+}
+
 DataLoadCSV::DataLoadCSV()
 {
   _extensions.push_back("csv");
-  _separator = QRegExp("(\\,)");
+  _separator = ',';
   // setup the dialog
 
   _dialog = new QDialog();
@@ -77,7 +147,7 @@ void DataLoadCSV::parseHeader(QFile& file,
 
   QString preview_lines = first_line + "\n";
 
-  QStringList firstline_items = first_line.split( _separator );
+  QStringList firstline_items = SpliLine( first_line, _separator );
 
   int is_number_count = 0;
 
@@ -158,17 +228,17 @@ int DataLoadCSV::launchDialog(QFile &file, std::vector<std::string> *column_name
     if( comma_count > 3 && comma_count > semicolon_count )
     {
       _ui->comboBox->setCurrentIndex( 0 );
-      _separator = QRegExp("(\\,)");
+      _separator = ',';
     }
     if( semicolon_count > 3 && semicolon_count > comma_count )
     {
       _ui->comboBox->setCurrentIndex( 1 );
-      _separator = QRegExp("(\\;)");
+      _separator = ';';
     }
     if( space_count > 3 && comma_count == 0 && semicolon_count == 0 )
     {
       _ui->comboBox->setCurrentIndex( 2 );
-      _separator = QRegExp("(\\ )");
+      _separator = ' ';
     }
     file.close();
   }
@@ -181,9 +251,9 @@ int DataLoadCSV::launchDialog(QFile &file, std::vector<std::string> *column_name
   {
     switch( index )
     {
-    case 0: _separator = QRegExp("(\\,)"); break;
-    case 1: _separator = QRegExp("(\\;)"); break;
-    case 2: _separator = QRegExp("(\\ )"); break;
+    case 0: _separator = ','; break;
+    case 1: _separator = ';'; break;
+    case 2: _separator = ' '; break;
     }
     parseHeader( file, column_names );
   });
@@ -323,7 +393,7 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   while (!in.atEnd())
   {
     QString line = in.readLine();
-    QStringList string_items = line.split( _separator );
+    QStringList string_items = SpliLine( line, _separator );
 
     if (string_items.size() != column_names.size())
     {

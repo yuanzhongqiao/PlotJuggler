@@ -43,7 +43,7 @@ private:
 
   std::string _default_time_axis;
 
-  QRegExp _separator;
+  QChar _separator;
 
   QDialog* _dialog;
   Ui::DialogCSV* _ui;
