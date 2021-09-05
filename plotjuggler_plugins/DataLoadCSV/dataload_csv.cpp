@@ -12,7 +12,7 @@ const int TIME_INDEX_NOT_DEFINED = -2;
 const int TIME_INDEX_GENERATED = -1;
 
 
-QStringList SpliLine(const QString& line, QChar separator)
+QStringList SplitLine(const QString& line, QChar separator)
 {
   QStringList parts;
   bool inside_quotes = false;
@@ -147,7 +147,7 @@ void DataLoadCSV::parseHeader(QFile& file,
 
   QString preview_lines = first_line + "\n";
 
-  QStringList firstline_items = SpliLine( first_line, _separator );
+  QStringList firstline_items = SplitLine( first_line, _separator );
 
   int is_number_count = 0;
 
@@ -359,11 +359,16 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   //---- build plots_vector from header  ------
 
   std::vector<PlotData*> plots_vector;
+  std::vector<StringSeries*> string_vector;
+
   for (unsigned i = 0; i < column_names.size(); i++)
   {
     const std::string& field_name = (column_names[i]);
-    auto it = plot_data.addNumeric(field_name);
-    plots_vector.push_back(&(it->second));
+    auto num_it = plot_data.addNumeric(field_name);
+    plots_vector.push_back(&(num_it->second));
+
+    auto str_it = plot_data.addStringSeries(field_name);
+    string_vector.push_back(&(str_it->second));
   }
 
   //-----------------
@@ -393,7 +398,7 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   while (!in.atEnd())
   {
     QString line = in.readLine();
-    QStringList string_items = SpliLine( line, _separator );
+    QStringList string_items = SplitLine( line, _separator );
 
     if (string_items.size() != column_names.size())
     {
@@ -439,11 +444,14 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     for (unsigned i = 0; i < string_items.size(); i++)
     {
       bool is_number = false;
-      double y = ParseNumber( string_items[i], is_number);
+      const auto& str = string_items[i];
+      double y = ParseNumber( str, is_number);
       if (is_number)
       {
-        PlotData::Point point(t, y);
-        plots_vector[i]->pushBack(point);
+        plots_vector[i]->pushBack( {t, y} );
+      }
+      else{
+        string_vector[i]->pushBack( {t, str.toStdString()} );
       }
     }
 
@@ -467,6 +475,24 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
 
   if( time_index >= 0){
     _default_time_axis = column_names[ time_index ];
+  }
+
+  // cleanups
+  for (unsigned i = 0; i < column_names.size(); i++)
+  {
+    const auto& name = column_names[i];
+    bool is_numeric = true;
+    if( plots_vector[i]->size() == 0 && string_vector[i]->size() > 0 )
+    {
+      is_numeric = false;
+    }
+    if( is_numeric )
+    {
+      plot_data.strings.erase( plot_data.strings.find(name) );
+    }
+    else{
+      plot_data.numeric.erase( plot_data.numeric.find(name) );
+    }
   }
   return true;
 }
