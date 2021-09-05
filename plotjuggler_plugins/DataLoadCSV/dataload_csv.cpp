@@ -21,6 +21,27 @@ DataLoadCSV::DataLoadCSV()
   _ui = new Ui::DialogCSV();
   _ui->setupUi(_dialog);
 
+  connect ( _ui->radioButtonSelect, &QRadioButton::toggled,
+          this, [this]( bool checked ) {
+            _ui->listWidgetSeries->setEnabled( checked );
+          });
+  connect ( _ui->listWidgetSeries, &QListWidget::itemSelectionChanged,
+          this, [this]() {
+            QModelIndexList indexes = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
+            _ui->buttonBox->setEnabled( indexes.size() == 1 );
+          });
+
+  connect ( _ui->listWidgetSeries, &QListWidget::itemDoubleClicked,
+          this, [this]() {
+            emit _ui->buttonBox->accepted();
+          });
+
+  connect(_ui->checkBoxDateFormat, &QCheckBox::toggled,
+          this,  [this](bool checked) {
+          _ui->lineEditDateFormat->setEnabled( checked );
+        });
+
+
   _ui->splitter->setStretchFactor(0, 1);
   _ui->splitter->setStretchFactor(1, 2);
 }
@@ -116,6 +137,10 @@ int DataLoadCSV::launchDialog(QFile &file, std::vector<std::string> *column_name
   QSettings settings;
   _dialog->restoreGeometry(settings.value("DataLoadCSV.geometry").toByteArray());
 
+  _ui->radioButtonIndex->setChecked( settings.value("DataLoadCSV.useIndex", false).toBool() );
+  _ui->checkBoxDateFormat->setChecked( settings.value("DataLoadCSV.useDateFormat", false).toBool() );
+  _ui->lineEditDateFormat->setText( settings.value("DataLoadCSV.dateFormat","yyyy-MM-dd hh:mm:ss").toString() );
+
   // suggest separator
   {
     file.open(QFile::ReadOnly);
@@ -144,38 +169,30 @@ int DataLoadCSV::launchDialog(QFile &file, std::vector<std::string> *column_name
     file.close();
   }
 
-  // connections
-  connect ( _ui->comboBox, qOverload<int>( &QComboBox::currentIndexChanged ),
-          this, [&]( int index ) {
-            switch( index )
-            {
-            case 0: _separator = QRegExp("(\\,)"); break;
-            case 1: _separator = QRegExp("(\\;)"); break;
-            case 2: _separator = QRegExp("(\\ )"); break;
-            }
-            parseHeader( file, column_names );
-          });
-
-  connect ( _ui->radioButtonSelect, &QRadioButton::toggled,
-          this, [this]( bool checked ) {
-            _ui->listWidgetSeries->setEnabled( checked );
-          });
-  connect ( _ui->listWidgetSeries, &QListWidget::itemSelectionChanged,
-          this, [this]() {
-            QModelIndexList indexes = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
-            _ui->buttonBox->setEnabled( indexes.size() == 1 );
-          });
-
-  connect ( _ui->listWidgetSeries, &QListWidget::itemDoubleClicked,
-          this, [this]() {
-            emit _ui->buttonBox->accepted();
-          });
+  // temporaryy connection
+  std::unique_ptr<QObject> pcontext (new QObject);
+  QObject *context = pcontext.get();
+  QObject::connect( _ui->comboBox, qOverload<int>( &QComboBox::currentIndexChanged ),
+                    context, [&](int index)
+  {
+    switch( index )
+    {
+    case 0: _separator = QRegExp("(\\,)"); break;
+    case 1: _separator = QRegExp("(\\;)"); break;
+    case 2: _separator = QRegExp("(\\ )"); break;
+    }
+    parseHeader( file, column_names );
+  });
 
   // parse the header once and launch the dialog
   parseHeader(file, column_names);
 
   int res = _dialog->exec();
+
   settings.setValue("DataLoadCSV.geometry", _dialog->saveGeometry());
+  settings.setValue("DataLoadCSV.useIndex", _ui->radioButtonIndex->isChecked() );
+  settings.setValue("DataLoadCSV.useDateFormat", _ui->checkBoxDateFormat->isChecked() );
+  settings.setValue("DataLoadCSV.dateFormat", _ui->lineEditDateFormat->text() );
 
   if (res == QDialog::Rejected)
   {
@@ -286,14 +303,29 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
 
   //-----------------
   double prev_time = -std::numeric_limits<double>::max();
-  bool to_string_parse = false;
-  QString format_string = "";
+  bool parse_date_format = _ui->checkBoxDateFormat->isChecked();
+  QString format_string = _ui->lineEditDateFormat->text();
+
+  auto ParseNumber = [&](QString str, bool& is_number)
+  {
+    double val = str.trimmed().toDouble(&is_number);
+    if( !is_number && parse_date_format && !format_string.isEmpty() ) {
+      QDateTime ts = QDateTime::fromString(str, format_string);
+      is_number = ts.isValid();
+      if( is_number )
+      {
+         val = ts.toMSecsSinceEpoch()/1000.0;
+      }
+    }
+    return val;
+  };
 
   while (!in.atEnd())
   {
     QString line = in.readLine();
 
     QStringList string_items = line.split( _separator );
+
     if (string_items.size() != column_names.size())
     {
       auto err_msg = QString("The number of values at line %1 is %2,\n"
@@ -306,49 +338,21 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
       QMessageBox::warning(nullptr, "Error reading file", err_msg );
       return false;
     }
+
     double t = linecount;
 
     if (time_index >= 0)
     {
       bool is_number = false;
-      QString str = string_items[time_index].trimmed();
-      if (!to_string_parse)
+      QString str = string_items[time_index];
+      t = ParseNumber ( str, is_number );
+
+      if (!is_number)
       {
-          t = str.toDouble(&is_number);
-          if (!is_number)
-          {
-              to_string_parse = true;
-          }
-      }
-
-      if (!is_number || to_string_parse)
-      {
-          if (format_string.isEmpty())
-          {
-              bool ok;
-              format_string = QInputDialog::getText(nullptr, tr("Error reading file"),
-                      QString("One of the timestamps is not a valid number.\n"
-                              "Failing string: \"%1\".\n"
-                              "Please enter a Format String (see QDateTime::fromString).\n").arg(str),
-                      QLineEdit::Normal, "yyyy-MM-dd hh:mm:ss", &ok);
-
-              if (!ok || format_string.isEmpty())
-              {
-                  return false;
-              }
-          }
-
-          QDateTime ts = QDateTime::fromString(str, format_string);
-          is_number = ts.isValid();
-          if (!is_number)
-          {
-              QMessageBox::StandardButton reply;
-              reply = QMessageBox::warning(nullptr, tr("Error reading file"),
-                      tr("Couldn't parse timestamp. Aborting.\n"));
-
-              return false;
-          }
-          t = ts.toMSecsSinceEpoch()/1000.0;
+          QMessageBox::StandardButton reply;
+          reply = QMessageBox::warning(nullptr, tr("Error reading file"),
+                  tr("Couldn't parse timestamp with string \"%1\" . Aborting.\n").arg(str) );
+          return false;
       }
 
       if (prev_time > t)
@@ -367,7 +371,7 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     for (int i = 0; i < string_items.size(); i++)
     {
       bool is_number = false;
-      double y = string_items[i].toDouble(&is_number);
+      double y = ParseNumber( string_items[i], is_number);
       if (is_number)
       {
         PlotData::Point point(t, y);
@@ -404,6 +408,11 @@ bool DataLoadCSV::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) c
 {
   QDomElement elem = doc.createElement("default");
   elem.setAttribute("time_axis", _default_time_axis.c_str());
+  QString date_format;
+  if( _ui->checkBoxDateFormat->isChecked() )
+  {
+    elem.setAttribute("date_format", _ui->lineEditDateFormat->text() );
+  }
 
   parent_element.appendChild(elem);
   return true;
@@ -417,8 +426,12 @@ bool DataLoadCSV::xmlLoadState(const QDomElement& parent_element)
     if (elem.hasAttribute("time_axis"))
     {
       _default_time_axis = elem.attribute("time_axis").toStdString();
-      return true;
+    }
+    if (elem.hasAttribute("date_format"))
+    {
+      _ui->checkBoxDateFormat->setChecked( true );
+      _ui->lineEditDateFormat->setText( elem.attribute("date_format") );
     }
   }
-  return false;
+  return true;
 }
