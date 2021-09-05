@@ -609,31 +609,29 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
       if ( (_enabled_plugins.size() > 0) && (_enabled_plugins.contains(fileinfo.baseName()) == false) )
       {
-        qDebug() << message << " ...skipping because it is not explicitly enabled";
+        qDebug() << message << " ...skipping, because it is not explicitly enabled";
         continue;
       }
       if ( (_disabled_plugins.size() > 0) && (_disabled_plugins.contains(fileinfo.baseName()) == true) )
       {
-        qDebug() << message << " ...skipping because it is explicitly disabled";
+        qDebug() << message << " ...skipping, because it is explicitly disabled";
         continue;
       }
       if ( !_test_option && is_debug_plugin )
       {
-        qDebug() << message << " ...disabled unless option -t is used";
+        qDebug() << message << " ...disabled, unless option -t is used";
         continue;
       }
+      if (loaded_plugins.find(plugin_name) != loaded_plugins.end())
+      {
+        qDebug() << message << " ...skipping, because already loaded";
+        continue;
+      }
+
       qDebug() << message;
 
-      if (loaded_plugins.find(plugin_name) == loaded_plugins.end())
-      {
-        loaded_plugins.insert(plugin_name);
-        loaded_count++;
-      }
-      else
-      {
-        qDebug() << tr("Trying to load twice a plugin with name [%1]. Skipping...").arg(plugin_name);
-        continue;
-      }
+      loaded_plugins.insert(plugin_name);
+      loaded_count++;
 
       if (loader)
       {
