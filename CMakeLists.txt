@@ -18,13 +18,10 @@ add_definitions(
 #set(PJ_DEFAULT_ARGS "-n --enabled_plugins=libDataLoadCSV_0x3b_libDataStreamSample")
 #add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
 
-# Settings to build PJ - RTI Connext DDS Edition
-set(COMPILING_RTI_PLUGIN_AS_SUBMODULE 1)
-set(PJ_DEFAULT_ARGS "--skin_path :/plotjuggler_plugins/DataStreamRTI/skin --disabled_plugins=libDataStreamWebSocket_0x3b_libDataStreamUDP")
-add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
-
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+IF (NOT WIN32)
+  set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+  set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+endif()
 
 include_directories( plotjuggler_base/include )
 include_directories( plotjuggler_base/src )
@@ -113,6 +110,7 @@ set( QT_LINK_LIBRARIES
     Qt5::WebSockets
     )
 
+
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to RelWithDebInfo")
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -166,7 +164,7 @@ add_library( plotjuggler_base SHARED
      plotjuggler_base/src/timeseries_qwt.cpp
      )
 # target_link_libraries(plotjuggler_base plotjuggler_qwt)
-#RTI: DEBUG
+
 target_link_libraries(plotjuggler_base
         Qt5::Core
         Qt5::Widgets
@@ -243,7 +241,6 @@ add_subdirectory( 3rdparty/lua-5.4.1 )
 
 add_subdirectory( plotjuggler_app )
 
-add_subdirectory( plotjuggler_plugins/DataStreamRTI )
 add_subdirectory( plotjuggler_plugins/DataLoadCSV )
 add_subdirectory( plotjuggler_plugins/DataLoadULog )
 add_subdirectory( plotjuggler_plugins/DataStreamSample )

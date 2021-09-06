@@ -111,6 +111,7 @@ QTextBrowser {
    color: ${default_text};
 }
 
+QTextEdit,
 QPlainTextEdit {
    background: ${widget_background};
    color: ${default_text};

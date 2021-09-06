@@ -610,31 +610,29 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
       if ( (_enabled_plugins.size() > 0) && (_enabled_plugins.contains(fileinfo.baseName()) == false) )
       {
-        qDebug() << message << " ...skipping because it is not explicitly enabled";
+        qDebug() << message << " ...skipping, because it is not explicitly enabled";
         continue;
       }
       if ( (_disabled_plugins.size() > 0) && (_disabled_plugins.contains(fileinfo.baseName()) == true) )
       {
-        qDebug() << message << " ...skipping because it is explicitly disabled";
+        qDebug() << message << " ...skipping, because it is explicitly disabled";
         continue;
       }
       if ( !_test_option && is_debug_plugin )
       {
-        qDebug() << message << " ...disabled unless option -t is used";
+        qDebug() << message << " ...disabled, unless option -t is used";
         continue;
       }
+      if (loaded_plugins.find(plugin_name) != loaded_plugins.end())
+      {
+        qDebug() << message << " ...skipping, because already loaded";
+        continue;
+      }
+
       qDebug() << message;
 
-      if (loaded_plugins.find(plugin_name) == loaded_plugins.end())
-      {
-        loaded_plugins.insert(plugin_name);
-        loaded_count++;
-      }
-      else
-      {
-        qDebug() << tr("Trying to load twice a plugin with name [%1]. Skipping...").arg(plugin_name);
-        continue;
-      }
+      loaded_plugins.insert(plugin_name);
+      loaded_count++;
 
       if (loader)
       {
@@ -730,9 +728,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
                     _replot_timer->start( 40 );
                   }
                 });
-        
-        connect(streamer, &DataStreamer::runStatusChanged,
-                this, &MainWindow::on_runStatusChanged );
+
         connect(streamer, &DataStreamer::notificationsChanged,
                 this, &MainWindow::on_streamingNotificationsChanged );
       }
@@ -1483,7 +1479,7 @@ void MainWindow::on_streamingToggled()
 }
 
 
-void MainWindow::stopStreamingPlugin(bool plugin_initiated)
+void MainWindow::stopStreamingPlugin()
 {
   ui->comboStreaming->setEnabled(true);
   ui->buttonStreamingStart->setText("Start");
@@ -1503,7 +1499,7 @@ void MainWindow::stopStreamingPlugin(bool plugin_initiated)
     on_buttonStreamingPause_toggled(true);
   }
 
-  if( _active_streamer_plugin && (plugin_initiated == false) ) {
+  if( _active_streamer_plugin ) {
     _active_streamer_plugin->shutdown();
     _active_streamer_plugin = nullptr;
   }
@@ -1518,8 +1514,14 @@ void MainWindow::stopStreamingPlugin(bool plugin_initiated)
 
 }
 
-void MainWindow::startStreamingPlugin(QString streamer_name, bool plugin_initiated)
+void MainWindow::startStreamingPlugin(QString streamer_name)
 {
+  if (_active_streamer_plugin)
+  {
+    _active_streamer_plugin->shutdown();
+    _active_streamer_plugin = nullptr;
+  }
+
   if (_data_streamer.empty())
   {
     qDebug() << "Error, no streamer loaded";
@@ -1527,49 +1529,29 @@ void MainWindow::startStreamingPlugin(QString streamer_name, bool plugin_initiat
   }
 
   auto it = _data_streamer.find(streamer_name);
-  if (it == _data_streamer.end())
+  if (it != _data_streamer.end())
   {
-    qDebug() << "Error. The streamer " << streamer_name << " is not loaded";
+    _active_streamer_plugin = it->second;
+  }
+  else
+  {
+    qDebug() << "Error. The streamer " << streamer_name << " can't be loaded";
     _active_streamer_plugin = nullptr;
     return;
-  } 
-
-  DataStreamerPtr plugin_to_start = it->second;
-  if ( plugin_initiated == false )
-  {
-    if (_active_streamer_plugin) 
-    {
-      _active_streamer_plugin->shutdown();
-      _active_streamer_plugin = nullptr;
-    }
   }
-  else 
-  {
-    if ( _active_streamer_plugin && (_active_streamer_plugin != plugin_to_start) )
-    {
-      _active_streamer_plugin->shutdown();
-      _active_streamer_plugin = nullptr;
-    }
-  }
-  _active_streamer_plugin = plugin_to_start;
 
-  // plugin_initiated indicates that the plugin is already started 
-  // using some plugin-specific means
-  bool started = plugin_initiated;
-  if (!started )
+  bool started = false;
+  try
   {
-    try
-    {
-      // TODO data sources (argument to _active_streamer_plugin->start()
-      started = _active_streamer_plugin && _active_streamer_plugin->start(nullptr);
-    }
-    catch (std::runtime_error& err)
-    {
-      QMessageBox::warning(this, tr("Exception from the plugin"),
-                          tr("The plugin thrown the following exception: \n\n %1\n").arg(err.what()));
-      _active_streamer_plugin = nullptr;
-      return;
-    }
+    // TODO data sources (argument to _active_streamer_plugin->start()
+    started = _active_streamer_plugin && _active_streamer_plugin->start(nullptr);
+  }
+  catch (std::runtime_error& err)
+  {
+    QMessageBox::warning(this, tr("Exception from the plugin"),
+                         tr("The plugin thrown the following exception: \n\n %1\n").arg(err.what()));
+    _active_streamer_plugin = nullptr;
+    return;
   }
 
   // The attemp to start the plugin may have succeded or failed
@@ -2314,26 +2296,6 @@ void MainWindow::on_deleteSerieFromGroup(std::string group_name )
   AddFromGroup( _mapped_plot_data.user_defined );
 
   onDeleteMultipleCurves(names);
-}
-
-void MainWindow::on_runStatusChanged(const QString &plugin_name, bool running)
-{
-  // Change the button only the the plugin matches the on 
-  // currently selected in the combo box
-  // signal is the one 
-  if ( ui->comboStreaming->currentText() != plugin_name) 
-  {
-    return;
-  }
-
-  if ( running ) 
-  {
-    startStreamingPlugin(plugin_name, true);
-  }
-  else
-  {
-    stopStreamingPlugin(true);
-  }
 }
 
 void MainWindow::on_streamingNotificationsChanged(int active_count)

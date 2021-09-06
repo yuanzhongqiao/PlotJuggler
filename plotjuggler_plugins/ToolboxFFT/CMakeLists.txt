@@ -19,6 +19,7 @@ target_link_libraries(ToolboxFFT
     ${Qt5Widgets_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
     kissfft
-    plotjuggler_base)
+    plotjuggler_base
+    plotjuggler_qwt)
 
 install(TARGETS ToolboxFFT DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY}  )

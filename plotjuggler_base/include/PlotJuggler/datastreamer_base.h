@@ -94,10 +94,6 @@ signals:
   /// When the plugin stops itself, this signal must be emitted.
   void closed();
 
-  // Plugin notification incating a status change: 'running' <-> 'not-running'
-  // PJ should modify the Start/Stop button if it is the currently-active streamer plugin 
-  void runStatusChanged(const QString &plugin_name, bool running);
-
   // Plugin notifications.
   // PJ modifies the "notifications" button to indicate whether there are any
   void notificationsChanged(int active_notification_count);
