@@ -730,7 +730,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
                     _replot_timer->start( 40 );
                   }
                 });
-
+        
+        connect(streamer, &DataStreamer::runStatusChanged,
+                this, &MainWindow::on_runStatusChanged );
         connect(streamer, &DataStreamer::notificationsChanged,
                 this, &MainWindow::on_streamingNotificationsChanged );
       }
@@ -1481,7 +1483,7 @@ void MainWindow::on_streamingToggled()
 }
 
 
-void MainWindow::stopStreamingPlugin()
+void MainWindow::stopStreamingPlugin(bool plugin_initiated)
 {
   ui->comboStreaming->setEnabled(true);
   ui->buttonStreamingStart->setText("Start");
@@ -1501,7 +1503,7 @@ void MainWindow::stopStreamingPlugin()
     on_buttonStreamingPause_toggled(true);
   }
 
-  if( _active_streamer_plugin ) {
+  if( _active_streamer_plugin && (plugin_initiated == false) ) {
     _active_streamer_plugin->shutdown();
     _active_streamer_plugin = nullptr;
   }
@@ -1516,14 +1518,8 @@ void MainWindow::stopStreamingPlugin()
 
 }
 
-void MainWindow::startStreamingPlugin(QString streamer_name)
+void MainWindow::startStreamingPlugin(QString streamer_name, bool plugin_initiated)
 {
-  if (_active_streamer_plugin)
-  {
-    _active_streamer_plugin->shutdown();
-    _active_streamer_plugin = nullptr;
-  }
-
   if (_data_streamer.empty())
   {
     qDebug() << "Error, no streamer loaded";
@@ -1531,29 +1527,49 @@ void MainWindow::startStreamingPlugin(QString streamer_name)
   }
 
   auto it = _data_streamer.find(streamer_name);
-  if (it != _data_streamer.end())
+  if (it == _data_streamer.end())
   {
-    _active_streamer_plugin = it->second;
-  }
-  else
-  {
-    qDebug() << "Error. The streamer " << streamer_name << " can't be loaded";
+    qDebug() << "Error. The streamer " << streamer_name << " is not loaded";
     _active_streamer_plugin = nullptr;
     return;
-  }
+  } 
 
-  bool started = false;
-  try
+  DataStreamerPtr plugin_to_start = it->second;
+  if ( plugin_initiated == false )
   {
-    // TODO data sources (argument to _active_streamer_plugin->start()
-    started = _active_streamer_plugin && _active_streamer_plugin->start(nullptr);
+    if (_active_streamer_plugin) 
+    {
+      _active_streamer_plugin->shutdown();
+      _active_streamer_plugin = nullptr;
+    }
   }
-  catch (std::runtime_error& err)
+  else 
   {
-    QMessageBox::warning(this, tr("Exception from the plugin"),
-                         tr("The plugin thrown the following exception: \n\n %1\n").arg(err.what()));
-    _active_streamer_plugin = nullptr;
-    return;
+    if ( _active_streamer_plugin && (_active_streamer_plugin != plugin_to_start) )
+    {
+      _active_streamer_plugin->shutdown();
+      _active_streamer_plugin = nullptr;
+    }
+  }
+  _active_streamer_plugin = plugin_to_start;
+
+  // plugin_initiated indicates that the plugin is already started 
+  // using some plugin-specific means
+  bool started = plugin_initiated;
+  if (!started )
+  {
+    try
+    {
+      // TODO data sources (argument to _active_streamer_plugin->start()
+      started = _active_streamer_plugin && _active_streamer_plugin->start(nullptr);
+    }
+    catch (std::runtime_error& err)
+    {
+      QMessageBox::warning(this, tr("Exception from the plugin"),
+                          tr("The plugin thrown the following exception: \n\n %1\n").arg(err.what()));
+      _active_streamer_plugin = nullptr;
+      return;
+    }
   }
 
   // The attemp to start the plugin may have succeded or failed
@@ -1628,8 +1644,14 @@ void MainWindow::on_stylesheetChanged(QString theme)
 {
   ui->pushButtonLoadDatafile->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
   ui->buttonStreamingPause->setIcon(LoadSvg(":/resources/svg/pause.svg", theme));
-  ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
-
+  if ( ui->buttonStreamingNotifications->isEnabled() )
+  {
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell-active.svg", theme));
+  }
+  else 
+  {
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
+  }
   ui->buttonRecentData->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
   ui->buttonRecentLayout->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
 
@@ -2292,6 +2314,26 @@ void MainWindow::on_deleteSerieFromGroup(std::string group_name )
   AddFromGroup( _mapped_plot_data.user_defined );
 
   onDeleteMultipleCurves(names);
+}
+
+void MainWindow::on_runStatusChanged(const QString &plugin_name, bool running)
+{
+  // Change the button only the the plugin matches the on 
+  // currently selected in the combo box
+  // signal is the one 
+  if ( ui->comboStreaming->currentText() != plugin_name) 
+  {
+    return;
+  }
+
+  if ( running ) 
+  {
+    startStreamingPlugin(plugin_name, true);
+  }
+  else
+  {
+    stopStreamingPlugin(true);
+  }
 }
 
 void MainWindow::on_streamingNotificationsChanged(int active_count)

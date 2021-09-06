@@ -112,7 +112,7 @@ std::pair<int,char**> MergeArguments(int argc, char* argv[])
     new_argv[index++] = strdup(cmdline_arg.toLocal8Bit().data());
   }
 
-  // If an argument is repeated it overrides the 'default' setting rside default arguments. 
+  // If an argument appears repeated, the second value overrides previous one. 
   // Do this after adding default_cmdline_args so the command-line overide default
   for (int i=1; i< argc; ++i ) {
     new_argv[index++] = argv[i];

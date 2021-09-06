@@ -77,6 +77,10 @@ QTabWidget::right-corner {
     subcontrol-position: left bottom;
 }
 
+QTabWidget::tab-bar {
+    left: 0; 
+}
+
 QTabBar::tab {
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
@@ -107,6 +111,7 @@ QTextBrowser {
    color: ${default_text};
 }
 
+QTextEdit,
 QPlainTextEdit {
    background: ${widget_background};
    color: ${default_text};
@@ -612,7 +617,6 @@ QSlider::handle:horizontal:hover {
 
 
 /* --------------------------------------------------------------------------- */
-
 QTableView,
 QTreeView,
 QListView {
@@ -633,6 +637,14 @@ QListView::item:selected {
    color: black;
 }
 
+QHeaderView::section {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                      stop:0 #E2E1E0,   stop:0.5 #F2F1F0,
+                                      stop:0.6 #F5F4F3, stop:1.0 #D2D1D0);
+    color: black;
+    padding-left: 4px;
+    border: 1px solid #6c6c6c;
+}
 
 QTreeView:branch {
     background-color: transparent;

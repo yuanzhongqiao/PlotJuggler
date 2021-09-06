@@ -17,6 +17,9 @@ add_definitions(
 
 #set(PJ_DEFAULT_ARGS "-n --enabled_plugins=libDataLoadCSV_0x3b_libDataStreamSample")
 #add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
+
+# Settings to build PJ - RTI Connext DDS Edition
+set(COMPILING_RTI_PLUGIN_AS_SUBMODULE 1)
 set(PJ_DEFAULT_ARGS "--skin_path :/plotjuggler_plugins/DataStreamRTI/skin --disabled_plugins=libDataStreamWebSocket_0x3b_libDataStreamUDP")
 add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
 
@@ -110,7 +113,6 @@ set( QT_LINK_LIBRARIES
     Qt5::WebSockets
     )
 
-
 if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type selected, default to RelWithDebInfo")
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -164,6 +166,16 @@ add_library( plotjuggler_base SHARED
      plotjuggler_base/src/timeseries_qwt.cpp
      )
 # target_link_libraries(plotjuggler_base plotjuggler_qwt)
+#RTI: DEBUG
+target_link_libraries(plotjuggler_base
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Xml
+        Qt5::Concurrent
+        Qt5::Svg
+        Qt5::OpenGL
+        plotjuggler_qwt
+        )
 
 #########################  INSTALL  ####################################
 
@@ -231,6 +243,7 @@ add_subdirectory( 3rdparty/lua-5.4.1 )
 
 add_subdirectory( plotjuggler_app )
 
+add_subdirectory( plotjuggler_plugins/DataStreamRTI )
 add_subdirectory( plotjuggler_plugins/DataLoadCSV )
 add_subdirectory( plotjuggler_plugins/DataLoadULog )
 add_subdirectory( plotjuggler_plugins/DataStreamSample )
@@ -239,7 +252,6 @@ add_subdirectory( plotjuggler_plugins/DataStreamUDP )
 add_subdirectory( plotjuggler_plugins/StatePublisherCSV )
 add_subdirectory( plotjuggler_plugins/ToolboxQuaternion )
 add_subdirectory( plotjuggler_plugins/ToolboxFFT )
-add_subdirectory( plotjuggler_plugins/DataStreamRTI )
 
 if( ZMQ_FOUND )
   add_subdirectory( plotjuggler_plugins/DataStreamZMQ )
