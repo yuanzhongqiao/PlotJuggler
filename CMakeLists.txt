@@ -152,7 +152,7 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/plotwidget_base.h
 )
 
-add_library( plotjuggler_base SHARED
+add_library( plotjuggler_base
     ${PLOTJUGGLER_BASE_MOCS}
      plotjuggler_base/src/plotdata.cpp
      plotjuggler_base/src/datastreamer_base.cpp
@@ -164,16 +164,6 @@ add_library( plotjuggler_base SHARED
      plotjuggler_base/src/timeseries_qwt.cpp
      )
 # target_link_libraries(plotjuggler_base plotjuggler_qwt)
-
-target_link_libraries(plotjuggler_base
-        Qt5::Core
-        Qt5::Widgets
-        Qt5::Xml
-        Qt5::Concurrent
-        Qt5::Svg
-        Qt5::OpenGL
-        plotjuggler_qwt
-        )
 
 #########################  INSTALL  ####################################
 
