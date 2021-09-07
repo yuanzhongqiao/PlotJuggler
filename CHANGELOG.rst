@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.0 (2021-09-07)
+------------------
 * add "start_streamer" option
 * MacOS compilation and improvements to dark mode
 * Support MacOS and Dark Mode
