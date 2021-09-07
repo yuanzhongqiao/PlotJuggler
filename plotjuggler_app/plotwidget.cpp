@@ -111,12 +111,16 @@ PlotWidget::PlotWidget(PlotDataMapRef& datamap, QWidget* parent)
 
 PlotWidget::~PlotWidget()
 {
-//  QwtScaleWidget* bottomAxis = qwtPlot()->axisWidget( QwtPlot::xBottom );
-//  QwtScaleWidget* leftAxis = qwtPlot()->axisWidget( QwtPlot::yLeft );
-
-//  bottomAxis->removeEventFilter(this);
-//  leftAxis->removeEventFilter(this);
-//  qwtPlot()->canvas()->removeEventFilter(this);
+  delete _action_split_horizontal;
+  delete _action_split_vertical;
+  delete _action_removeAllCurves;
+  delete _action_zoomOutMaximum;
+  delete _action_zoomOutHorizontally;
+  delete _action_zoomOutVertically;
+  delete _action_saveToFile;
+  delete _action_copy;
+  delete _action_paste;
+  delete _action_image_to_clipboard;
 }
 
 void PlotWidget::setContextMenuEnabled(bool enabled)
@@ -207,7 +211,7 @@ void PlotWidget::canvasContextMenuTriggered(const QPoint& pos)
   QSettings settings;
   QString theme = settings.value("StyleSheet::theme", "light").toString();
 
-  _action_removeAllCurves->setIcon( LoadSvg(":/resources/svg/remove_red.svg", theme) );
+  _action_removeAllCurves->setIcon( LoadSvg(":/resources/svg/trash.svg", theme) );
   _action_edit->setIcon( LoadSvg(":/resources/svg/pencil-edit.svg", theme) );
   _action_formula->setIcon( LoadSvg(":/resources/svg/Fx.svg", theme) );
   _action_split_horizontal->setIcon( LoadSvg(":/resources/svg/add_column.svg", theme) );

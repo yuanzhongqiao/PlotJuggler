@@ -116,7 +116,7 @@ private:
   std::map<QString, StatePublisherPtr> _state_publisher;
   std::map<QString, DataStreamerPtr> _data_streamer;
 
-  QString _streamer_autostart;
+  QString _default_streamer;
 
   std::shared_ptr<MessageParserFactory> _message_parser_factory;
 

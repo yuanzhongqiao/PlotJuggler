@@ -125,6 +125,12 @@ QToolTip {
     background: ${widget_background};
     color: ${default_text}; }
 
+
+/* QScrollArea ------------------------------------------------------------
+
+--------------------------------------------------------------------------- */
+
+
 /* QScrollBar -------------------------------------------------------------
 
 https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qscrollbar
@@ -362,7 +368,6 @@ QAbstractSpinBox::down-arrow:hover {
 QAbstractSpinBox:hover {
   border: 1px solid ${border_hover};
 }
-
 
 
 /* QRadioButton ----------------------------------------------------------- */
@@ -617,6 +622,7 @@ QSlider::handle:horizontal:hover {
 
 
 /* --------------------------------------------------------------------------- */
+
 QTableView,
 QTreeView,
 QListView {

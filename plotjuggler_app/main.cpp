@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
   manager.get(request);
 
 
-
+  MainWindow* w = nullptr;
 
   /*
    * You, fearless code reviewer, decided to start a journey into my source code.
@@ -308,19 +308,24 @@ int main(int argc, char* argv[])
       app.processEvents();
     }
 
-    MainWindow w(parser);
+    w = new MainWindow(parser);
 
     deadline = QDateTime::currentDateTime().addMSecs(3000);
     while (QDateTime::currentDateTime() < deadline && !splash.isHidden())
     {
       app.processEvents();
     }
-
-    w.show();
-    splash.finish(&w);
-    return app.exec();
   }
-  MainWindow w(parser);
-  w.show();
+  else{
+    w = new MainWindow(parser);
+  }
+
+  w->show();
+
+  if ( parser.isSet(start_streamer))
+  {
+     w->on_buttonStreamingStart_clicked();
+  }
+
   return app.exec();
 }

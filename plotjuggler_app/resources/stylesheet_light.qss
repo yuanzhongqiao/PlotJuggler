@@ -23,7 +23,7 @@ QWidget {
   background: transparent;
   padding: 0px;
   color: ${default_text};
-  font-size: 11pt;
+  font-size: 10pt;
 }
 
 QWidget:disabled{
@@ -267,7 +267,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 /* QMenu ----------------------------------------------------------- */
 
 QMenu {
-    background: ${widget_background};
+    background-color: ${widget_background};
     border: 1px solid ${border_default};
 }
 
@@ -523,6 +523,10 @@ QPushButton[flat="false"]
     border: 1px solid ${border_default};
 }
 
+QPushButton:disabled {
+    color: ${disabled_text};
+}
+
 
 QPushButton:checked {
   border: 2px solid ${border_checked};
@@ -760,7 +764,6 @@ QWidget#leftMainWindowFrame
   background-color: ${main_background};
 }
 
-
 QWidget#widgetLabelLoad,
 QWidget#widgetLabelStreaming,
 QWidget#widgetLabelPublishers,
@@ -824,7 +827,6 @@ QFrame#framePlotPreviewC {
    border: 1px solid ${border_default};
    margin: 0px;
 }
-
 
 QWidget#formulaPage{
    background-color: ${main_background};
