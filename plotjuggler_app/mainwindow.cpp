@@ -228,6 +228,8 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   //------------ Load plugins -------------
   auto plugin_extra_folders = commandline_parser.value("plugin_folders").split(";", QString::SkipEmptyParts);
 
+  _streamer_autostart = commandline_parser.value("start_streamer");
+
   loadAllPlugins(plugin_extra_folders);
 
   //------------------------------------
@@ -353,6 +355,16 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   _message_parser_factory->insert( {"BSON", std::make_shared<BSON_ParserCreator>() });
   _message_parser_factory->insert( {"MessagePack", std::make_shared<MessagePack_ParserCreator>() });
 
+  // start streaming programmatically
+  if( !_streamer_autostart.isEmpty() )
+  {
+    auto index = ui->comboStreaming->findText( _streamer_autostart );
+    if( index != -1)
+    {
+      ui->comboStreaming->setCurrentIndex( index );
+      startStreamingPlugin( _streamer_autostart );
+    }
+  }
 }
 
 MainWindow::~MainWindow()
@@ -699,6 +711,10 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if (streamer)
       {
+        if( _streamer_autostart == fileinfo.baseName() )
+        {
+          _streamer_autostart = plugin_name;
+        }
         _data_streamer.insert(std::make_pair(plugin_name, streamer));
 
         streamer->setAvailableParsers( _message_parser_factory );

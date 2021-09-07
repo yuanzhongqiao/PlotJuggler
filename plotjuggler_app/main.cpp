@@ -216,6 +216,11 @@ int main(int argc, char* argv[])
                                       "New \"skin\". Refer to the sample in [plotjuggler_app/resources/skin]", "path to folder");
   parser.addOption(skin_path_option);
 
+  QCommandLineOption start_streamer(QStringList() << "start_streamer",
+                                    "Automatically start a Streaming Plugin with the give filename",
+                                    "file_name (no extension)");
+  parser.addOption(start_streamer);
+
   parser.process(*qApp);
 
   if (parser.isSet(publish_option) && !parser.isSet(layout_option))
