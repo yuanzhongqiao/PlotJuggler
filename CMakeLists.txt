@@ -152,7 +152,7 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/plotwidget_base.h
 )
 
-add_library( plotjuggler_base
+add_library( plotjuggler_base SHARED
     ${PLOTJUGGLER_BASE_MOCS}
      plotjuggler_base/src/plotdata.cpp
      plotjuggler_base/src/datastreamer_base.cpp
@@ -163,6 +163,17 @@ add_library( plotjuggler_base
      plotjuggler_base/src/plotlegend.cpp
      plotjuggler_base/src/timeseries_qwt.cpp
      )
+# target_link_libraries(plotjuggler_base plotjuggler_qwt)
+
+target_link_libraries(plotjuggler_base
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Xml
+        Qt5::Concurrent
+        Qt5::Svg
+        Qt5::OpenGL
+        plotjuggler_qwt
+        )
 
 #########################  INSTALL  ####################################
 
@@ -184,8 +195,8 @@ elseif(COMPILING_WITH_AMENT)
         export_plotjuggler_base
         export_plotjuggler_qwt
         HAS_LIBRARY_TARGET)
-
     ament_package()
+
 else()
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -203,7 +214,9 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/PlotJuggler.desktop
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
         DESTINATION ${DESKTOP_ICON_DIR}  )
 
+
 add_subdirectory( 3rdparty/qwt/src )
+
 
 install(
      TARGETS
@@ -240,4 +253,3 @@ add_subdirectory( plotjuggler_plugins/ToolboxFFT )
 if( ZMQ_FOUND )
   add_subdirectory( plotjuggler_plugins/DataStreamZMQ )
 endif()
-

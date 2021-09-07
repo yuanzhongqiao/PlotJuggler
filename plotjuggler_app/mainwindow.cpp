@@ -1642,8 +1642,14 @@ void MainWindow::on_stylesheetChanged(QString theme)
 {
   ui->pushButtonLoadDatafile->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
   ui->buttonStreamingPause->setIcon(LoadSvg(":/resources/svg/pause.svg", theme));
-  ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
-
+  if ( ui->buttonStreamingNotifications->isEnabled() )
+  {
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell-active.svg", theme));
+  }
+  else 
+  {
+    ui->buttonStreamingNotifications->setIcon(LoadSvg(":/resources/svg/alarm-bell.svg", theme));
+  }
   ui->buttonRecentData->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
   ui->buttonRecentLayout->setIcon(LoadSvg(":/resources/svg/right-arrow.svg", theme));
 

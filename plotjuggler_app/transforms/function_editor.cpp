@@ -31,7 +31,7 @@
 
 void FunctionEditorWidget::on_stylesheetChanged(QString theme)
 {
-  ui->pushButtonDeleteCurves->setIcon(LoadSvg(":/resources/svg/remove_red.svg", theme));
+  ui->pushButtonDeleteCurves->setIcon(LoadSvg(":/resources/svg/trash.svg", theme));
   ui->buttonLoadFunctions->setIcon(LoadSvg(":/resources/svg/import.svg", theme));
   ui->buttonSaveFunctions->setIcon(LoadSvg(":/resources/svg/export.svg", theme));
   ui->buttonSaveCurrent->setIcon(LoadSvg(":/resources/svg/save.svg", theme));

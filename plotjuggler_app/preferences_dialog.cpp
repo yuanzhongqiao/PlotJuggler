@@ -27,7 +27,7 @@ PreferencesDialog::PreferencesDialog(QWidget* parent) : QDialog(parent), ui(new 
   ui->radioGlobalColorIndex->setChecked(!use_plot_color_index);
 
   ui->pushButtonAdd->setIcon( LoadSvg(":/resources/svg/add_tab.svg", theme));
-  ui->pushButtonRemove->setIcon( LoadSvg(":/resources/svg/remove_red.svg", theme));
+  ui->pushButtonRemove->setIcon( LoadSvg(":/resources/svg/trash.svg", theme));
 
 
   bool use_separator = settings.value("Preferences::use_separator", true).toBool();
