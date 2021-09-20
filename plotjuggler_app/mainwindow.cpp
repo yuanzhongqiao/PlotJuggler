@@ -1274,7 +1274,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
                    "This is an experimental feature. Publishers will not work as you may expect.");
     msgbox.addButton(QMessageBox::Ok);
     QCheckBox *cb = new QCheckBox("Don't show this again");
-    cb->setChecked( !show_me );
+    cb->setChecked(!show_me);
     msgbox.setCheckBox(cb);
     connect(cb, &QCheckBox::stateChanged, this, [&]() {  show_me = !cb->isChecked(); } );
     msgbox.exec();
