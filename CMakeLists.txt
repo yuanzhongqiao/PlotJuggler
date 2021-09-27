@@ -85,8 +85,10 @@ if(APPLE AND EXISTS /usr/local/opt/qt5)
     # source: https://github.com/Homebrew/homebrew-core/issues/8392#issuecomment-325226494
     list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
     set(CMAKE_MACOSX_RPATH 1)
+elseif(APPLE AND EXISTS /opt/homebrew/opt/qt@5)
+    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@5")
+    set(CMAKE_MACOSX_RPATH 1)
 endif()
-
 
 find_package(Qt5 REQUIRED COMPONENTS
     Core
