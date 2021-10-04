@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.1 (2021-10-04)
+------------------
 * fix `#527 <https://github.com/facontidavide/PlotJuggler/issues/527>`_
 * avoid shared libraries in libkissFFT
 * Fix `#524 <https://github.com/facontidavide/PlotJuggler/issues/524>`_ and `#529 <https://github.com/facontidavide/PlotJuggler/issues/529>`_
