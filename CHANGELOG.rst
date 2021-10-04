@@ -2,6 +2,21 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix `#527 <https://github.com/facontidavide/PlotJuggler/issues/527>`_
+* avoid shared libraries in libkissFFT
+* Fix `#524 <https://github.com/facontidavide/PlotJuggler/issues/524>`_ and `#529 <https://github.com/facontidavide/PlotJuggler/issues/529>`_
+* Fix bug with Outlier Removal (`#532 <https://github.com/facontidavide/PlotJuggler/issues/532>`_)
+* minor changes
+* Implement Moving RMS filter `#510 <https://github.com/facontidavide/PlotJuggler/issues/510>`_
+* Fix issue `#516 <https://github.com/facontidavide/PlotJuggler/issues/516>`_
+  - Don't show more than once "Do you want to delete old data" when
+  loading multiple files.
+  - Correctly clean all the data, including _loaded_datafiles
+* Update README.md
+* Contributors: Davide Faconti
+
 3.3.0 (2021-09-07)
 ------------------
 * add "start_streamer" option
