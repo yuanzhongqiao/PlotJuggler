@@ -1254,27 +1254,19 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
 {
   if (remove_old)
   {
-    std::vector<std::string> old_plots_to_delete;
-
-    auto AddToDeleteList = [&old_plots_to_delete](auto& prev_plot_data,
-                                                  auto& new_plot_data) {
+    auto ClearOldSeries = [](auto& prev_plot_data, auto& new_plot_data) {
       for (auto& it : prev_plot_data)
       {
-        // timeseries in old but not in new
-        if (new_plot_data.count(it.first) == 0)
+        // timeseries in both
+        if (new_plot_data.count(it.first) != 0)
         {
-          old_plots_to_delete.push_back(it.first);
+          prev_plot_data.clear();
         }
       }
     };
 
-    AddToDeleteList(_mapped_plot_data.numeric, new_data.numeric);
-    AddToDeleteList(_mapped_plot_data.strings, new_data.strings);
-
-    if (!old_plots_to_delete.empty())
-    {
-      onDeleteMultipleCurves(old_plots_to_delete);
-    }
+    ClearOldSeries(_mapped_plot_data.numeric, new_data.numeric);
+    ClearOldSeries(_mapped_plot_data.strings, new_data.strings);
   }
 
   auto [added_curves, curve_updated, data_pushed] =
@@ -1441,7 +1433,7 @@ bool MainWindow::loadDataFromFile(const FileLoadInfo& info)
         AddPrefixToPlotData(info.prefix.toStdString(), mapped_data.numeric);
         AddPrefixToPlotData(info.prefix.toStdString(), mapped_data.strings);
 
-        importPlotDataMap(mapped_data, false);
+        importPlotDataMap(mapped_data, true);
 
         QDomElement plugin_elem = dataloader->xmlSaveState(new_info.plugin_config);
         new_info.plugin_config.appendChild(plugin_elem);
