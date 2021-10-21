@@ -1334,7 +1334,10 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   {
     FileLoadInfo info;
     info.filename = filenames[i];
-    info.prefix = QFileInfo(info.filename).baseName();
+    if( ui->checkBoxLoadDataPrefix->isChecked() )
+    {
+      info.prefix = QFileInfo(info.filename).baseName();
+    }
 
     if (loadDataFromFile(info))
     {
