@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.2 (2021-10-21)
+------------------
 * don't add the prefix. Checkbox added
 * bug fix when accidentally merging datafiles
 * clang-format
