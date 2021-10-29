@@ -1123,8 +1123,8 @@ void MainWindow::onDeleteMultipleCurves(const std::vector<std::string>& curve_na
 {
   for (const auto& curve_name : curve_names)
   {
-    _mapped_plot_data.erase(curve_name);
     emit dataSourceRemoved(curve_name);
+    _mapped_plot_data.erase(curve_name);
     _curvelist_widget->removeCurve(curve_name);
   }
 
