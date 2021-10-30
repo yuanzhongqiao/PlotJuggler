@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.3 (2021-10-30)
+------------------
 * Fix critical bug when loading a file twice
 * change order of removal
 * fix crash when one of the source of XY is deleted
