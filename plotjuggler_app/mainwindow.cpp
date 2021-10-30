@@ -1260,7 +1260,7 @@ void MainWindow::importPlotDataMap(PlotDataMapRef& new_data, bool remove_old)
         // timeseries in both
         if (new_plot_data.count(it.first) != 0)
         {
-          prev_plot_data.clear();
+          it.second.clear();
         }
       }
     };
