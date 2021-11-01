@@ -11,7 +11,7 @@ void LuaCustomFunction::initEngine()
 
   _lua_engine = std::unique_ptr<sol::state>(new sol::state());
   _lua_engine->open_libraries();
-  _lua_engine->script(_snippet.global_vars.toStdString());
+  _lua_engine->safe_script(_snippet.global_vars.toStdString());
 
   auto calcMethodStr = QString("function calc(time, value");
   for (int index = 1; index <= _snippet.additional_sources.size(); index++)

@@ -139,7 +139,7 @@ include_directories(
     ./3rdparty/Qt-Advanced-Docking/include
     ./3rdparty/qwt/src
     ./3rdparty/sol
-    ./3rdparty/lua-5.4.1/src
+    ./3rdparty/lua-5.4.3/src
 )
 
 #########################  BASE library  ####################################
@@ -227,7 +227,7 @@ endif()
 
 add_subdirectory( 3rdparty/color_widgets )
 add_subdirectory( 3rdparty/Qt-Advanced-Docking )
-add_subdirectory( 3rdparty/lua-5.4.1 )
+add_subdirectory( 3rdparty/lua-5.4.3 )
 
 add_subdirectory( plotjuggler_app )
 
