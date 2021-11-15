@@ -1,10 +1,7 @@
 syntax = "proto3";
+import "math.proto";
 
-message Vector {
-    double x = 1;
-    double y = 2;
-    double z = 3;
-}
+package flr.robot;
 
 message RobotState {
 
@@ -21,7 +18,7 @@ message RobotState {
     VIDEO = 6;
   }
   Corpus corpus = 4;
-  Vector pos = 5;
+  math.Vector pos = 5;
   repeated double joint_positions = 6;
 
 }

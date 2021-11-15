@@ -8,6 +8,7 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/tokenizer.h>
 #include <google/protobuf/compiler/parser.h>
+#include <google/protobuf/compiler/importer.h>
 
 #include <QCheckBox>
 #include <QDebug>
@@ -43,6 +44,8 @@ class ProtobufParserCreator : public MessageParserCreator
   Q_PLUGIN_METADATA(IID "facontidavide.PlotJuggler3.MessageParserCreator")
   Q_INTERFACES(PJ::MessageParserCreator)
 
+  void loadSettings();
+
   void saveSettings();
 
 public:
@@ -68,7 +71,7 @@ protected:
   Ui::ProtobufLoader* ui;
   QWidget* _widget;
 
-  google::protobuf::DescriptorPool _pool;
+  std::unique_ptr<google::protobuf::compiler::Importer> _importer;
 
   struct Info
   {
@@ -82,7 +85,7 @@ protected:
 
   QMap<QString, Info> _files;
 
-  bool updateDescription(QString filename, QByteArray proto);
+  bool updateDescription(QStringList filenames);
 
 private slots:
 

@@ -145,21 +145,14 @@ ProtobufParserCreator::ProtobufParserCreator()
   ui = new Ui::ProtobufLoader;
   ui->setupUi(_widget);
 
+  loadSettings();
+
   QSettings settings;
   QString theme = settings.value("Preferences::theme", "light").toString();
   ui->pushButtonRemove->setIcon(LoadSvg(":/resources/svg/trash.svg", theme));
 
   connect( ui->pushButtonLoad, &QPushButton::clicked, this, &ProtobufParserCreator::onLoadFile);
   connect( ui->pushButtonRemove, &QPushButton::clicked, this, &ProtobufParserCreator::onRemoveFile);
-
-  auto tmp_map = settings.value("ProtobufParserCreator.protoMap").toMap();
-
-  QMapIterator<QString, QVariant> it(tmp_map);
-  while (it.hasNext())
-  {
-    it.next();  
-    updateDescription(it.key(), it.value().toByteArray());
-  }
 
   connect( ui->listWidget, &QListWidget::currentRowChanged,
           this, &ProtobufParserCreator::onSelectionChanged );
@@ -183,6 +176,19 @@ ProtobufParserCreator::ProtobufParserCreator()
 
   connect( ui->comboBox, qOverload<const QString&>(&QComboBox::currentIndexChanged),
           this, &ProtobufParserCreator::onComboChanged );
+}
+
+void ProtobufParserCreator::loadSettings()
+{
+  QSettings settings;
+  auto tmp_map = settings.value("ProtobufParserCreator.filenames").toStringList();
+
+  QMapIterator<QString, QVariant> it(tmp_map);
+  while (it.hasNext())
+  {
+    it.next();
+    updateDescription(it.key(), it.value().toByteArray());
+  }
 }
 
 void ProtobufParserCreator::saveSettings()
@@ -250,6 +256,7 @@ void ProtobufParserCreator::onRemoveFile()
     selected.pop_front();
   }
   saveSettings();
+  loadSettings();
 }
 
 void ProtobufParserCreator::onSelectionChanged(int row)
@@ -295,7 +302,7 @@ void ProtobufParserCreator::onComboChanged(const QString& text)
   }
 }
 
-bool ProtobufParserCreator::updateDescription(QString filename, QByteArray proto)
+bool ProtobufParserCreator::updateDescription(QStringList filenames)
 {
   Info info;
   info.proto_text = proto;
@@ -304,8 +311,10 @@ bool ProtobufParserCreator::updateDescription(QString filename, QByteArray proto
   Tokenizer tokenizer(&proto_input_stream, nullptr);
   FileDescriptorProto file_desc_proto;
 
-  Parser parser;
-  if (!parser.Parse(&tokenizer, &file_desc_proto))
+  DiskSourceTree source_tree;
+  Importer importer(&source_tree, nullptr);
+
+  if (!importer.Import(&tokenizer, &file_desc_proto))
   {
     QMessageBox::warning(nullptr, tr("Error loading file"),
                          tr("Error parsing the file %1").arg(filename),
@@ -318,7 +327,7 @@ bool ProtobufParserCreator::updateDescription(QString filename, QByteArray proto
     file_desc_proto.set_name(filename.toStdString());
   }
 
-  info.file_descriptor = _pool.BuildFile(file_desc_proto);
+  info.file_descriptor = _pool->BuildFile(file_desc_proto);
   if (info.file_descriptor == nullptr)
   {
     QMessageBox::warning(nullptr, tr("Error loading file"),

@@ -12,21 +12,23 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
+import math_pb2 as math__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='robot_state.proto',
-  package='',
+  package='flr.robot',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x11robot_state.proto\")\n\x06Vector\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\"\xf8\x01\n\nRobotState\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0bpage_number\x18\x02 \x01(\x05\x12\x17\n\x0fresult_per_page\x18\x03 \x01(\x05\x12\"\n\x06\x63orpus\x18\x04 \x01(\x0e\x32\x12.RobotState.Corpus\x12\x14\n\x03pos\x18\x05 \x01(\x0b\x32\x07.Vector\x12\x17\n\x0fjoint_positions\x18\x06 \x03(\x01\"Z\n\x06\x43orpus\x12\r\n\tUNIVERSAL\x10\x00\x12\x07\n\x03WEB\x10\x01\x12\n\n\x06IMAGES\x10\x02\x12\t\n\x05LOCAL\x10\x03\x12\x08\n\x04NEWS\x10\x04\x12\x0c\n\x08PRODUCTS\x10\x05\x12\t\n\x05VIDEO\x10\x06\x62\x06proto3')
-)
+  serialized_pb=_b('\n\x11robot_state.proto\x12\tflr.robot\x1a\nmath.proto\"\x8b\x02\n\nRobotState\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0bpage_number\x18\x02 \x01(\x05\x12\x17\n\x0fresult_per_page\x18\x03 \x01(\x05\x12,\n\x06\x63orpus\x18\x04 \x01(\x0e\x32\x1c.flr.robot.RobotState.Corpus\x12\x1d\n\x03pos\x18\x05 \x01(\x0b\x32\x10.flr.math.Vector\x12\x17\n\x0fjoint_positions\x18\x06 \x03(\x01\"Z\n\x06\x43orpus\x12\r\n\tUNIVERSAL\x10\x00\x12\x07\n\x03WEB\x10\x01\x12\n\n\x06IMAGES\x10\x02\x12\t\n\x05LOCAL\x10\x03\x12\x08\n\x04NEWS\x10\x04\x12\x0c\n\x08PRODUCTS\x10\x05\x12\t\n\x05VIDEO\x10\x06\x62\x06proto3')
+  ,
+  dependencies=[math__pb2.DESCRIPTOR,])
 
 
 
 _ROBOTSTATE_CORPUS = _descriptor.EnumDescriptor(
   name='Corpus',
-  full_name='RobotState.Corpus',
+  full_name='flr.robot.RobotState.Corpus',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -61,101 +63,56 @@ _ROBOTSTATE_CORPUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=223,
-  serialized_end=313,
+  serialized_start=222,
+  serialized_end=312,
 )
 _sym_db.RegisterEnumDescriptor(_ROBOTSTATE_CORPUS)
 
 
-_VECTOR = _descriptor.Descriptor(
-  name='Vector',
-  full_name='Vector',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='x', full_name='Vector.x', index=0,
-      number=1, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='y', full_name='Vector.y', index=1,
-      number=2, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='z', full_name='Vector.z', index=2,
-      number=3, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=21,
-  serialized_end=62,
-)
-
-
 _ROBOTSTATE = _descriptor.Descriptor(
   name='RobotState',
-  full_name='RobotState',
+  full_name='flr.robot.RobotState',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='query', full_name='RobotState.query', index=0,
+      name='query', full_name='flr.robot.RobotState.query', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='page_number', full_name='RobotState.page_number', index=1,
+      name='page_number', full_name='flr.robot.RobotState.page_number', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='result_per_page', full_name='RobotState.result_per_page', index=2,
+      name='result_per_page', full_name='flr.robot.RobotState.result_per_page', index=2,
       number=3, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='corpus', full_name='RobotState.corpus', index=3,
+      name='corpus', full_name='flr.robot.RobotState.corpus', index=3,
       number=4, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='pos', full_name='RobotState.pos', index=4,
+      name='pos', full_name='flr.robot.RobotState.pos', index=4,
       number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='joint_positions', full_name='RobotState.joint_positions', index=5,
+      name='joint_positions', full_name='flr.robot.RobotState.joint_positions', index=5,
       number=6, type=1, cpp_type=5, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -174,28 +131,20 @@ _ROBOTSTATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=65,
-  serialized_end=313,
+  serialized_start=45,
+  serialized_end=312,
 )
 
 _ROBOTSTATE.fields_by_name['corpus'].enum_type = _ROBOTSTATE_CORPUS
-_ROBOTSTATE.fields_by_name['pos'].message_type = _VECTOR
+_ROBOTSTATE.fields_by_name['pos'].message_type = math__pb2._VECTOR
 _ROBOTSTATE_CORPUS.containing_type = _ROBOTSTATE
-DESCRIPTOR.message_types_by_name['Vector'] = _VECTOR
 DESCRIPTOR.message_types_by_name['RobotState'] = _ROBOTSTATE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-Vector = _reflection.GeneratedProtocolMessageType('Vector', (_message.Message,), dict(
-  DESCRIPTOR = _VECTOR,
-  __module__ = 'robot_state_pb2'
-  # @@protoc_insertion_point(class_scope:Vector)
-  ))
-_sym_db.RegisterMessage(Vector)
 
 RobotState = _reflection.GeneratedProtocolMessageType('RobotState', (_message.Message,), dict(
   DESCRIPTOR = _ROBOTSTATE,
   __module__ = 'robot_state_pb2'
-  # @@protoc_insertion_point(class_scope:RobotState)
+  # @@protoc_insertion_point(class_scope:flr.robot.RobotState)
   ))
 _sym_db.RegisterMessage(RobotState)
 
