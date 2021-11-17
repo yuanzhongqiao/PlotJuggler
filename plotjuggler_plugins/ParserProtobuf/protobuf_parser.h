@@ -18,6 +18,28 @@
 
 using namespace PJ;
 
+class ProtoErrorCollector: public google::protobuf::compiler::MultiFileErrorCollector
+{
+public:
+  void AddError(const std::string& filename, int line, int, const std::string& message) override
+  {
+    auto msg = QString("Error [%1] line %2: %3")
+                   .arg(QString::fromStdString(filename))
+                   .arg(line)
+                   .arg(QString::fromStdString(message));
+    qDebug() << msg;
+  }
+
+  void AddWarning(const std::string& filename, int line, int, const std::string& message) override
+  {
+    auto msg = QString("Warning [%1] line %2: %3")
+                   .arg(QString::fromStdString(filename))
+                   .arg(line)
+                   .arg(QString::fromStdString(message));
+    qDebug() << msg;
+  }
+};
+
 class ProtobufParser : public MessageParser
 {
 public:
@@ -48,6 +70,8 @@ class ProtobufParserCreator : public MessageParserCreator
 
   void saveSettings();
 
+  void importFile(QString filename);
+
 public:
   ProtobufParserCreator();
 
@@ -71,21 +95,23 @@ protected:
   Ui::ProtobufLoader* ui;
   QWidget* _widget;
 
+  google::protobuf::compiler::DiskSourceTree _source_tree;
+  ProtoErrorCollector _error_collector;
   std::unique_ptr<google::protobuf::compiler::Importer> _importer;
 
   struct Info
   {
+    QString file_path;
     QByteArray proto_text;
     const google::protobuf::FileDescriptor* file_descriptor = nullptr;
     std::map<QString,const google::protobuf::Descriptor*> descriptors;
   };
+  std::map<QString, Info> _files;
 
   QString _selected_file;
   const google::protobuf::Descriptor* _selected_descriptor = nullptr;
 
-  QMap<QString, Info> _files;
-
-  bool updateDescription(QStringList filenames);
+  bool updateUI();
 
 private slots:
 
