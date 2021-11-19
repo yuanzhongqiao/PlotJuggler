@@ -1333,7 +1333,6 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
 
   QStringList loaded_filenames;
 
-
   for (int i = 0; i < filenames.size(); i++)
   {
     FileLoadInfo info;
@@ -1390,6 +1389,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   if (loaded_filenames.size() > 0)
   {
     updateRecentDataMenu(loaded_filenames);
+    forEachWidget([&](PlotWidget* plot) { plot->zoomOut(false); });
     return true;
   }
   return false;
