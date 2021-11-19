@@ -21,23 +21,13 @@ using namespace PJ;
 class ProtoErrorCollector: public google::protobuf::compiler::MultiFileErrorCollector
 {
 public:
-  void AddError(const std::string& filename, int line, int, const std::string& message) override
-  {
-    auto msg = QString("Error [%1] line %2: %3")
-                   .arg(QString::fromStdString(filename))
-                   .arg(line)
-                   .arg(QString::fromStdString(message));
-    qDebug() << msg;
-  }
+  void AddError(const std::string& filename, int line, int, const std::string& message) override;
 
-  void AddWarning(const std::string& filename, int line, int, const std::string& message) override
-  {
-    auto msg = QString("Warning [%1] line %2: %3")
-                   .arg(QString::fromStdString(filename))
-                   .arg(line)
-                   .arg(QString::fromStdString(message));
-    qDebug() << msg;
-  }
+  void AddWarning(const std::string& filename, int line, int, const std::string& message) override;
+
+  void showErrors();
+private:
+  QString _error_msg;
 };
 
 class ProtobufParser : public MessageParser
@@ -106,20 +96,19 @@ protected:
     const google::protobuf::FileDescriptor* file_descriptor = nullptr;
     std::map<QString,const google::protobuf::Descriptor*> descriptors;
   };
-  std::map<QString, Info> _files;
+  Info _loaded_file;
 
-  QString _selected_file;
   const google::protobuf::Descriptor* _selected_descriptor = nullptr;
 
   bool updateUI();
 
 private slots:
 
+  void onIncludeDirectory();
+
   void onLoadFile();
 
-  void onRemoveFile();
-
-  void onSelectionChanged(int row);
+  void onRemoveInclude();
 
   void onComboChanged(const QString &text);
 };
