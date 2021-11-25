@@ -27,11 +27,14 @@ bool ProtobufParser::parseMessage(const MessageRef serialized_msg,
   ParseImpl = [&](const google::protobuf::Message& msg, const std::string& prefix)
   {
     const Reflection* reflection = msg.GetReflection();
-    std::vector<const FieldDescriptor*> fields;
-    reflection->ListFields(msg, &fields);
+    const Descriptor* descriptor = msg.GetDescriptor();
+//    std::vector<const FieldDescriptor*> reflection_fields;
+//    reflection->ListFields(msg, &reflection_fields);
 
-    for (auto field: fields)
+    for (int index=0; index < descriptor->field_count(); index++)
     {
+      auto field = descriptor->field(index);
+
       std::string key = prefix.empty() ?
                             field->name():
                             fmt::format("{}/{}", prefix, field->name() );

@@ -35,6 +35,8 @@ while True:
     robot_state.pos.y = 2.2
     robot_state.pos.z = 3.3
 
+#    robot_state.corpus = 3
+
     msg = robot_state.SerializeToString()
 
     ret = client.publish("plotjuggler/stuff", msg, qos=0 )
