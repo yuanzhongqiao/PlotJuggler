@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.4 (2021-12-28)
+------------------
 * Video plugin (`#574 <https://github.com/facontidavide/PlotJuggler/issues/574>`_)
 * gitignore *.swp files (`#569 <https://github.com/facontidavide/PlotJuggler/issues/569>`_)
 * Added libprotoc-dev to the apt install targets (`#573 <https://github.com/facontidavide/PlotJuggler/issues/573>`_)
