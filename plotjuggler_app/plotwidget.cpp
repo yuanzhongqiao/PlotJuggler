@@ -628,6 +628,7 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
   curveList().clear();
 
   // insert curves
+  QStringList missing_curves;
   for (QDomElement curve_element = plot_widget.firstChildElement("curve");
        !curve_element.isNull(); curve_element = curve_element.nextSiblingElement("curve"))
   {
@@ -635,12 +636,11 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
     std::string curve_name_std = curve_name.toStdString();
     QColor color(curve_element.attribute("color"));
 
-    bool error = false;
     if (!isXYPlot())
     {
       if (_mapped_data.numeric.find(curve_name_std) == _mapped_data.numeric.end())
       {
-        error = true;
+        missing_curves.append(curve_name);
       }
       else
       {
@@ -674,7 +674,7 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
       if (_mapped_data.numeric.find(curve_x) == _mapped_data.numeric.end() ||
           _mapped_data.numeric.find(curve_y) == _mapped_data.numeric.end())
       {
-        error = true;
+        missing_curves.append(curve_name);
       }
       else
       {
@@ -689,14 +689,15 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
         added_curve_names.insert(curve_name_std);
       }
     }
+  }
 
-    if (error && !warning_message_shown)
-    {
-      QMessageBox::warning(qwtPlot(), "Warning",
-                           tr("Can't find one or more curves.\n"
-                              "This message will be shown only once."));
-      warning_message_shown = true;
-    }
+  if (missing_curves.size() > 0 && !warning_message_shown)
+  {
+    QMessageBox::warning(qwtPlot(), "Warning",
+                         tr("Can't find one or more curves.\n"
+                            "This message will be shown only once.\n%1")
+                            .arg(missing_curves.join(",\n")));
+    warning_message_shown = true;
   }
 
   emit curveListChanged();
