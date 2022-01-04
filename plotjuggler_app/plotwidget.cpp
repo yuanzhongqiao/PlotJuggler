@@ -979,7 +979,6 @@ void PlotWidget::updateCurves(bool reset_older_data)
   {
     auto series = dynamic_cast<QwtSeriesWrapper*>(it.curve->data());
     series->updateCache(reset_older_data);
-    // TODO check res and do something if false.
   }
   updateMaximumZoomArea();
 }
@@ -1381,7 +1380,7 @@ void PlotWidget::setDefaultRangeX()
   if (!curveList().empty())
   {
     double min = std::numeric_limits<double>::max();
-    double max = -std::numeric_limits<double>::max();
+    double max = std::numeric_limits<double>::lowest();
     for (auto& it : _mapped_data.numeric)
     {
       const PlotData& data = it.second;
@@ -1404,7 +1403,7 @@ void PlotWidget::setDefaultRangeX()
 QwtSeriesWrapper* PlotWidget::createCurveXY(const PlotData* data_x,
                                             const PlotData* data_y)
 {
-  QwtSeriesWrapper* output = nullptr;
+  PointSeriesXY* output = nullptr;
 
   try
   {
