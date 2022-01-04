@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.3.5 (2022-01-04)
+------------------
 * fix zoom issue when toggling T_offset
 * cosmetic changes
 * show missing curves in error dialog (`#579 <https://github.com/facontidavide/PlotJuggler/issues/579>`_)
