@@ -918,6 +918,7 @@ void PlotWidget::on_changeTimeOffset(double offset)
       setZoomRectangle(rect, false);
     }
   }
+  updateMaximumZoomArea();
 }
 
 void PlotWidget::on_changeDateTimeScale(bool enable)
