@@ -315,6 +315,8 @@ DockWidget::DockWidget(PlotDataMapRef& datamap, QWidget* parent)
 
   QObject::connect(_toolbar->buttonClose(), &QPushButton::pressed, [=]() {
     dockAreaWidget()->closeArea();
+    takeWidget();
+    _plot_widget->deleteLater();
     this->undoableChange();
   });
 
@@ -323,11 +325,6 @@ DockWidget::DockWidget(PlotDataMapRef& datamap, QWidget* parent)
 
 DockWidget::~DockWidget()
 {
-  if (_plot_widget)
-  {
-    delete _plot_widget;
-    _plot_widget = nullptr;
-  }
 }
 
 DockWidget* DockWidget::splitHorizontal()
