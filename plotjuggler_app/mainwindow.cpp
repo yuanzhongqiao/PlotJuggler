@@ -1062,11 +1062,9 @@ bool MainWindow::xmlLoadState(QDomDocument state_document)
   size_t num_floating = 0;
   std::map<QString, QDomElement> tabbed_widgets_with_name;
 
-  for (QDomElement tw = root.firstChildElement("tabbed_widget"); tw.isNull() == false;
-       tw = tw.nextSiblingElement("tabb"
-                                  "ed_"
-                                  "widg"
-                                  "et"))
+  for (QDomElement tw = root.firstChildElement("tabbed_widget");
+       tw.isNull() == false;
+       tw = tw.nextSiblingElement("tabbed_widget"))
   {
     if (tw.attribute("parent") != ("main_window"))
     {

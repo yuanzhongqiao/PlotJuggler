@@ -447,7 +447,9 @@ void PlotWidgetBase::removeCurve(const QString& title)
   if (it != p->curve_list.end())
   {
     it->curve->detach();
+    delete it->curve;
     it->marker->detach();
+    delete it->marker;
     p->curve_list.erase(it);
 
     emit curveListChanged();
@@ -752,7 +754,9 @@ void PlotWidgetBase::removeAllCurves()
   for (auto& it : curveList())
   {
     it.curve->detach();
+    delete it.curve;
     it.marker->detach();
+    delete it.marker;
   }
 
   curveList().clear();

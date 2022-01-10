@@ -207,9 +207,8 @@ bool PlotDocker::xmlLoadState(QDomElement& tab_element)
   }
 
   for (auto container_elem = tab_element.firstChildElement("Container");
-       !container_elem.isNull(); container_elem = container_elem.nextSiblingElement("Cont"
-                                                                                    "aine"
-                                                                                    "r"))
+       !container_elem.isNull();
+       container_elem = container_elem.nextSiblingElement("Container"))
   {
     auto splitter_elem = container_elem.firstChildElement("DockSplitter");
     if (!splitter_elem.isNull())
@@ -317,6 +316,7 @@ DockWidget::DockWidget(PlotDataMapRef& datamap, QWidget* parent)
     dockAreaWidget()->closeArea();
     takeWidget();
     _plot_widget->deleteLater();
+    _plot_widget = nullptr;
     this->undoableChange();
   });
 
@@ -325,6 +325,10 @@ DockWidget::DockWidget(PlotDataMapRef& datamap, QWidget* parent)
 
 DockWidget::~DockWidget()
 {
+  if(_plot_widget)
+  {
+    delete _plot_widget;
+  }
 }
 
 DockWidget* DockWidget::splitHorizontal()
