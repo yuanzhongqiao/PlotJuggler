@@ -325,10 +325,7 @@ DockWidget::DockWidget(PlotDataMapRef& datamap, QWidget* parent)
 
 DockWidget::~DockWidget()
 {
-  if(_plot_widget)
-  {
-    delete _plot_widget;
-  }
+
 }
 
 DockWidget* DockWidget::splitHorizontal()
