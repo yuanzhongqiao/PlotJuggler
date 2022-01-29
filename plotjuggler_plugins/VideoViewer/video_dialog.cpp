@@ -64,6 +64,7 @@ VideoDialog::VideoDialog(QWidget *parent) :
 
   ui->setupUi(this);
   _media_player = new AVPlayer(this);
+  _media_player->audio()->setBackends(QStringList() << "null");
   _video_output = new VideoOutput(this);
 
   if (!_video_output->widget())

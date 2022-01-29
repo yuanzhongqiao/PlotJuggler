@@ -2562,6 +2562,11 @@ void MainWindow::closeEvent(QCloseEvent* event)
   settings.setValue("MainWindow.streamingBufferValue", ui->streamingSpinBox->value());
   settings.setValue("MainWindow.timeTrackerSetting", (int)_tracker_param);
   settings.setValue("MainWindow.splitterWidth", ui->mainSplitter->sizes()[0]);
+
+  _data_loader.clear();
+  _data_streamer.clear();
+  _state_publisher.clear();
+  _toolboxes.clear();
 }
 
 void MainWindow::onAddCustomPlot(const std::string& plot_name)
