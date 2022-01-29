@@ -1542,6 +1542,10 @@ std::unordered_set<std::string> MainWindow::loadDataFromFile(const FileLoadInfo&
 
 void MainWindow::on_buttonStreamingNotifications_clicked()
 {
+  if(_data_streamer.empty())
+  {
+    return;
+  }
   auto streamer = _data_streamer.at(ui->comboStreaming->currentText());
   QAction* notification_button_action = streamer->notificationAction().first;
   if (notification_button_action != nullptr)
@@ -3271,6 +3275,10 @@ void MainWindow::on_buttonRecentData_clicked()
 
 void MainWindow::on_buttonStreamingOptions_clicked()
 {
+  if(_data_streamer.empty())
+  {
+    return;
+  }
   auto streamer = _data_streamer.at(ui->comboStreaming->currentText());
 
   PopupMenu* menu = new PopupMenu(ui->buttonStreamingOptions, this);
