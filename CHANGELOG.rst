@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.4.1 (2022-02-06)
+------------------
 * add flip axis
 * fix zoom in icon
 * Fix typo in toolbox Lua (`#598 <https://github.com/facontidavide/PlotJuggler/issues/598>`_)
