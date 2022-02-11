@@ -392,9 +392,12 @@ PlotWidgetBase::CurveInfo* PlotWidget::addCurve(const std::string& name, QColor 
     info = PlotWidgetBase::addCurve(name, it2->second, color);
   }
 
-  if( auto timeseries = dynamic_cast<QwtTimeseries*>( info->curve->data() ))
+  if( info && info->curve )
   {
-    timeseries->setTimeOffset(_time_offset);
+    if( auto timeseries = dynamic_cast<QwtTimeseries*>( info->curve->data() ))
+    {
+      timeseries->setTimeOffset(_time_offset);
+    }
   }
 
   return info;
