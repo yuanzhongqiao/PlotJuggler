@@ -918,8 +918,7 @@ void PlotWidget::reloadPlotData()
     auto data_it = _mapped_data.numeric.find(curve_name);
     if (data_it != _mapped_data.numeric.end())
     {
-      auto ts = dynamic_cast<TransformedTimeseries*>(it.curve->data());
-      if (ts)
+      if (auto ts = dynamic_cast<TransformedTimeseries*>(it.curve->data()))
       {
         ts->updateCache(true);
       }
@@ -1552,8 +1551,8 @@ QwtSeriesWrapper* PlotWidget::createCurveXY(const PlotData* data_x,
   return output;
 }
 
-QwtSeriesWrapper* PlotWidget::createTimeSeries(const QString& transform_ID,
-                                               const PlotData* data)
+QwtSeriesWrapper* PlotWidget::createTimeSeries(const PlotData* data,
+                                               const QString& transform_ID)
 {
   TransformedTimeseries* output = new TransformedTimeseries(data);
   output->setTransform(transform_ID);

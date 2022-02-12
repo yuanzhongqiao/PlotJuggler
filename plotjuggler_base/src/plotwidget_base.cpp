@@ -395,7 +395,7 @@ PlotWidgetBase::CurveInfo* PlotWidgetBase::addCurve(const std::string& name,
     QwtSeriesWrapper* plot_qwt = nullptr;
     if(auto ts_data = dynamic_cast<const PlotData*>(&data) )
     {
-      plot_qwt = new QwtTimeseries(ts_data);
+      plot_qwt = createTimeSeries(ts_data);
     }
     else{
       plot_qwt = new QwtSeriesWrapper(&data);
@@ -475,8 +475,7 @@ std::list<PlotWidgetBase::CurveInfo>& PlotWidgetBase::curveList()
   return p->curve_list;
 }
 
-QwtSeriesWrapper* PlotWidgetBase::createTimeSeries(const QString& transform_ID,
-                                                   const PlotData* data)
+QwtSeriesWrapper* PlotWidgetBase::createTimeSeries(const PlotData* data, const QString& transform_ID)
 {
   TransformedTimeseries* output = new TransformedTimeseries(data);
   output->setTransform(transform_ID);

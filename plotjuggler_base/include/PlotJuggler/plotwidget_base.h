@@ -57,8 +57,8 @@ public:
 
   CurveInfo* curveFromTitle(const QString& title);
 
-  virtual QwtSeriesWrapper* createTimeSeries(const QString& transform_ID,
-                                             const PlotData* data);
+  virtual QwtSeriesWrapper* createTimeSeries(const PlotData* data,
+                                             const QString& transform_ID = {});
 
   virtual void resetZoom();
 

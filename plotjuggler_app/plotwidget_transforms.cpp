@@ -115,17 +115,18 @@ void DialogTransformEditor::on_listCurves_itemSelectionChanged()
   auto curve_name = row_widget->text();
 
   auto curve_it = _plotwidget->curveFromTitle(curve_name);
-  auto ts = dynamic_cast<TransformedTimeseries*>(curve_it->curve->data());
-
   int transform_row = 0;
-  if (ts->transform())
+  if( auto ts = dynamic_cast<TransformedTimeseries*>(curve_it->curve->data()) )
   {
-    for (int row = 1; row < ui->listTransforms->count(); row++)
+    if (ts->transform())
     {
-      if (ui->listTransforms->item(row)->text() == ts->transformName())
+      for (int row = 1; row < ui->listTransforms->count(); row++)
       {
-        transform_row = row;
-        break;
+        if (ui->listTransforms->item(row)->text() == ts->transformName())
+        {
+          transform_row = row;
+          break;
+        }
       }
     }
   }
