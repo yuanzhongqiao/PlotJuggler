@@ -422,10 +422,8 @@ void PlotWidget::onDataSourceRemoved(const std::string& src_name)
     if (it->src_name == src_name || remove_curve_xy)
     {
       deleted = true;
-
       it->curve->detach();
       it->marker->detach();
-
       it = curveList().erase(it);
     }
     else
@@ -992,8 +990,7 @@ void PlotWidget::on_changeTimeOffset(double offset)
   {
     for (auto& it : curveList())
     {
-      auto series = dynamic_cast<QwtTimeseries*>(it.curve->data());
-      if( series )
+      if( auto series = dynamic_cast<QwtTimeseries*>(it.curve->data()) )
       {
         series->setTimeOffset(_time_offset);
       }

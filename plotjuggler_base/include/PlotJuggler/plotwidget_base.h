@@ -16,7 +16,7 @@ class PlotLegend;
 
 namespace PJ
 {
-class PlotWidgetBase : public QObject
+class PlotWidgetBase : public QWidget
 {
   Q_OBJECT
 
@@ -83,10 +83,6 @@ public:
   QRectF canvasBoundingRect() const;
 
   QRectF maxZoomRect() const;
-
-  QWidget* widget();
-
-  const QWidget* widget() const;
 
   CurveStyle curveStyle() const;
 

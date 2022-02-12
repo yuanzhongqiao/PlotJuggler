@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QHBoxLayout>
 
 static int _global_color_index_ = 0;
 
@@ -157,16 +158,6 @@ QwtPlot* PlotWidgetBase::qwtPlot()
 const QwtPlot* PlotWidgetBase::qwtPlot() const
 {
   return p;
-}
-
-QWidget* PlotWidgetBase::widget()
-{
-  return qwtPlot();
-}
-
-const QWidget* PlotWidgetBase::widget() const
-{
-  return qwtPlot();
 }
 
 void PlotWidgetBase::resetZoom()
@@ -345,6 +336,11 @@ PlotWidgetBase::PlotWidgetBase(QWidget* parent)
   abs_canvas->setObjectName("qwtCanvas");
 
   p = new QwtPlotPimpl(this, abs_canvas, onViewResized, onEvent);
+
+  auto layout = new QHBoxLayout(this);
+  layout->setMargin(0);
+  this->setLayout(layout);
+  layout->addWidget(p);
 
   qwtPlot()->setMinimumWidth(100);
   qwtPlot()->setMinimumHeight(100);
