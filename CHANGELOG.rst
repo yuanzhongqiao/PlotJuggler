@@ -2,6 +2,14 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* delete orhphaned transforms
+* bug fix that cause crash
+* fix error `#603 <https://github.com/facontidavide/PlotJuggler/issues/603>`_
+* Fix `#594 <https://github.com/facontidavide/PlotJuggler/issues/594>`_
+* Contributors: Davide Faconti
+
 3.4.1 (2022-02-06)
 ------------------
 * add flip axis
