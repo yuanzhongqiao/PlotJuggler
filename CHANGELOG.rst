@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.4.2 (2022-02-12)
+------------------
 * delete orhphaned transforms
 * bug fix that cause crash
 * fix error `#603 <https://github.com/facontidavide/PlotJuggler/issues/603>`_
