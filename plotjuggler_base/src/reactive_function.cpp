@@ -14,6 +14,7 @@ void ReactiveLuaFunction::init()
   _lua_engine.open_libraries(sol::lib::base);
   _lua_engine.open_libraries(sol::lib::string);
   _lua_engine.open_libraries(sol::lib::math);
+  _lua_engine.open_libraries(sol::lib::table);
 
   _lua_engine.script(_library_code);
 
@@ -108,6 +109,7 @@ void ReactiveLuaFunction::prepareLua()
   };
   _timeseries_ref["size"] = &TimeseriesRef::size;
   _timeseries_ref["at"] = &TimeseriesRef::at;
+  _timeseries_ref["set"] = &TimeseriesRef::set;
   _timeseries_ref["atTime"] = &TimeseriesRef::atTime;
 
   //---------------------------------------
@@ -153,6 +155,15 @@ void ReactiveLuaFunction::prepareLua()
   _created_scatter["push_back"] = &CreatedSeriesXY::push_back;
 
   //---------------------------------------
+  _lua_engine.set_function("GetSeriesNames", [this]()
+                           {
+                             std::vector<std::string> names;
+                             for(const auto& it: plotData()->numeric)
+                             {
+                               names.push_back(it.first);
+                             }
+                             return names;
+                           });
 }
 
 TimeseriesRef:: TimeseriesRef(PlotData *data): _plot_data(data)
@@ -167,6 +178,12 @@ std::pair<double, double> TimeseriesRef::at(unsigned i) const
 {
   const auto& p = _plot_data->at(i);
   return {p.x, p.y};
+}
+
+void TimeseriesRef::set(unsigned index, double x, double y)
+{
+  auto& p = _plot_data->at(index);
+  p = {x, y};
 }
 
 double TimeseriesRef::atTime(double t) const
