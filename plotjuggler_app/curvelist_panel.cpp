@@ -446,15 +446,14 @@ QString CurveListPanel::getTreeName(QString name)
 
 void CurveListPanel::on_lineEditFilter_textChanged(const QString& search_string)
 {
-  bool updated = false;
+  bool updated = _tree_view->applyVisibilityFilter(search_string) |
+                 _custom_view->applyVisibilityFilter(search_string);
 
-  CurvesView* active_view = (CurvesView*)_tree_view;
+  std::pair<int, int> hc_1 = _tree_view->hiddenItemsCount();
+  std::pair<int, int> hc_2 = _custom_view->hiddenItemsCount();
 
-  updated = active_view->applyVisibilityFilter(search_string);
-
-  auto h_c = active_view->hiddenItemsCount();
-  int item_count = h_c.second;
-  int visible_count = item_count - h_c.first;
+  int item_count = hc_1.second + hc_2.second;
+  int visible_count = item_count - hc_1.first - hc_2.first;
 
   ui->labelNumberDisplayed->setText(QString::number(visible_count) + QString(" of ") +
                                     QString::number(item_count));

@@ -43,7 +43,7 @@ CurveTreeView::CurveTreeView(CurveListPanel* parent)
           [this](QTreeWidgetItem* item, int column) {
             if (column == 0)
             {
-              expandChildren(item);
+              expandChildren(!item->isExpanded(), item);
             }
           });
 
@@ -349,17 +349,17 @@ void CurveTreeView::treeVisitor(std::function<void(QTreeWidgetItem*)> visitor)
   }
 }
 
-void CurveTreeView::expandChildren(QTreeWidgetItem* item)
+void CurveTreeView::expandChildren(bool expanded, QTreeWidgetItem* item)
 {
   int childCount = item->childCount();
   for (int i = 0; i < childCount; i++)
   {
     const auto child = item->child(i);
     // Recursively call the function for each child node.
-    if (!child->isExpanded() && child->childCount() > 0)
+    if( child->childCount() > 0 )
     {
-      child->setExpanded(true);
-      expandChildren(child);
+      child->setExpanded(expanded);
+      expandChildren(expanded, child);
     }
   }
 }
