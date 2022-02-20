@@ -139,6 +139,16 @@ FunctionEditorWidget::FunctionEditorWidget(PlotDataMapRef& plotMapData,
 
   _tab2_filter.connectCallback([this]() { onLineEditTab2FilterChanged(); } );
 
+  int batch_filter_type = settings.value("FunctionEditorWidget.filterType", 2).toInt();
+  switch(batch_filter_type)
+  {
+  case 1: ui->radioButtonContains->setChecked(true); break;
+  case 2: ui->radioButtonWildcard->setChecked(true); break;
+  case 3: ui->radioButtonRegExp->setChecked(true); break;
+  }
+
+  bool use_batch_prefix = settings.value("FunctionEditorWidget.batchPrefix", false).toBool();
+  ui->radioButtonPrefix->setChecked( use_batch_prefix );
 }
 
 void FunctionEditorWidget::saveSettings()
@@ -156,6 +166,22 @@ void FunctionEditorWidget::saveSettings()
                     ui->functionText->toPlainText());
   settings.setValue("FunctionEditorWidget.previousFunctionBatch",
                     ui->functionTextBatch->toPlainText());
+  int batch_filter_type = 0;
+  if( ui->radioButtonContains->isChecked() )
+  {
+    batch_filter_type = 1;
+  }
+  else if( ui->radioButtonWildcard->isChecked() )
+  {
+    batch_filter_type = 2;
+  }
+  if( ui->radioButtonRegExp->isChecked() )
+  {
+    batch_filter_type = 3;
+  }
+  settings.setValue("FunctionEditorWidget.filterType", batch_filter_type);
+
+  settings.setValue("FunctionEditorWidget.batchPrefix", ui->radioButtonPrefix->isChecked());
 }
 
 FunctionEditorWidget::~FunctionEditorWidget()
