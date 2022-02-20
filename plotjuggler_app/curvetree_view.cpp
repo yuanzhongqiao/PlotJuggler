@@ -200,7 +200,7 @@ bool CurveTreeView::applyVisibilityFilter(const QString& search_string)
   bool updated = false;
   _hidden_count = 0;
 
-  QStringList spaced_items = search_string.split(' ');
+  QStringList spaced_items = search_string.split(' ', QString::SkipEmptyParts);
 
   auto hideFunc = [&](QTreeWidgetItem* item) {
     QString name = item->data(0, Qt::UserRole).toString();

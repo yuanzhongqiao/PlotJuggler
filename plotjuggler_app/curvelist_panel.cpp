@@ -28,7 +28,7 @@ CurveListPanel::CurveListPanel(PlotDataMapRef& mapped_plot_data,
   : QWidget(parent)
   , ui(new Ui::CurveListPanel)
   , _plot_data(mapped_plot_data)
-  , _custom_view(new CurveTableView(this))
+  , _custom_view(new CurveTreeView(this))
   , _tree_view(new CurveTreeView(this))
   , _transforms_map(mapped_math_plots)
   , _column_width_dirty(true)
@@ -331,38 +331,38 @@ void CurveListPanel::refreshValues()
   };
 
   //------------------------------------
-  for (CurveTableView* table : { _custom_view })
-  {
-    table->setViewResizeEnabled(false);
-    const int vertical_height = table->visibleRegion().boundingRect().height();
+//  for (CurveTableView* table : { _custom_view })
+//  {
+//    table->setViewResizeEnabled(false);
+//    const int vertical_height = table->visibleRegion().boundingRect().height();
 
-    for (int row = 0; row < table->rowCount(); row++)
-    {
-      int vertical_pos = table->rowViewportPosition(row);
-      if (vertical_pos < 0 || table->isRowHidden(row))
-      {
-        continue;
-      }
-      if (vertical_pos > vertical_height)
-      {
-        break;
-      }
+//    for (int row = 0; row < table->rowCount(); row++)
+//    {
+//      int vertical_pos = table->rowViewportPosition(row);
+//      if (vertical_pos < 0 || table->isRowHidden(row))
+//      {
+//        continue;
+//      }
+//      if (vertical_pos > vertical_height)
+//      {
+//        break;
+//      }
 
-      if (!is2ndColumnHidden())
-      {
-        const std::string& name = table->item(row, 0)->text().toStdString();
-        QString str_value = GetValue(name);
-        table->item(row, 1)->setText(str_value);
-      }
-    }
-    if (_column_width_dirty)
-    {
-      _column_width_dirty = false;
-      table->setViewResizeEnabled(true);
-    }
-  }
+//      if (!is2ndColumnHidden())
+//      {
+//        const std::string& name = table->item(row, 0)->text().toStdString();
+//        QString str_value = GetValue(name);
+//        table->item(row, 1)->setText(str_value);
+//      }
+//    }
+//    if (_column_width_dirty)
+//    {
+//      _column_width_dirty = false;
+//      table->setViewResizeEnabled(true);
+//    }
+//  }
   //------------------------------------
-  for (CurveTreeView* tree_view : { _tree_view })
+  for (CurveTreeView* tree_view : { _tree_view, _custom_view })
   {
     const int vertical_height = tree_view->visibleRegion().boundingRect().height();
 
