@@ -304,7 +304,8 @@
 
  new_series: a series previously created with MutableScatterXY.new(name)
  prefix:     prefix of the timeseries, before the index of the array
- suffix_X:   suffix to complete the name of the series containing the X value. If [nil], use the index of the array.
+ suffix_X:   suffix to complete the name of the series containing the X value.
+             if [nil], the index of the array will be used.
  suffix_Y:   suffix to complete the name of the series containing the Y value
  timestamp:   usually the tracker_time variable
               
@@ -317,7 +318,7 @@
    
  where {N} is the index of the array (integer). We can create a reactive series from the array with:
  
-   new_series = MutableScatterXY.new(&quot;my_trajectory&quot;) 
+   new_series = ScatterXY.new(&quot;my_trajectory&quot;) 
    CreateSeriesFromArray( new_series, &quot;/trajectory/node&quot;, &quot;position/x&quot;, &quot;position/y&quot;, tracker_time );
 ]]--
 
@@ -347,8 +348,7 @@ function CreateSeriesFromArray( new_series, prefix, suffix_X, suffix_Y, timestam
   end
 end
 
-
--- Similar to the built-in function GetSeriesNames(), but select only the names with a give prefix.
+--[[ Similar to the built-in function GetSeriesNames(), but select only the names with a give prefix. ]]--
 
 function GetSeriesNamesByPrefix(prefix)
   -- GetSeriesNames(9 is a built-in function
@@ -361,6 +361,22 @@ function GetSeriesNamesByPrefix(prefix)
     end
   end
   return filtered_names
+end
+
+--[[ Apply offsets to an existing series
+
+ series: an existing timeseries, obtained with TimeseriesView.find(name)
+ delta_x: offset to apply to each x value
+ delta_y: offset to apply to each y value  
+
+]]--
+
+function ApplyOffset(series, delta_x, delta_y)
+  -- use C++ indeces, not Lua indeces
+  for index=0, series:size()-1 do
+    x,y = series:at(index)
+    series:set(index, x + delta_x, y + delta_y)
+  end
 end
 </string>
          </property>

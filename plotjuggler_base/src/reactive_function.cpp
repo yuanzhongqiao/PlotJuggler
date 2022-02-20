@@ -113,7 +113,7 @@ void ReactiveLuaFunction::prepareLua()
   _timeseries_ref["atTime"] = &TimeseriesRef::atTime;
 
   //---------------------------------------
-  _created_timeseries = _lua_engine.new_usertype<CreatedSeriesTime>("MutableTimeseries");
+  _created_timeseries = _lua_engine.new_usertype<CreatedSeriesTime>("Timeseries");
 
   _created_timeseries["new"] = [this](sol::object name)
   {
@@ -134,7 +134,7 @@ void ReactiveLuaFunction::prepareLua()
   _created_timeseries["push_back"] = &CreatedSeriesTime::push_back;
 
   //---------------------------------------
-  _created_scatter = _lua_engine.new_usertype<CreatedSeriesXY>("MutableScatterXY");
+  _created_scatter = _lua_engine.new_usertype<CreatedSeriesXY>("ScatterXY");
 
   _created_scatter["new"] = [this](sol::object name)
   {
@@ -155,22 +155,19 @@ void ReactiveLuaFunction::prepareLua()
   _created_scatter["push_back"] = &CreatedSeriesXY::push_back;
 
   //---------------------------------------
-  _lua_engine.set_function("GetSeriesNames", [this]()
-                           {
-                             std::vector<std::string> names;
-                             for(const auto& it: plotData()->numeric)
-                             {
-                               names.push_back(it.first);
-                             }
-                             return names;
-                           });
+  auto GetSeriesNames = [this]()
+  {
+    std::vector<std::string> names;
+    for(const auto& it: plotData()->numeric)
+    {
+      names.push_back(it.first);
+    }
+    return names;
+  };
+  _lua_engine.set_function("GetSeriesNames", GetSeriesNames);
 }
 
 TimeseriesRef:: TimeseriesRef(PlotData *data): _plot_data(data)
-{
-}
-
-TimeseriesRef::~TimeseriesRef()
 {
 }
 

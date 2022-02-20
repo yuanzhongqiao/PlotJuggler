@@ -15,8 +15,6 @@ struct TimeseriesRef
 {
   TimeseriesRef(PlotData* data);
 
-  ~TimeseriesRef();
-
   std::pair<double, double> at(unsigned i) const;
 
   void set(unsigned index, double x, double y);
