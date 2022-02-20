@@ -2644,59 +2644,60 @@ void MainWindow::onPlaybackLoop()
   });
 }
 
-void MainWindow::onCustomPlotCreated(CustomPlotPtr custom_plot)
+void MainWindow::onCustomPlotCreated(std::vector<CustomPlotPtr> custom_plots)
 {
-  const std::string& curve_name = custom_plot->aliasName().toStdString();
+  std::set<PlotWidget*> widget_to_replot;
 
-  // clear already existing data first
-  auto data_it = _mapped_plot_data.numeric.find(curve_name);
-  if (data_it != _mapped_plot_data.numeric.end())
+  for(auto custom_plot: custom_plots)
   {
-    data_it->second.clear();
+    const std::string& curve_name = custom_plot->aliasName().toStdString();
+    // clear already existing data first
+    auto data_it = _mapped_plot_data.numeric.find(curve_name);
+    if (data_it != _mapped_plot_data.numeric.end())
+    {
+      data_it->second.clear();
+    }
+    try
+    {
+      custom_plot->calculateAndAdd(_mapped_plot_data);
+    }
+    catch (std::exception& ex)
+    {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("Failed to create the custom timeseries. "
+                              "Error:\n\n%1")
+                               .arg(ex.what()));
+    }
+
+    // keep data for reference
+    auto custom_it = _transform_functions.find(curve_name);
+    if (custom_it == _transform_functions.end())
+    {
+      _transform_functions.insert({ curve_name, custom_plot });
+      _curvelist_widget->addCustom(QString::fromStdString(curve_name));
+    }
+    else
+    {
+      custom_it->second = custom_plot;
+    }
+
+    forEachWidget([&](PlotWidget* plot) {
+      if ( plot->curveFromTitle(QString::fromStdString(curve_name)) )
+      {
+        widget_to_replot.insert(plot);
+      }
+    });
   }
 
-  try
-  {
-    custom_plot->calculateAndAdd(_mapped_plot_data);
-  }
-  catch (std::exception& ex)
-  {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Failed to create the custom timeseries. "
-                            "Error:\n\n%1")
-                             .arg(ex.what()));
-
-    return;
-  }
+  onUpdateLeftTableValues();
   ui->widgetStack->setCurrentIndex(0);
   _function_editor->clear();
-
-  // keep data for reference
-  auto custom_it = _transform_functions.find(curve_name);
-  if (custom_it == _transform_functions.end())
+  
+  for(auto plot: widget_to_replot)
   {
-    _transform_functions.insert({ curve_name, custom_plot });
-    _curvelist_widget->addCustom(QString::fromStdString(curve_name));
-    onUpdateLeftTableValues();
+    plot->updateCurves(true);
+    plot->replot();
   }
-  else
-  {
-    custom_it->second = custom_plot;
-  }
-
-  _function_editor->clear();
-
-  // update plots
-  forEachWidget([&](PlotWidget* plot) {
-    PlotWidgetBase::CurveInfo* info =
-        plot->curveFromTitle(QString::fromStdString(curve_name));
-
-    if (info)
-    {
-      plot->updateCurves(true);
-      plot->replot();
-    }
-  });
 }
 
 void MainWindow::on_actionReportBug_triggered()
