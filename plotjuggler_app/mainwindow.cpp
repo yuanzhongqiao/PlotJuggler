@@ -44,6 +44,7 @@
 #include "dummy_data.h"
 #include "PlotJuggler/svg_util.h"
 #include "PlotJuggler/reactive_function.h"
+#include "multifile_prefix.h"
 
 #include "ui_aboutdialog.h"
 #include "ui_support_dialog.h"
@@ -1308,22 +1309,18 @@ bool MainWindow::isStreamingActive() const
 
 bool MainWindow::loadDataFromFiles(QStringList filenames)
 {
-  static bool show_me = true;
-  if (filenames.size() > 1 && show_me)
+  filenames.sort();
+  std::map<QString, QString> filename_prefix;
+
+  if (filenames.size() > 1)
   {
-    QMessageBox msgbox;
-    msgbox.setWindowTitle("Loading multiple files");
-    msgbox.setText("You are loading multiple files at once. A prefix will be "
-                   "automatically added to the name of the "
-                   "timeseries.\n\n"
-                   "This is an experimental feature. Publishers will not work as you may "
-                   "expect.");
-    msgbox.addButton(QMessageBox::Ok);
-    QCheckBox* cb = new QCheckBox("Don't show this again");
-    cb->setChecked(!show_me);
-    msgbox.setCheckBox(cb);
-    connect(cb, &QCheckBox::stateChanged, this, [&]() { show_me = !cb->isChecked(); });
-    msgbox.exec();
+    DialogMultifilePrefix dialog(filenames, this);
+    int ret = dialog.exec();
+    if(ret != QDialog::Accepted)
+    {
+      return false;
+    }
+    filename_prefix = dialog.getPrefixes();
   }
 
   std::unordered_set<std::string> previous_names = _mapped_plot_data.getAllNames();
@@ -1334,9 +1331,9 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   {
     FileLoadInfo info;
     info.filename = filenames[i];
-    if( ui->checkBoxLoadDataPrefix->isChecked() )
+    if( filename_prefix.count(info.filename) > 0 )
     {
-      info.prefix = QFileInfo(info.filename).baseName();
+      info.prefix = filename_prefix[info.filename];
     }
     auto added_names = loadDataFromFile(info);
     if (!added_names.empty())
