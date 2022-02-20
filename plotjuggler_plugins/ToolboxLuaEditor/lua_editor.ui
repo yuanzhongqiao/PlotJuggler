@@ -22,7 +22,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:600;&quot;&gt;Script Editor &lt;/span&gt;is an advanced Lua editor that allows the user to create new series (scatteXY or timeseries) which are updated when the timetracker slider is moved or new data is received. &lt;a href=&quot;https://slides.com/davidefaconti/plotjuggler-reactive-scripts/fullscreen&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Tutorial link&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The &lt;span style=&quot; font-weight:600;&quot;&gt;Script Editor &lt;/span&gt;is an advanced Lua editor that allows the user to create new series (ScatteXY or Timeseries) which are updated when the timetracker slider is moved or new data is received. &lt;a href=&quot;https://slides.com/davidefaconti/plotjuggler-reactive-scripts/fullscreen&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Tutorial link&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -302,10 +302,9 @@
          <property name="plainText">
           <string>--[[ Helper function to create a series from arrays
 
- new_series: a series previously created with MutableScatterXY.new(name)
+ new_series: a series previously created with ScatterXY.new(name)
  prefix:     prefix of the timeseries, before the index of the array
- suffix_X:   suffix to complete the name of the series containing the X value.
-             if [nil], the index of the array will be used.
+ suffix_X:   suffix to complete the name of the series containing the X value. If [nil], use the index of the array.
  suffix_Y:   suffix to complete the name of the series containing the Y value
  timestamp:   usually the tracker_time variable
               
@@ -363,7 +362,7 @@ function GetSeriesNamesByPrefix(prefix)
   return filtered_names
 end
 
---[[ Apply offsets to an existing series
+--[[ Modify an existing series, applying offsets to all their X and Y values
 
  series: an existing timeseries, obtained with TimeseriesView.find(name)
  delta_x: offset to apply to each x value
@@ -371,7 +370,7 @@ end
 
 ]]--
 
-function ApplyOffset(series, delta_x, delta_y)
+function ApplyOffsetInPlace(series, delta_x, delta_y)
   -- use C++ indeces, not Lua indeces
   for index=0, series:size()-1 do
     x,y = series:at(index)
