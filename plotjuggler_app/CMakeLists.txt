@@ -71,6 +71,7 @@ SET( PLOtJUGGLER_SRC
     transforms/moving_rms.cpp
     transforms/outlier_removal.cpp
     transforms/integral_transform.cpp
+    transforms/absolute_transform.cpp
 
     transforms/first_derivative.cpp
     transforms/scale_transform.cpp
