@@ -790,8 +790,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
 
         connect(toolbox, &ToolboxPlugin::plotCreated, this,
                 [=](std::string name) {
-                  _curvelist_widget->addCurve(name);
+                  _curvelist_widget->addCustom(QString::fromStdString(name));
                   _curvelist_widget->updateAppearance();
+                  _curvelist_widget->clearSelections();
                 }
                 );
       }
@@ -2698,6 +2699,7 @@ void MainWindow::onCustomPlotCreated(std::vector<CustomPlotPtr> custom_plots)
     plot->updateCurves(true);
     plot->replot();
   }
+  _curvelist_widget->clearSelections();
 }
 
 void MainWindow::on_actionReportBug_triggered()
