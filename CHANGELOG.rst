@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.4.3 (2022-03-06)
+------------------
 * Apply changes to reactive Scripts
 * improve reactive Scripts
 * clear selections when CustomSeries is created
