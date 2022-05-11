@@ -46,7 +46,7 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
         CATKIN_DEPENDS roslib
     )
 
-message(${catkin_INCLUDE_DIRS})
+message(STATUS ${catkin_INCLUDE_DIRS})
 
     include_directories(${catkin_INCLUDE_DIRS})
     add_definitions(-DCOMPILED_WITH_CATKIN)
