@@ -43,7 +43,7 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
     catkin_package(
         INCLUDE_DIRS  plotjuggler_base/include
         LIBRARIES  plotjuggler_base
-        CATKIN_DEPENDS roslib
+        CATKIN_DEPENDS roslib roscpp
     )
 
 message(${catkin_INCLUDE_DIRS})
@@ -55,6 +55,7 @@ elseif( DEFINED ENV{AMENT_PREFIX_PATH})
     set(COMPILING_WITH_AMENT 1)
 
     find_package(ament_index_cpp REQUIRED)
+    find_package(rclcpp REQUIRED)
     include_directories(${ament_index_cpp_INCLUDE_DIRS})
 
     message(STATUS "--------------------------------------------------")
