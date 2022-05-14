@@ -38,7 +38,7 @@ if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
     message(STATUS "PlotJuggler is being built using CATKIN.")
     message(STATUS "--------------------------------------------------")
 
-    find_package(catkin REQUIRED COMPONENTS roslib )
+    find_package(catkin REQUIRED COMPONENTS roslib roscpp)
 
     catkin_package(
         INCLUDE_DIRS  plotjuggler_base/include
