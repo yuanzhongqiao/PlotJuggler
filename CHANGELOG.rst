@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.4.4 (2022-05-15)
+------------------
 * fix issue `#561 <https://github.com/facontidavide/PlotJuggler/issues/561>`_
 * add STATUS to CmakeLists.txt message() to avoid 'message called with incorrect number of arguments' (`#649 <https://github.com/facontidavide/PlotJuggler/issues/649>`_)
   cmake 3.22.1 errors on this
