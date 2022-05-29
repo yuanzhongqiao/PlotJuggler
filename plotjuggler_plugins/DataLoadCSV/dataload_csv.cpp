@@ -306,6 +306,16 @@ int DataLoadCSV::launchDialog(QFile& file, std::vector<std::string>* column_name
   // parse the header once and launch the dialog
   parseHeader(file, *column_names);
 
+  QString previous_index = settings.value("DataLoadCSV.timeIndex", "").toString();
+  if (previous_index.isEmpty() == false)
+  {
+    auto items = _ui->listWidgetSeries->findItems(previous_index, Qt::MatchExactly);
+    if( items.size() > 0 )
+    {
+      _ui->listWidgetSeries->setCurrentItem(items.front());
+    }
+  }
+
   int res = _dialog->exec();
 
   settings.setValue("DataLoadCSV.geometry", _dialog->saveGeometry());
@@ -323,10 +333,13 @@ int DataLoadCSV::launchDialog(QFile& file, std::vector<std::string>* column_name
     return TIME_INDEX_GENERATED;
   }
 
-  QModelIndexList indexes = _ui->listWidgetSeries->selectionModel()->selectedIndexes();
+  QModelIndexList indexes = _ui->listWidgetSeries->selectionModel()->selectedRows();
   if (indexes.size() == 1)
   {
-    return indexes.front().row();
+    int row = indexes.front().row();
+    auto item = _ui->listWidgetSeries->item(row);
+    settings.setValue("DataLoadCSV.timeIndex", item->text());
+    return row;
   }
 
   return TIME_INDEX_NOT_DEFINED;
