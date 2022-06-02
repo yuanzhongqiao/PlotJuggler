@@ -470,6 +470,12 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     QString line = in.readLine();
     SplitLine(line, _delimiter, string_items);
 
+    // empty line? just try skipping
+    if(string_items.size() == 0)
+    {
+      continue;
+    }
+
     if (string_items.size() != column_names.size())
     {
       auto err_msg = QString("The number of values at line %1 is %2,\n"
