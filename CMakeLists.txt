@@ -225,7 +225,7 @@ install(
 
 install(DIRECTORY plotjuggler_base/include/ DESTINATION include )
 
-set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/${PROJECT_NAME}")
 
 install(EXPORT export_plotjuggler_base 
         FILE ${PROJECT_NAME}Targets.cmake
