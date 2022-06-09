@@ -214,7 +214,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
 
 add_subdirectory( 3rdparty/qwt/src )
 
-
 install(
      TARGETS
         plotjuggler_base
@@ -222,9 +221,33 @@ install(
      LIBRARY DESTINATION lib
      ARCHIVE DESTINATION lib
      RUNTIME DESTINATION bin
-     INCLUDES DESTINATION include )
+     INCLUDES DESTINATION include)
 
 install(DIRECTORY plotjuggler_base/include/ DESTINATION include )
+
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+install(EXPORT export_plotjuggler_base 
+        FILE ${PROJECT_NAME}Targets.cmake
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
+
+export(PACKAGE ${PROJECT_NAME})
+
+include(CMakePackageConfigHelpers)
+
+set(PJ_INCLUDE_INSTALL_DIR include )
+
+configure_package_config_file(${PROJECT_NAME}Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+        PATH_VARS CMAKE_INSTALL_PREFIX
+                  PJ_INCLUDE_INSTALL_DIR
+                  CMAKE_INSTALL_LIBDIR
+    )
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION ${CMAKECONFIG_INSTALL_DIR}
+    )
 
 ######################## Main App, Libraries amd Plugins ###################################
 
