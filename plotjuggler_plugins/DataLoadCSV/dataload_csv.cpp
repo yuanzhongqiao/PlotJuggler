@@ -558,6 +558,9 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   if (time_index >= 0)
   {
     _default_time_axis = column_names[time_index];
+  } else if (time_index == TIME_INDEX_GENERATED)
+  {
+    _default_time_axis = "__TIME_INDEX_GENERATED__";
   }
 
   // cleanups
