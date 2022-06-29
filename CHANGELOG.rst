@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.4.5 (2022-06-29)
+------------------
 * fix compilation
 * add QCodeEditor
 * CI: cmake ubuntu/Windows
