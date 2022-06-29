@@ -1,4 +1,5 @@
 #include "lua_custom_function.h"
+#include <QTextStream>
 
 LuaCustomFunction::LuaCustomFunction(SnippetData snippet) : CustomFunction(snippet)
 {
