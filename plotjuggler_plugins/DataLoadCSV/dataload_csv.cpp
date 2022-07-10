@@ -146,12 +146,6 @@ void DataLoadCSV::parseHeader(QFile& file, std::vector<std::string>& column_name
   file.open(QFile::ReadOnly);
 
   _csvHighlighter.delimiter = _delimiter;
-  //if(_ui->checkBoxSyntaxHilighting->isChecked()){
-  //  _ui->rawText->setHighlighter(&_csvHighlighter);
-  //}
-  //else{
-  //    _ui->rawText->setHighlighter(nullptr);//method for clearing the syntax highlighter as given in QCodeEditor example
-  //}
 
   column_names.clear();
   _ui->listWidgetSeries->clear();
