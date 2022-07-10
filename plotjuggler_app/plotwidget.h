@@ -27,6 +27,9 @@
 
 #include "plot_background.h"
 
+
+class StatisticsDialog;
+
 class PlotWidget : public PlotWidgetBase
 {
   Q_OBJECT
@@ -127,6 +130,8 @@ public slots:
 
   void onBackgroundColorRequest(QString name);
 
+  void onShowDataStatistics();
+
 private slots:
 
   // void on_changeToBuiltinTransforms(QString new_transform);
@@ -153,6 +158,7 @@ private:
   QAction* _action_formula;
   QAction* _action_split_horizontal;
   QAction* _action_split_vertical;
+  QAction* _action_data_statistics;
 
   QAction* _action_zoomOutMaximum;
   QAction* _action_zoomOutHorizontally;
@@ -171,6 +177,8 @@ private:
   std::unique_ptr<BackgroundColorItem> _background_item;
 
   bool _use_date_time_scale;
+
+  StatisticsDialog* _statistics_dialog = nullptr;
 
   struct DragInfo
   {

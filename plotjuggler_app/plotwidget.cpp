@@ -46,6 +46,8 @@
 #include "point_series_xy.h"
 #include "colormap_selector.h"
 
+#include "statistics_dialog.h"
+
 class TimeScaleDraw : public QwtScaleDraw
 {
   virtual QwtText label(double v) const
@@ -126,6 +128,7 @@ PlotWidget::~PlotWidget()
   delete _action_copy;
   delete _action_paste;
   delete _action_image_to_clipboard;
+  delete _action_data_statistics;
 }
 
 void PlotWidget::setContextMenuEnabled(bool enabled)
@@ -213,6 +216,10 @@ void PlotWidget::buildActions()
   _flip_y = new QAction("&Flip Vertical Axis", this);
   _flip_y->setCheckable(true);
   connect(_flip_y, &QAction::changed, this, &PlotWidget::onFlipAxis );
+
+  _action_data_statistics = new QAction("&Show data statistics", this);
+  connect(_action_data_statistics, &QAction::triggered,
+          this, &PlotWidget::onShowDataStatistics );
 }
 
 void PlotWidget::canvasContextMenuTriggered(const QPoint& pos)
@@ -263,6 +270,7 @@ void PlotWidget::canvasContextMenuTriggered(const QPoint& pos)
   menu.addAction(_action_paste);
   menu.addAction(_action_image_to_clipboard);
   menu.addAction(_action_saveToFile);
+  menu.addAction(_action_data_statistics);
 
   // check the clipboard
   QClipboard* clipboard = QGuiApplication::clipboard();
@@ -1106,6 +1114,12 @@ void PlotWidget::updateCurves(bool reset_older_data)
     series->updateCache(reset_older_data);
   }
   updateMaximumZoomArea();
+
+  if(_statistics_dialog)
+  {
+    auto rect = canvasBoundingRect();
+    _statistics_dialog->update( {rect.left(), rect.right()} );
+  }
 }
 
 void PlotWidget::on_changeCurveColor(const QString& curve_name, QColor new_color)
@@ -1196,6 +1210,34 @@ void PlotWidget::onBackgroundColorRequest(QString name)
     }
     replot();
   }
+}
+
+void PlotWidget::onShowDataStatistics()
+{
+  if (!_statistics_dialog) {
+    _statistics_dialog = new StatisticsDialog(this);
+  }
+
+  auto rect = canvasBoundingRect();
+  _statistics_dialog->update( {rect.left(), rect.right()} );
+  _statistics_dialog->show();
+  _statistics_dialog->raise();
+  _statistics_dialog->activateWindow();
+
+  _statistics_dialog->setAttribute(Qt::WA_DeleteOnClose);
+
+  auto setToNull = [this]() {
+    _statistics_dialog = nullptr;
+  };
+
+  connect(this, &PlotWidget::rectChanged, _statistics_dialog,
+          [=](PlotWidget*, QRectF rect)
+          {
+            _statistics_dialog->update( {rect.left(), rect.right()} );
+          });
+
+  connect(_statistics_dialog, &QDialog::rejected,
+          this, setToNull);
 }
 
 void PlotWidget::on_externallyResized(const QRectF& rect)

@@ -18,6 +18,7 @@ QT5_WRAP_UI ( UI_SRC
     multifile_prefix.ui
     colormap_editor.ui
     colormap_selector.ui
+    statistics_dialog.ui
 
     plot_docker_toolbar.ui
     plotwidget_editor.ui
@@ -64,6 +65,7 @@ SET( PLOtJUGGLER_SRC
     point_series_xy.cpp
 #    plotzoomer.cpp
     plot_background.cpp
+    statistics_dialog.cpp
 
     suggest_dialog.cpp
 #    timeseries_qwt.cpp
