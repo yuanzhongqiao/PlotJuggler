@@ -1,6 +1,8 @@
 #ifndef COLOR_MAP_H
 #define COLOR_MAP_H
 
+#include <algorithm>
+#include <limits>
 #include <map>
 #include <QColor>
 #include "sol.hpp"
