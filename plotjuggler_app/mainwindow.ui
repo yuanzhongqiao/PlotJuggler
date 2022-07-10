@@ -1849,6 +1849,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="actionLoadStyleSheet"/>
+    <addaction name="actionColorMap_Editor"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -1940,6 +1941,11 @@
   <action name="actionLoadStyleSheet">
    <property name="text">
     <string>Load StyleSheet</string>
+   </property>
+  </action>
+  <action name="actionColorMap_Editor">
+   <property name="text">
+    <string>ColorMap Editor</string>
    </property>
   </action>
  </widget>

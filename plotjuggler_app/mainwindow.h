@@ -269,6 +269,8 @@ private slots:
   void on_pushButtonSaveLayout_clicked();
   void on_pushButtonLoadDatafile_clicked();
 
+  void on_actionColorMap_Editor_triggered();
+
 private:
   QStringList readAllCurvesFromXML(QDomElement root_node);
   void loadAllPlugins(QStringList command_line_plugin_folders);

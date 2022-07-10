@@ -45,6 +45,8 @@ public:
 
   void treeVisitor(std::function<void(QTreeWidgetItem*)> visitor);
 
+  virtual void keyPressEvent(QKeyEvent*) override;
+
 private:
   void expandChildren(bool expanded, QTreeWidgetItem* item);
 

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QDebug>
 #include <QToolTip>
+#include <QKeySequence>
+#include <QClipboard>
 
 class TreeWidgetItem : public QTreeWidgetItem
 {
@@ -346,6 +348,19 @@ void CurveTreeView::treeVisitor(std::function<void(QTreeWidgetItem*)> visitor)
   for (int c = 0; c < invisibleRootItem()->childCount(); c++)
   {
     recursiveFunction(invisibleRootItem()->child(c));
+  }
+}
+
+void CurveTreeView::keyPressEvent(QKeyEvent *event)
+{
+  if(event->matches(QKeySequence::Copy))
+  {
+    auto selected = selectedItems();
+    if (selected.size() > 0)
+    {
+      QClipboard *clipboard = QApplication::clipboard();
+      clipboard->setText( selected.front()->data(0, Name).toString() );
+    }
   }
 }
 

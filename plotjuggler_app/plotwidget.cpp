@@ -44,6 +44,7 @@
 
 #include "PlotJuggler/svg_util.h"
 #include "point_series_xy.h"
+#include "colormap_selector.h"
 
 class TimeScaleDraw : public QwtScaleDraw
 {
@@ -110,6 +111,7 @@ PlotWidget::PlotWidget(PlotDataMapRef& datamap, QWidget* parent)
   //  bottomAxis->installEventFilter(this);
   //  leftAxis->installEventFilter(this);
   //  qwtPlot()->canvas()->installEventFilter(this);
+
 }
 
 PlotWidget::~PlotWidget()
@@ -399,7 +401,6 @@ PlotWidgetBase::CurveInfo* PlotWidget::addCurve(const std::string& name, QColor 
       timeseries->setTimeOffset(_time_offset);
     }
   }
-
   return info;
 }
 
@@ -436,6 +437,11 @@ void PlotWidget::onDataSourceRemoved(const std::string& src_name)
   {
     _tracker->redraw();
     emit curveListChanged();
+  }
+  if( _background_item && _background_item->dataName() == QString::fromStdString(src_name) )
+  {
+    _background_item->detach();
+    _background_item.reset();
   }
 }
 
@@ -676,6 +682,12 @@ QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
   plot_el.setAttribute("flip_x", isXYPlot() && _flip_x->isChecked() ? "true" : "false");
   plot_el.setAttribute("flip_y", _flip_y->isChecked() ? "true" : "false");
 
+  if( _background_item )
+  {
+    plot_el.setAttribute("background_data", _background_item->dataName());
+    plot_el.setAttribute("background_colormap", _background_item->colormapName());
+  }
+
   return plot_el;
 }
 
@@ -830,6 +842,35 @@ bool PlotWidget::xmlLoadState(QDomElement& plot_widget)
     else if (style == "Sticks")
     {
       changeCurvesStyle(PlotWidgetBase::STICKS);
+    }
+  }
+
+  QString bg_data = plot_widget.attribute("background_data");
+  QString bg_colormap = plot_widget.attribute("background_colormap");
+
+  if( !bg_data.isEmpty() && !bg_colormap.isEmpty() )
+  {
+    auto plot_it = datamap().numeric.find(bg_data.toStdString());
+    if( plot_it == datamap().numeric.end() )
+    {
+      QMessageBox::warning(qwtPlot(), "Warning",
+                           tr("Can't restore the background color.\n"
+                              "Series [%1] not found.").arg(bg_data));
+    }
+    else{
+      auto color_it = ColorMapLibrary().find(bg_colormap);
+      if( color_it == ColorMapLibrary().end() )
+      {
+        QMessageBox::warning(qwtPlot(), "Warning",
+                             tr("Can't restore the background color.\n"
+                                "ColorMap [%1] not found.").arg(bg_colormap));
+      }
+      else{
+        // everything fine.
+        _background_item = std::make_unique<BackgroundColorItem>(plot_it->second, bg_colormap);
+        _background_item->setTimeOffset( &_time_offset );
+        _background_item->attach(qwtPlot());
+      }
     }
   }
 
@@ -1109,6 +1150,54 @@ void PlotWidget::onFlipAxis()
   emit undoableChange();
 }
 
+void PlotWidget::onBackgroundColorRequest(QString name)
+{
+  QString prev_colormap;
+  if(name.isEmpty())
+  {
+    if(_background_item)
+    {
+      name = _background_item->dataName();
+      prev_colormap = _background_item->colormapName();
+    }
+    else{
+      return;
+    }
+  }
+
+  auto plot_it = datamap().numeric.find(name.toStdString());
+  if( plot_it == datamap().numeric.end() )
+  {
+    if( _background_item )
+    {
+      _background_item->detach();
+      _background_item.reset();
+      replot();
+    }
+    return;
+  }
+
+  ColormapSelectorDialog dialog(name, prev_colormap, this);
+  auto ret = dialog.exec();
+  if (ret == QDialog::Accepted)
+  {
+    if( _background_item )
+    {
+      _background_item->detach();
+      _background_item.reset();
+    }
+
+    QString colormap = dialog.selectedColorMap();
+    if(!colormap.isEmpty() && ColorMapLibrary().count(colormap) != 0)
+    {
+      _background_item = std::make_unique<BackgroundColorItem>(plot_it->second, colormap);
+      _background_item->setTimeOffset( &_time_offset );
+      _background_item->attach(qwtPlot());
+    }
+    replot();
+  }
+}
+
 void PlotWidget::on_externallyResized(const QRectF& rect)
 {
   QRectF current_rect = canvasBoundingRect();
@@ -1347,7 +1436,6 @@ void PlotWidget::on_pasteAction_triggered()
   {
     auto el = root.firstChildElement();
     xmlLoadState(el);
-    clipboard->setText("");
     emit undoableChange();
   }
 }
@@ -1558,11 +1646,3 @@ QwtSeriesWrapper* PlotWidget::createTimeSeries(const PlotData* data,
   return output;
 }
 
-void PlotWidget::changeBackgroundColor(QColor color)
-{
-  if (qwtPlot()->canvasBackground().color() != color)
-  {
-    qwtPlot()->setCanvasBackground(color);
-    replot();
-  }
-}

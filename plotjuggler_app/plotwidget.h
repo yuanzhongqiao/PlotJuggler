@@ -20,9 +20,12 @@
 
 #include "PlotJuggler/plotwidget_base.h"
 #include "customtracker.h"
+#include "colormap_editor.h"
 
 #include "transforms/transform_selector.h"
 #include "transforms/custom_function.h"
+
+#include "plot_background.h"
 
 class PlotWidget : public PlotWidgetBase
 {
@@ -44,8 +47,6 @@ public:
   void setZoomRectangle(QRectF rect, bool emit_signal);
 
   void reloadPlotData();
-
-  void changeBackgroundColor(QColor color);
 
   double timeOffset() const
   {
@@ -124,6 +125,8 @@ public slots:
 
   void onFlipAxis();
 
+  void onBackgroundColorRequest(QString name);
+
 private slots:
 
   // void on_changeToBuiltinTransforms(QString new_transform);
@@ -164,6 +167,8 @@ private:
 
   CurveTracker* _tracker;
   QwtPlotGrid* _grid;
+
+  std::unique_ptr<BackgroundColorItem> _background_item;
 
   bool _use_date_time_scale;
 
@@ -207,7 +212,6 @@ private:
   void overrideCursonMove();
 
   void setAxisScale(QwtAxisId axisId, double min, double max);
-
 };
 
 #endif

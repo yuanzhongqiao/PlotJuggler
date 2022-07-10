@@ -51,6 +51,7 @@
 #include "preferences_dialog.h"
 #include "nlohmann_parsers.h"
 #include "cheatsheet/cheatsheet_dialog.h"
+#include "colormap_editor.h"
 
 #ifdef COMPILED_WITH_CATKIN
 
@@ -221,6 +222,8 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
           SLOT(on_splitterMoved(int, int)));
 
   initializeActions();
+
+  LoadColorMapFromSettings();
 
   //------------ Load plugins -------------
   auto plugin_extra_folders =
@@ -3362,4 +3365,10 @@ QStringList MainWindow::readAllCurvesFromXML(QDomElement root_node)
   recursiveXmlStream(0, root_node);
 
   return curves;
+}
+
+void MainWindow::on_actionColorMap_Editor_triggered()
+{
+  ColorMapEditor dialog;
+  dialog.exec();
 }
