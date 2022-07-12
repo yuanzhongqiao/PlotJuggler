@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 #include "curvetree_view.h"
 #include "curvelist_panel.h"
 #include <QFontDatabase>
@@ -68,7 +74,13 @@ void CurveTreeView::addItem(const QString& group_name,
                             const QString& tree_name,
                             const QString& plot_ID)
 {
-  QSettings settings;
+  QSettings settings;/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+
   bool use_separator = settings.value("Preferences::use_separator", true).toBool();
 
   QStringList parts;

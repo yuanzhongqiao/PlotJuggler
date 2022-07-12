@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 #include "mainwindow.h"
 #include <iostream>
 #include <QApplication>
@@ -342,11 +348,11 @@ int main(int argc, char* argv[])
 
   QNetworkRequest request;
 
-  QString uuid = settings.value("UUID", QUuid::createUuid().toString()).toString();
-  settings.setValue("UUID", uuid);
+//  QString uuid = settings.value("UUID", QUuid::createUuid().toString()).toString();
+//  settings.setValue("UUID", uuid);
 
-  request.setUrl(QUrl(QString("https://l4g9l4.deta.dev/check_updates/%1").arg(uuid)) );
-  manager.get(request);
+//  request.setUrl(QUrl(QString("https://l4g9l4.deta.dev/check_updates/%1").arg(uuid)) );
+//  manager.get(request);
 
   MainWindow* w = nullptr;
 
