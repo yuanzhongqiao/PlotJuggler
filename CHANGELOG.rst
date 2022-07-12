@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.5.0 (2022-07-12)
+------------------
 * license changed to MPL 2.0
 * Macos ci (`#685 <https://github.com/facontidavide/PlotJuggler/issues/685>`_)
 * Add CSV table preview and CSV highlighting (`#680 <https://github.com/facontidavide/PlotJuggler/issues/680>`_)
