@@ -940,7 +940,7 @@ void MainWindow::onPlotZoomChanged(PlotWidget* modified_plot, QRectF new_range)
       if (plot != modified_plot && !plot->isEmpty() && !plot->isXYPlot() &&
           plot->isZoomLinkEnabled())
       {
-        QRectF bound_act = plot->canvasBoundingRect();
+        QRectF bound_act = plot->currentCanvasRect();
         bound_act.setLeft(new_range.left());
         bound_act.setRight(new_range.right());
         plot->setZoomRectangle(bound_act, false);
@@ -1393,7 +1393,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   if (loaded_filenames.size() > 0)
   {
     updateRecentDataMenu(loaded_filenames);
-    forEachWidget([&](PlotWidget* plot) { plot->zoomOut(false); });
+    linkedZoomOut();
     return true;
   }
   return false;
@@ -1781,7 +1781,7 @@ void MainWindow::updateReactivePlots()
     {
       if( updated_curves.count(curve.src_name) != 0)
       {
-        plot->zoomOut(false);
+        plot->replot();
       }
     }
   });
@@ -2177,7 +2177,7 @@ bool MainWindow::loadLayoutFromFile(QString filename)
 
   xmlLoadState(domDocument);
 
-  forEachWidget([&](PlotWidget* plot) { plot->zoomOut(false); });
+  linkedZoomOut();
 
   _undo_states.clear();
   _undo_states.push_back(domDocument);
@@ -2243,6 +2243,52 @@ void MainWindow::updateTimeOffset()
   else
   {
     _time_offset.set(0.0);
+  }
+}
+
+void MainWindow::linkedZoomOut()
+{
+  if( ui->pushButtonLink->isChecked() )
+  {
+    for (const auto& it : TabbedPlotWidget::instances())
+    {
+      auto tabs = it.second->tabWidget();
+      for (int t = 0; t < tabs->count(); t++)
+      {
+        if (PlotDocker* matrix = dynamic_cast<PlotDocker*>(tabs->widget(t)))
+        {
+          Range range;
+          // find the ideal zoom
+          for (int index = 0; index < matrix->plotCount(); index++)
+          {
+            PlotWidget* plot = matrix->plotAt(index);
+            auto rect = plot->maxZoomRect();
+            if( index == 0 )
+            {
+              range.min = rect.left();
+              range.max = rect.right();
+            }
+            else{
+              range.min = std::min(rect.left(), range.min);
+              range.max = std::max(rect.right(), range.max);
+            }
+          }
+
+          for (int index = 0; index < matrix->plotCount(); index++)
+          {
+            PlotWidget* plot = matrix->plotAt(index);
+            QRectF bound_act = plot->maxZoomRect();
+            bound_act.setLeft(range.min);
+            bound_act.setRight(range.max);
+            plot->setZoomRectangle(bound_act, false);
+            plot->replot();
+          }
+        }
+      }
+    }
+  }
+  else{
+    this->forEachWidget([](PlotWidget* plot) { plot->zoomOut(false); });
   }
 }
 
@@ -2317,30 +2363,7 @@ void MainWindow::updateDataAndReplot(bool replot_hidden_tabs)
     updateTimeSlider();
   }
   //--------------------------------
-  if (move_ret.data_pushed)
-  {
-    for (const auto& it : TabbedPlotWidget::instances())
-    {
-      if (replot_hidden_tabs)
-      {
-        QTabWidget* tabs = it.second->tabWidget();
-        for (int index = 0; index < tabs->count(); index++)
-        {
-          PlotDocker* matrix = static_cast<PlotDocker*>(tabs->widget(index));
-          matrix->zoomOut();
-        }
-      }
-      else
-      {
-        PlotDocker* matrix = it.second->currentTab();
-        matrix->zoomOut();  // includes replot
-      }
-    }
-  }
-  else
-  {
-    forEachWidget([](PlotWidget* plot) { plot->replot(); });
-  }
+  linkedZoomOut();
 }
 
 void MainWindow::on_streamingSpinBox_valueChanged(int value)
@@ -3216,8 +3239,7 @@ void MainWindow::on_pushButtonLegend_clicked()
 
 void MainWindow::on_pushButtonZoomOut_clicked()
 {
-  auto visitor = [=](PlotWidget* plot) { plot->zoomOut(false); };
-  this->forEachWidget(visitor);
+  linkedZoomOut();
   onUndoableChange();
 }
 

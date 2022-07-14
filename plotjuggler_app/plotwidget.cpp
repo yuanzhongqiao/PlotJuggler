@@ -614,7 +614,7 @@ void PlotWidget::onDropEvent(QDropEvent*)
 
 void PlotWidget::on_panned(int, int)
 {
-  on_externallyResized(canvasBoundingRect());
+  on_externallyResized(currentCanvasRect());
 }
 
 QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
@@ -622,7 +622,7 @@ QDomElement PlotWidget::xmlSaveState(QDomDocument& doc) const
   QDomElement plot_el = doc.createElement("plot");
 
   QDomElement range_el = doc.createElement("range");
-  QRectF rect = canvasBoundingRect();
+  QRectF rect = currentCanvasRect();
   range_el.setAttribute("bottom", QString::number(rect.bottom(), 'f', 6));
   range_el.setAttribute("top", QString::number(rect.top(), 'f', 6));
   range_el.setAttribute("left", QString::number(rect.left(), 'f', 6));
@@ -923,12 +923,6 @@ void PlotWidget::rescaleEqualAxisScaling()
 
 void PlotWidget::setZoomRectangle(QRectF rect, bool emit_signal)
 {
-  QRectF current_rect = canvasBoundingRect();
-  if (current_rect == rect)
-  {
-    return;
-  }
-
   if (isXYPlot() && keepRatioXY())
   {
     rescaleEqualAxisScaling();
@@ -1052,7 +1046,7 @@ void PlotWidget::on_changeTimeOffset(double offset)
     }
     if (!isXYPlot() && !curveList().empty())
     {
-      QRectF rect = canvasBoundingRect();
+      QRectF rect = currentCanvasRect();
       double delta = prev_offset - offset;
       rect.moveLeft(rect.left() + delta);
       setZoomRectangle(rect, false);
@@ -1123,7 +1117,7 @@ void PlotWidget::updateCurves(bool reset_older_data)
 
   if(_statistics_dialog)
   {
-    auto rect = canvasBoundingRect();
+    auto rect = currentCanvasRect();
     _statistics_dialog->update( {rect.left(), rect.right()} );
   }
 }
@@ -1224,7 +1218,7 @@ void PlotWidget::onShowDataStatistics()
     _statistics_dialog = new StatisticsDialog(this);
   }
 
-  auto rect = canvasBoundingRect();
+  auto rect = currentCanvasRect();
   _statistics_dialog->update( {rect.left(), rect.right()} );
   _statistics_dialog->show();
   _statistics_dialog->raise();
@@ -1248,7 +1242,7 @@ void PlotWidget::onShowDataStatistics()
 
 void PlotWidget::on_externallyResized(const QRectF& rect)
 {
-  QRectF current_rect = canvasBoundingRect();
+  QRectF current_rect = currentCanvasRect();
   if (current_rect == rect)
   {
     return;
@@ -1276,7 +1270,7 @@ void PlotWidget::zoomOut(bool emit_signal)
 void PlotWidget::on_zoomOutHorizontal_triggered(bool emit_signal)
 {
   updateMaximumZoomArea();
-  QRectF act = canvasBoundingRect();
+  QRectF act = currentCanvasRect();
   auto rangeX = getVisualizationRangeX();
 
   act.setLeft(rangeX.min);
@@ -1287,7 +1281,7 @@ void PlotWidget::on_zoomOutHorizontal_triggered(bool emit_signal)
 void PlotWidget::on_zoomOutVertical_triggered(bool emit_signal)
 {
   updateMaximumZoomArea();
-  QRectF rect = canvasBoundingRect();
+  QRectF rect = currentCanvasRect();
   auto rangeY = getVisualizationRangeY({ rect.left(), rect.right() });
 
   rect.setBottom(rangeY.min);

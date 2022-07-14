@@ -285,7 +285,7 @@ bool PlotWidgetBase::isXYPlot() const
   return _xy_mode;
 }
 
-QRectF PlotWidgetBase::canvasBoundingRect() const
+QRectF PlotWidgetBase::currentCanvasRect() const
 {
   return p->canvasBoundingRect();
 }
