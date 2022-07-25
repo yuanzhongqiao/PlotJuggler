@@ -21,7 +21,7 @@ StatisticsDialog::StatisticsDialog(PlotWidget* parent)
 
   connect(ui->rangeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
           [this]() {
-            auto rect = _parent->canvasBoundingRect();
+            auto rect = _parent->currentBoundingRect();
             update({ rect.left(), rect.right() });
           });
 }

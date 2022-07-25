@@ -85,7 +85,7 @@ public:
 
   bool isXYPlot() const;
 
-  QRectF canvasBoundingRect() const;
+  QRectF currentBoundingRect() const;
 
   QRectF maxZoomRect() const;
 
