@@ -1,9 +1,9 @@
 name: plotjuggler
 adopt-info: plotjuggler # parse metadata from the plotjuggler part
-summary: Visualize timeseries like a pro
+summary: The timeseries visualization tool that you deserve
 description: |
   QT5 based application to display time series in plots,
-  using an intuitive "drag and drop" interface..
+  using an intuitive "drag and drop" interface.
 
 issues: https://github.com/facontidavide/plotjuggler/issues
 source-code: https://github.com/facontidavide/plotjuggler
