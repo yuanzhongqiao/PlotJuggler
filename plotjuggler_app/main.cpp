@@ -348,11 +348,11 @@ int main(int argc, char* argv[])
 
   QNetworkRequest request;
 
-  //  QString uuid = settings.value("UUID", QUuid::createUuid().toString()).toString();
-  //  settings.setValue("UUID", uuid);
+  QString uuid = settings.value("UUID", QUuid::createUuid().toString()).toString();
+  settings.setValue("UUID", uuid);
 
-  //  request.setUrl(QUrl(QString("https://l4g9l4.deta.dev/check_updates/%1").arg(uuid))
-  //  ); manager.get(request);
+  request.setUrl(QUrl(QString("https://l4g9l4.deta.dev/check_updates/%1").arg(uuid)));
+  manager.get(request);
 
   MainWindow* w = nullptr;
 
