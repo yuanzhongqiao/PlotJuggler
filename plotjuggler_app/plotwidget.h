@@ -33,7 +33,6 @@
 
 #include "plot_background.h"
 
-
 class StatisticsDialog;
 
 class PlotWidget : public PlotWidgetBase

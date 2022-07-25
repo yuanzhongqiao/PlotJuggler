@@ -83,4 +83,4 @@ private slots:
   void on_buttonBackground_clicked();
 };
 
-#endif // PLOT_DOCKER_TOOLBAR_H
+#endif  // PLOT_DOCKER_TOOLBAR_H

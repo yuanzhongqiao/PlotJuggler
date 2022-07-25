@@ -46,8 +46,7 @@ public:
 
   virtual ~PlotWidgetBase();
 
-  virtual CurveInfo* addCurve(const std::string& name,
-                              PlotDataXY &src_data,
+  virtual CurveInfo* addCurve(const std::string& name, PlotDataXY& src_data,
                               QColor color = Qt::transparent);
 
   virtual void removeCurve(const QString& title);
@@ -57,7 +56,7 @@ public:
 
   bool isEmpty() const;
 
-  QColor getColorHint(PlotDataXY *data);
+  QColor getColorHint(PlotDataXY* data);
 
   std::map<QString, QColor> getCurveColors() const;
 
