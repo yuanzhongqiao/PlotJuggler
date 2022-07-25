@@ -79,6 +79,10 @@ public:
 
   bool isZoomLinkEnabled() const;
 
+  void setStatisticsTitle(QString title);
+
+  void updateStatistics(bool forceUpdate = false);
+
 protected:
   PlotDataMapRef& _mapped_data;
 
@@ -179,6 +183,8 @@ private:
 
   CurveTracker* _tracker;
   QwtPlotGrid* _grid;
+
+  QString _statistics_window_title = "";
 
   std::unique_ptr<BackgroundColorItem> _background_item;
 

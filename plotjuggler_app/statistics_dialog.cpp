@@ -16,15 +16,25 @@ StatisticsDialog::StatisticsDialog(PlotWidget *parent) :
 {
   ui->setupUi(this);
 
-  setWindowTitle(QString("Statistics: %1").arg(_parent->windowTitle()));
-  setWindowFlag(Qt::WindowStaysOnTopHint);
+  setWindowTitle(QString("Statistics | %1").arg(_parent->windowTitle()));
+  setWindowFlag(Qt::Tool);
 
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+
+  connect(ui->rangeComboBox,qOverload<int>(&QComboBox::currentIndexChanged),this,[this](){
+                            auto rect = _parent->canvasBoundingRect();
+                            update({rect.left(), rect.right()});
+                            });
+
 }
 
 StatisticsDialog::~StatisticsDialog()
 {
   delete ui;
+}
+
+bool StatisticsDialog::calcVisibleRange(){
+    return (ui->rangeComboBox->currentIndex() == 0);
 }
 
 void StatisticsDialog::update(PJ::Range range)
@@ -41,13 +51,15 @@ void StatisticsDialog::update(PJ::Range range)
     for( size_t i=0; i<ts->size(); i++)
     {
       const auto p = ts->sample(i);
-      if( p.x() <  range.min )
-      {
-        continue;
-      }
-      if( p.x() >  range.max )
-      {
-        break;
+      if(calcVisibleRange()){
+        if( p.x() <  range.min )
+        {
+          continue;
+        }
+        if( p.x() >  range.max )
+        {
+          break;
+        }
       }
       stat.count++;
       if( first )
@@ -91,6 +103,13 @@ void StatisticsDialog::update(PJ::Range range)
     }
     row++;
   }
+}
+
+void StatisticsDialog::setTitle(QString title){
+    if(title == "..."){
+        title = "";
+    }
+    setWindowTitle(QString("Statistics | %1").arg(title));
 }
 
 void StatisticsDialog::closeEvent(QCloseEvent *event)

@@ -951,6 +951,7 @@ void PlotWidget::setZoomRectangle(QRectF rect, bool emit_signal)
       emit rectChanged(this, rect);
     }
   }
+  updateStatistics();
 }
 
 void PlotWidget::reloadPlotData()
@@ -1121,11 +1122,18 @@ void PlotWidget::updateCurves(bool reset_older_data)
   }
   updateMaximumZoomArea();
 
-  if(_statistics_dialog)
-  {
-    auto rect = canvasBoundingRect();
-    _statistics_dialog->update( {rect.left(), rect.right()} );
-  }
+  updateStatistics(true);
+}
+
+void PlotWidget::updateStatistics(bool forceUpdate){
+    if(_statistics_dialog)
+    {
+      if(_statistics_dialog->calcVisibleRange() || forceUpdate){
+        auto rect = canvasBoundingRect();
+        _statistics_dialog->update( {rect.left(), rect.right()} );
+      }
+    }
+
 }
 
 void PlotWidget::on_changeCurveColor(const QString& curve_name, QColor new_color)
@@ -1218,11 +1226,22 @@ void PlotWidget::onBackgroundColorRequest(QString name)
   }
 }
 
+void PlotWidget::setStatisticsTitle(QString title){
+    _statistics_window_title = title;
+
+    if(_statistics_dialog)
+    {
+      _statistics_dialog->setTitle(_statistics_window_title);
+    }
+}
+
 void PlotWidget::onShowDataStatistics()
 {
   if (!_statistics_dialog) {
     _statistics_dialog = new StatisticsDialog(this);
   }
+
+  setStatisticsTitle(_statistics_window_title);
 
   auto rect = canvasBoundingRect();
   _statistics_dialog->update( {rect.left(), rect.right()} );
@@ -1239,7 +1258,7 @@ void PlotWidget::onShowDataStatistics()
   connect(this, &PlotWidget::rectChanged, _statistics_dialog,
           [=](PlotWidget*, QRectF rect)
           {
-            _statistics_dialog->update( {rect.left(), rect.right()} );
+              _statistics_dialog->update( {rect.left(), rect.right()} );
           });
 
   connect(_statistics_dialog, &QDialog::rejected,
@@ -1271,6 +1290,8 @@ void PlotWidget::zoomOut(bool emit_signal)
   updateMaximumZoomArea();
   setZoomRectangle(maxZoomRect(), emit_signal);
   replot();
+
+  updateStatistics();
 }
 
 void PlotWidget::on_zoomOutHorizontal_triggered(bool emit_signal)
