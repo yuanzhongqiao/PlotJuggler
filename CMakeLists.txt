@@ -171,6 +171,12 @@ add_library( plotjuggler_base
      plotjuggler_base/src/reactive_function.cpp
      )
 
+# target_link_libraries(plotjuggler_base plotjuggler_qwt)
+target_include_directories(plotjuggler_base INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:include>
+)
+
 target_include_directories(plotjuggler_base INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include>
@@ -295,7 +301,7 @@ if(NOT COMPILING_WITH_AMENT AND NOT COMPILING_WITH_CATKIN)
       FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION ${PJ_CMAKECONFIG_INSTALL_DIR}
+      DESTINATION ${PJ_CMAKECONFIG_INSTALL_DIR}
     )
 
 endif()
