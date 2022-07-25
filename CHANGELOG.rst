@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.5.1 (2022-07-25)
+------------------
 * Dev/ros1 ros2 snap (`#698 <https://github.com/facontidavide/PlotJuggler/issues/698>`_)
 * update nlohmann json to fix `#640 <https://github.com/facontidavide/PlotJuggler/issues/640>`_
 * should prevent error `#696 <https://github.com/facontidavide/PlotJuggler/issues/696>`_
