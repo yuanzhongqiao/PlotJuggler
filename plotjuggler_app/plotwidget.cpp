@@ -1125,15 +1125,16 @@ void PlotWidget::updateCurves(bool reset_older_data)
   updateStatistics(true);
 }
 
-void PlotWidget::updateStatistics(bool forceUpdate){
+void PlotWidget::updateStatistics(bool forceUpdate)
+{
     if(_statistics_dialog)
     {
-      if(_statistics_dialog->calcVisibleRange() || forceUpdate){
+      if(_statistics_dialog->calcVisibleRange() || forceUpdate)
+      {
         auto rect = canvasBoundingRect();
         _statistics_dialog->update( {rect.left(), rect.right()} );
       }
     }
-
 }
 
 void PlotWidget::on_changeCurveColor(const QString& curve_name, QColor new_color)
@@ -1226,18 +1227,20 @@ void PlotWidget::onBackgroundColorRequest(QString name)
   }
 }
 
-void PlotWidget::setStatisticsTitle(QString title){
-    _statistics_window_title = title;
+void PlotWidget::setStatisticsTitle(QString title)
+{
+  _statistics_window_title = title;
 
-    if(_statistics_dialog)
-    {
-      _statistics_dialog->setTitle(_statistics_window_title);
-    }
+  if(_statistics_dialog)
+  {
+    _statistics_dialog->setTitle(_statistics_window_title);
+  }
 }
 
 void PlotWidget::onShowDataStatistics()
 {
-  if (!_statistics_dialog) {
+  if (!_statistics_dialog)
+  {
     _statistics_dialog = new StatisticsDialog(this);
   }
 
@@ -1256,13 +1259,18 @@ void PlotWidget::onShowDataStatistics()
   };
 
   connect(this, &PlotWidget::rectChanged, _statistics_dialog,
-          [=](PlotWidget*, QRectF rect)
+          [this](PlotWidget*, QRectF rect)
           {
-              _statistics_dialog->update( {rect.left(), rect.right()} );
+            _statistics_dialog->update( {rect.left(), rect.right()} );
           });
 
   connect(_statistics_dialog, &QDialog::rejected,
           this, setToNull);
+
+  connect(this, &PlotWidgetBase::curveListChanged, this,
+          [this]() {
+            updateStatistics();
+          });
 }
 
 void PlotWidget::on_externallyResized(const QRectF& rect)
@@ -1288,10 +1296,9 @@ void PlotWidget::zoomOut(bool emit_signal)
     return;
   }
   updateMaximumZoomArea();
+
   setZoomRectangle(maxZoomRect(), emit_signal);
   replot();
-
-  updateStatistics();
 }
 
 void PlotWidget::on_zoomOutHorizontal_triggered(bool emit_signal)
@@ -1302,7 +1309,7 @@ void PlotWidget::on_zoomOutHorizontal_triggered(bool emit_signal)
 
   act.setLeft(rangeX.min);
   act.setRight(rangeX.max);
-  this->setZoomRectangle(act, emit_signal);
+  setZoomRectangle(act, emit_signal);
 }
 
 void PlotWidget::on_zoomOutVertical_triggered(bool emit_signal)
