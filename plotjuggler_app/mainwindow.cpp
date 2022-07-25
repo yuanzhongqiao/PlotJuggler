@@ -606,7 +606,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
     QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(filename), this);
 
     QObject* plugin = pluginLoader.instance();
-    if (plugin)
+    if (plugin && dynamic_cast<PlotJugglerPlugin*>(plugin))
     {
       auto class_name = pluginLoader.metaData().value("className").toString();
       loaded_out.push_back(class_name);
