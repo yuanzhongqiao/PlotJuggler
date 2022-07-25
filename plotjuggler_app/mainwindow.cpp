@@ -2119,6 +2119,18 @@ bool MainWindow::loadLayoutFromFile(QString filename)
     _curvelist_widget->refreshColumns();
   }
 
+  auto colormaps = root.firstChildElement("colorMaps");
+
+  if (!colormaps.isNull())
+  {
+    for (auto colormap = colormaps.firstChildElement("colorMap");
+         colormap.isNull() == false; colormap = colormap.nextSiblingElement("colorMap"))
+    {
+      QString name = colormap.attribute("name");
+      ColorMapLibrary()[name]->setScrip(colormap.text());
+    }
+  }
+
   QByteArray snippets_saved_xml =
       settings.value("AddCustomPlotDialog.savedXML", QByteArray()).toByteArray();
 
@@ -2986,9 +2998,8 @@ void MainWindow::on_pushButtonSaveLayout_clicked()
   checkbox_datasource->setChecked(
       settings.value("MainWindow.saveLayoutDataSource", true).toBool());
 
-  auto checkbox_snippets = new QCheckBox("Save custom transformations");
-  checkbox_snippets->setToolTip("Do you want the layout to save the custom "
-                                "transformations?");
+  auto checkbox_snippets = new QCheckBox("Save Scripts (transforms and colormaps)");
+  checkbox_snippets->setToolTip("Do you want the layout to save your Lua scripts?");
   checkbox_snippets->setFocusPolicy(Qt::NoFocus);
   checkbox_snippets->setChecked(
       settings.value("MainWindow.saveLayoutSnippets", true).toBool());
@@ -3083,6 +3094,17 @@ void MainWindow::on_pushButtonSaveLayout_clicked()
     auto snipped_saved = GetSnippetsFromXML(snippets_xml_text);
     auto snippets_root = ExportSnippets(snipped_saved, doc);
     root.appendChild(snippets_root);
+
+    QDomElement color_maps = doc.createElement("colorMaps");
+    for (const auto& it : ColorMapLibrary())
+    {
+      QString colormap_name = it.first;
+      QDomElement colormap = doc.createElement("colorMap");
+      QDomText colormap_script = doc.createTextNode(it.second->script());
+      colormap.setAttribute("name", colormap_name);
+      colormap.appendChild(colormap_script);
+      color_maps.appendChild(colormap);
+    }
   }
   root.appendChild(doc.createComment(" - - - - - - - - - - - - - - "));
   //------------------------------------
