@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.16.3)
 
 
 find_path(MOSQUITTO_INCLUDE_DIR mosquitto.h)
