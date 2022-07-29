@@ -113,7 +113,7 @@ cd ~/plotjuggler_ws
 Then compile using cmake (qmake is NOT supported):
 
 ```
-cmake -S src/PlotJuggler -B src/PlotJuggler -DCMAKE_INSTALL_PREFIX=install
+cmake -S src/PlotJuggler -B build/PlotJuggler -DCMAKE_INSTALL_PREFIX=install
 cmake --build build/PlotJuggler --config RelWithDebInfo --parallel --target install
 ```
  
