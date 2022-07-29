@@ -1,8 +1,9 @@
 {
   "name": "plotjuggler",
-  "version-string": "3.4.0",
+  "version-string": "3.5.1",
   "dependencies": [
     "protobuf",
-    "mosquitto"
+    "mosquitto",
+    "zeromq"
   ]
 }
