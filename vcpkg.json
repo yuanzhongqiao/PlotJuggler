@@ -4,6 +4,10 @@
   "dependencies": [
     "protobuf",
     "mosquitto",
-    "zeromq"
+    "zeromq",
+    {
+      "name": "arrow",
+      "features": [ "parquet" ]
+    }
   ]
 }
