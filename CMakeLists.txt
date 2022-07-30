@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10.2)
 
 PROJECT(plotjuggler LANGUAGES C CXX VERSION 3.5.1)
 
@@ -266,6 +266,8 @@ install(DIRECTORY plotjuggler_base/include/ DESTINATION include )
 export(PACKAGE ${PROJECT_NAME})
 
 if(NOT COMPILING_WITH_AMENT AND NOT COMPILING_WITH_CATKIN)
+
+    include(GNUInstallDirs)
 
     set(PJ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
