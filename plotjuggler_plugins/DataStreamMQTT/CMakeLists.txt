@@ -1,13 +1,16 @@
-cmake_minimum_required(VERSION 3.10.2)
 
-find_package(mosquitto QUIET)
-
-if(mosquitto_LIBRARIES)
-
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-    find_package(mosquitto QUIET)
+if(BUILDING_WITH_VCPKG)
+    message(STATUS "Finding MOSQUITTO with vcpkg")
+    find_package(mosquitto CONFIG REQUIRED)
+    set(mosquitto_FOUND ON)
+elseif(BUILDING_WITH_CONAN)
+    message(STATUS "Finding MOSQUITTO with conan")
+    find_package(mosquitto CONFIG REQUIRED)
+    set(mosquitto_FOUND ON)
 else()
-    set(mosquitto_FOUND True)
+    message(STATUS "Finding MOSQUITTO without package managers")
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+    find_package(mosquitto QUIET)
 endif()
 
 if(mosquitto_FOUND)
