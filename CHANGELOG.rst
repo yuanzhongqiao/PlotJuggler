@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.5.2 (2022-08-05)
+------------------
 * fix issue `#642 <https://github.com/facontidavide/PlotJuggler/issues/642>`_
 * fix FFT toolbox
 * Add options for enabling/disabling autozoom in preferences (`#704 <https://github.com/facontidavide/PlotJuggler/issues/704>`_)
