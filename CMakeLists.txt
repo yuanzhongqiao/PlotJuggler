@@ -179,6 +179,7 @@ add_library( plotjuggler_base
      plotjuggler_base/src/plotzoomer.cpp
      plotjuggler_base/src/plotmagnifier.cpp
      plotjuggler_base/src/plotlegend.cpp
+     plotjuggler_base/src/plotpanner.cpp
      plotjuggler_base/src/timeseries_qwt.cpp
      plotjuggler_base/src/reactive_function.cpp
      )
