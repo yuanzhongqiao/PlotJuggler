@@ -590,13 +590,13 @@ bool PlotWidgetBase::eventFilter(QObject* obj, QEvent* event)
           {
             for (auto& it : curveList())
             {
+              QSettings settings;
+              bool autozoom_visibility = settings.value("Preferences::autozoom_visibility",true).toBool();
               if (clicked_item == it.curve)
               {
                 it.curve->setVisible(!it.curve->isVisible());
                 //_tracker->redraw();
 
-                QSettings settings;
-                bool autozoom_visibility = settings.value("Preferences::autozoom_visibility",true).toBool();
                 if(autozoom_visibility)
                 {
                     resetZoom();
