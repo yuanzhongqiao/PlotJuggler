@@ -108,7 +108,7 @@ cmake -G "Visual Studio 16" ^
       -DCMAKE_TOOLCHAIN_FILE=%CMAKE_TOOLCHAIN%  ^
       -DCMAKE_INSTALL_PREFIX=%cd%/install ^
       -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-      -D
+
 
 cmake --build build/PlotJuggler --config Release --parallel --target install
 ```
@@ -126,4 +126,21 @@ cmake -G "Visual Studio 16" ^
       -DCMAKE_INSTALL_PREFIX=%cd%/install
 
 cmake --build build/PlotJuggler --config Release --parallel --target install
+```
+
+## Create a Windows installer
+
+Change the **Qt** and **QtInstallerFramework** version as needed.
+
+```
+xcopy src\PlotJuggler\installer installer\ /Y /S /f /z 
+xcopy install\bin\*.* installer\io.plotjuggler.application\data /Y /S /f /z 
+
+C:\Qt\5.15.2\msvc2019_64\bin\windeployqt.exe --release ^
+   installer\io.plotjuggler.application\data\plotjuggler.exe 
+
+C:\Qt\Tools\QtInstallerFramework\4.1\bin\binarycreator.exe ^
+   --offline-only -c installer\config.xml -p installer ^
+   PlotJuggler-Windows-installer.exe
+
 ```
