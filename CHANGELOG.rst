@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.6.0 (2022-08-13)
+------------------
 * More memes
 * Refactoring of the MessageParser plugins 
 * Mcap support (`#722 <https://github.com/facontidavide/PlotJuggler/issues/722>`_)
