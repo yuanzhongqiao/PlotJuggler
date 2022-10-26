@@ -20,6 +20,7 @@ add_definitions(
 #add_definitions( -DPJ_DEFAULT_ARGS="${PJ_DEFAULT_ARGS}")
 
 option(ENABLE_ASAN "Enable Address Sanitizer" OFF)
+option(BASE_AS_SHARED "Build the base library as a shared libary" OFF)
 
 IF (NOT WIN32 AND ENABLE_ASAN)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
@@ -161,6 +162,21 @@ include_directories(
 )
 
 #########################  BASE library  ####################################
+
+set(PLOTJUGGLER_BASE_SRC
+    plotjuggler_base/src/plotdata.cpp
+    plotjuggler_base/src/datastreamer_base.cpp
+    plotjuggler_base/src/transform_function.cpp
+    plotjuggler_base/src/plotwidget_base.cpp
+    plotjuggler_base/src/plotzoomer.cpp
+    plotjuggler_base/src/plotmagnifier.cpp
+    plotjuggler_base/src/plotlegend.cpp
+    plotjuggler_base/src/plotpanner.cpp
+    plotjuggler_base/src/timeseries_qwt.cpp
+    plotjuggler_base/src/reactive_function.cpp
+    plotjuggler_base/src/special_messages.cpp
+)
+
 qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/dataloader_base.h
   plotjuggler_base/include/PlotJuggler/statepublisher_base.h
@@ -170,22 +186,21 @@ qt5_wrap_cpp(PLOTJUGGLER_BASE_MOCS
   plotjuggler_base/include/PlotJuggler/plotwidget_base.h
 )
 
-add_library( plotjuggler_base
-    ${PLOTJUGGLER_BASE_MOCS}
-     plotjuggler_base/src/plotdata.cpp
-     plotjuggler_base/src/datastreamer_base.cpp
-     plotjuggler_base/src/transform_function.cpp
-     plotjuggler_base/src/plotwidget_base.cpp
-     plotjuggler_base/src/plotzoomer.cpp
-     plotjuggler_base/src/plotmagnifier.cpp
-     plotjuggler_base/src/plotlegend.cpp
-     plotjuggler_base/src/plotpanner.cpp
-     plotjuggler_base/src/timeseries_qwt.cpp
-     plotjuggler_base/src/reactive_function.cpp
-     plotjuggler_base/src/special_messages.cpp
-     )
+if (BASE_AS_SHARED)
+    add_library(plotjuggler_base SHARED
+        ${PLOTJUGGLER_BASE_SRC}
+        ${PLOTJUGGLER_BASE_MOCS}
+        )
+    target_link_libraries(plotjuggler_base PRIVATE lua_objects plotjuggler_qwt_objects)
+else()
+    add_library(plotjuggler_base STATIC
+        ${PLOTJUGGLER_BASE_SRC}
+        ${PLOTJUGGLER_BASE_MOCS}
+        )
+endif()
 
 # target_link_libraries(plotjuggler_base plotjuggler_qwt)
+
 target_include_directories(plotjuggler_base INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include>
@@ -229,7 +244,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/PlotJuggler.desktop
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/plotjuggler.svg
         DESTINATION ${DESKTOP_ICON_DIR}  )
 
-######################## Main App, Libraries amd Plugins ###################################
+######################## Main App, Libraries and Plugins ###################################
 
 add_subdirectory( 3rdparty/qwt/src )
 add_subdirectory( 3rdparty/lz4 )
