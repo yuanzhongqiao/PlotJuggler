@@ -2,6 +2,34 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* apply changes suggested in `#767 <https://github.com/facontidavide/PlotJuggler/issues/767>`_
+* fix parsing of custom types added multiple times in messages (`#769 <https://github.com/facontidavide/PlotJuggler/issues/769>`_)
+* ZMQ: Add topics filtering (`#730 <https://github.com/facontidavide/PlotJuggler/issues/730>`_)
+* Add CSV loader date-time format help dialog (`#731 <https://github.com/facontidavide/PlotJuggler/issues/731>`_)
+* Set MQTT topics list to be multi-selectable (`#745 <https://github.com/facontidavide/PlotJuggler/issues/745>`_)
+* Always use topic names for creating MQTT parsers (`#746 <https://github.com/facontidavide/PlotJuggler/issues/746>`_)
+* fix typo (`#770 <https://github.com/facontidavide/PlotJuggler/issues/770>`_)
+* Fix/add other dds vendors (`#763 <https://github.com/facontidavide/PlotJuggler/issues/763>`_)
+* Add option to build plotjuggler_base to shared library (`#757 <https://github.com/facontidavide/PlotJuggler/issues/757>`_)
+* Add a new meme with The Rock (`#751 <https://github.com/facontidavide/PlotJuggler/issues/751>`_)
+* Add precision to CSV export to handle geocoordinates (`#753 <https://github.com/facontidavide/PlotJuggler/issues/753>`_)
+* compile: add cmake to brew install (`#742 <https://github.com/facontidavide/PlotJuggler/issues/742>`_)
+* Add MIT license notice to QCodeEditor dddition (`#733 <https://github.com/facontidavide/PlotJuggler/issues/733>`_)
+  Added per https://github.com/facontidavide/PlotJuggler/issues/732
+* Fix multi-plugin selection (`#739 <https://github.com/facontidavide/PlotJuggler/issues/739>`_)
+  Broken in `#726 <https://github.com/facontidavide/PlotJuggler/issues/726>`_. If all plugins are enabled, then opening a file supported by multiple plugins does not work.
+* - Add drag n drop (`#726 <https://github.com/facontidavide/PlotJuggler/issues/726>`_)
+  - Ignore VSCode and OS X files
+* readme: add details about default snap command (`#727 <https://github.com/facontidavide/PlotJuggler/issues/727>`_)
+* Add mac compilation section (`#725 <https://github.com/facontidavide/PlotJuggler/issues/725>`_)
+* Update README.md (`#723 <https://github.com/facontidavide/PlotJuggler/issues/723>`_)
+  minor typos
+* Update README.md
+* Update COMPILE.md
+* Contributors: Andrew Van Overloop, Bartimaeus-, Bonkura, Davide Faconti, Guillaume Beuzeboc, Jeff Ithier, Jeremie Deray, Mark Cutler, Orhan G. Hafif, Romain Reignier, Zach Davis
+
 3.6.0 (2022-08-13)
 ------------------
 * More memes
