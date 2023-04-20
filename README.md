@@ -158,3 +158,9 @@ Please note that some third party dependencies (including Qt) use the
 # Stargazers
 
 [![Stargazers over time](https://starchart.cc/facontidavide/PlotJuggler.svg)](https://starchart.cc/facontidavide/PlotJuggler)
+
+# Contributors
+
+<a href="https://github.com/facontidavide/plotjuggler/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=facontidavide/plotjuggler" />
+</a>
