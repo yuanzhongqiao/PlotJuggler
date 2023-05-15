@@ -98,7 +98,9 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
     if (!type_reader.status().ok())
     {
       QMessageBox::warning(nullptr, tr("MCAP parsing"),
-                           QString("Error reading the MCAP file:\n%1").arg(info->filename),
+                           QString("Error reading the MCAP file:\n%1.\n%2")
+                               .arg(info->filename)
+                               .arg(QString::fromStdString(type_reader.status().message)),
                            QMessageBox::Cancel);
       return false;
     }
