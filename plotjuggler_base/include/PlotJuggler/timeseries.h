@@ -17,6 +17,7 @@ class TimeseriesBase : public PlotDataBase<double, Value>
 {
 protected:
   double _max_range_x;
+  double _latest_time = std::numeric_limits<double>::lowest();
   using PlotDataBase<double, Value>::_points;
 
 public:
@@ -37,6 +38,12 @@ public:
   virtual bool isTimeseries() const override
   {
     return true;
+  }
+
+  void clear() override
+  {
+    _latest_time = std::numeric_limits<double>::lowest();
+    PlotDataBase<double, Value>::clear();
   }
 
   void setMaximumRangeX(double max_range)
@@ -66,26 +73,43 @@ public:
 
   void pushBack(Point&& p) override
   {
-    bool need_sorting = (!_points.empty() && p.x < this->back().x);
+    bool const need_sorting = p.x < _latest_time;
 
     if (need_sorting)
     {
-      auto it = std::upper_bound(_points.begin(), _points.end(), p, TimeCompare);
+      auto it = std::upper_bound(_points.begin(), _points.end(), p,
+                                 [](const Point& a, const Point& b)
+                                 { return a.x < b.x; });
+
       PlotDataBase<double, Value>::insert(it, std::move(p));
+      _latest_time = _points.back().x;
     }
     else
     {
+      _latest_time = p.x;
       PlotDataBase<double, Value>::pushBack(std::move(p));
     }
     trimRange();
   }
 
+  virtual void popFront() override
+  {
+    PlotDataBase<double, Value>::popFront();
+    if(_points.size() == 0)
+    {
+      _latest_time = std::numeric_limits<double>::lowest();
+    }
+  }
+
 private:
   void trimRange()
   {
-    while (_points.size() > 2 && (_points.back().x - _points.front().x) > _max_range_x)
+    if(_max_range_x < std::numeric_limits<double>::max())
     {
-      this->popFront();
+      while (_points.size() > 2 && (_points.back().x - _points.front().x) > _max_range_x)
+      {
+        this->popFront();
+      }
     }
   }
 
