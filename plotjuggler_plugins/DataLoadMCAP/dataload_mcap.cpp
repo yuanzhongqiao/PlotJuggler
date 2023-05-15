@@ -148,6 +148,18 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
 
   auto messages = msg_reader.readMessages(onProblem);
 
+  QProgressDialog progress_dialog("Loading... please wait",
+                                  "Cancel",
+                                  0, 0, nullptr);
+  progress_dialog.setModal(true);
+  progress_dialog.setAutoClose(true);
+  progress_dialog.setAutoReset(true);
+  progress_dialog.setMinimumDuration(0);
+  progress_dialog.show();
+  progress_dialog.setValue(0);
+
+  size_t msg_count = 0;
+
   for (const auto& msg_view : messages)
   {
     if( enabled_channels.count(msg_view.channel->id) == 0 )
@@ -168,10 +180,18 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
     auto parser = parser_it->second;
     MessageRef msg(msg_view.message.data, msg_view.message.dataSize);
     parser->parseMessage(msg, timestamp_sec);
+
+    if (msg_count++ % 1000 == 0)
+    {
+      QApplication::processEvents();
+      if (progress_dialog.wasCanceled())
+      {
+        break;
+      }
+    }
   }
 
   msg_reader.close();
-
   return true;
 }
 
