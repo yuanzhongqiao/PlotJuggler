@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.7.0 (2023-05-19)
+------------------
 * Handle protobuf maps (`#824 <https://github.com/facontidavide/PlotJuggler/issues/824>`_)
   Protobuf maps are just repeated protobuf messages with only 2 fields
   "key" and "value". Extract the map's key and use it in the series name
