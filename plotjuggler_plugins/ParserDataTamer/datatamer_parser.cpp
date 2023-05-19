@@ -64,13 +64,12 @@ class DataTamerParser: public MessageParser
                   const std::string &type_name,
                   const std::string &schema,
                   PJ::PlotDataMapRef &data):
-            MessageParser(topic_name, data)
+            MessageParser(topic_name, data),
+            topic_name_(topic_name)
   {
     // the expected schema contains a series per line
     std::istringstream ss(schema);
     std::string line;
-
-    PlotGroup::Ptr group = std::make_shared<PlotGroup>(topic_name);
 
     while (std::getline(ss, line))
     {
@@ -78,8 +77,6 @@ class DataTamerParser: public MessageParser
       auto pos = line.find(' ');
       ts.name = line.substr(0, pos);
       ts.type = DataTamer::FromStr(line.substr(pos+1));
-      ts.plot_data = &(data.addNumeric(ts.name, group)->second);
-
       timeseries_.push_back(std::move(ts));
     }
   }
@@ -147,7 +144,12 @@ class DataTamerParser: public MessageParser
         default:
           break;
         }
-        timeseries_[i].plot_data->pushBack({timestamp, val});
+        auto& ts = timeseries_[i];
+        if(!ts.plot_data)
+        {
+          ts.plot_data = &(_plot_data.addNumeric(topic_name_ + "/" + ts.name)->second);
+        }
+        ts.plot_data->pushBack({timestamp, val});
       }
     }
     return true;
@@ -161,6 +163,7 @@ class DataTamerParser: public MessageParser
     PlotData* plot_data = nullptr;
   };
 
+  std::string topic_name_;
   std::vector<TimeSeries> timeseries_;
 };
 

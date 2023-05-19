@@ -59,6 +59,10 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
   type_reader.onChannel = [&](const mcap::ChannelPtr recordPtr,
                               mcap::ByteOffset, std::optional<mcap::ByteOffset>)
   {
+    if(channels.count(recordPtr->id) != 0)
+    {
+      return;
+    }
     channels.insert( {recordPtr->id, recordPtr} );
 
     auto schema = schemas.at(recordPtr->schemaId);

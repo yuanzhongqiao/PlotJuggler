@@ -91,7 +91,7 @@ SET(CMAKE_AUTOUIC ON)
 
 
 if (NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 endif()
 
 if(APPLE AND EXISTS /usr/local/opt/qt5)
