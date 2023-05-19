@@ -66,7 +66,7 @@ public:
 
   void pushBack(Point&& p) override
   {
-    bool const need_sorting = p.x < _points.back().x;
+    bool need_sorting = (!_points.empty() && p.x < this->back().x);
 
     if (need_sorting)
     {
