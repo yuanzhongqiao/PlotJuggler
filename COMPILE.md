@@ -76,6 +76,12 @@ cp -v install/bin/* AppDir/usr/bin
     --plugin qt --output appimage
 ```
 
+## Deploy as an AppImage via Docker
+
+```shell
+docker buildx build -o . .
+```
+
 # Compile in Mac
 
 On Mac, the dependencies can be installed using [brew](https://brew.sh/) with the following command:
