@@ -72,7 +72,7 @@ bool DataStreamZcm::start(QStringList*)
   _ui->lineEditSubscribe->setText(subscribe_text);
 
   {
-    auto transport = QString(getenv("PJ_ZCM_DEFAULT_URL"));
+    auto transport = QString(getenv("ZCM_DEFAULT_URL"));
     transport = settings.value("DataStreamZcm::transport", transport).toString();
     _ui->lineEditTransport->setText(transport);
   }
@@ -220,9 +220,9 @@ void DataStreamZcm::handler(const zcm::ReceiveBuffer* rbuf, const string& channe
 
 void DataStreamZcm::on_pushButtonUrl_clicked()
 {
-  QString url = getenv("PJ_ZCM_DEFAULT_URL");
+  QString url = getenv("ZCM_DEFAULT_URL");
   if (url.isEmpty()) {
-    QMessageBox::warning(nullptr, "Error", "Environment variable PJ_ZCM_DEFAULT_URL not set");
+    QMessageBox::warning(nullptr, "Error", "Environment variable ZCM_DEFAULT_URL not set");
   } else {
     _ui->lineEditTransport->setText(url);
   }
