@@ -19,6 +19,8 @@
 
 using namespace std;
 
+static bool verbose = false;
+
 DataLoadZcm::DataLoadZcm()
 {
   _dialog = new QDialog();
@@ -88,7 +90,9 @@ static int processInputLog(const string& logpath,
 
             int percent = 100.0 * offset / (logSize == 0 ? 1 : logSize);
             if (percent != lastPrintPercent) {
-                cout << "\r" << "Percent Complete: " << percent << flush;
+                if (verbose) {
+                    cout << "\r" << "Percent Complete: " << percent << flush;
+                }
                 lastPrintPercent = percent;
 
                 progress_dialog.setValue(percent);
@@ -103,9 +107,11 @@ static int processInputLog(const string& logpath,
 
             processEvent(evt);
         }
-        if (lastPrintPercent != 100 && !interrupted)
-            cout << "\r" << "Percent Complete: 100" << flush;
-        cout << endl;
+        if (verbose) {
+            if (lastPrintPercent != 100 && !interrupted)
+                cout << "\r" << "Percent Complete: 100" << flush;
+            cout << endl;
+        }
 
         if (interrupted) progress_dialog.cancel();
     };
@@ -117,23 +123,25 @@ static int processInputLog(const string& logpath,
     return 0;
 }
 
+bool DataLoadZcm::refreshChannels(const string& filepath)
+{
+  _all_channels.clear();
+  _all_channels_filepath = filepath;
+
+  auto processEvent = [&](const zcm::LogEvent* evt){
+    _all_channels.insert(evt->channel);
+  };
+
+  return processInputLog(filepath, processEvent) == 0;
+}
+
 bool DataLoadZcm::launchDialog(const string& filepath)
 {
   QSettings settings;
   _dialog->restoreGeometry(settings.value("DataLoadZcm.geometry").toByteArray());
 
-
-  _channels.clear();
-  auto processEvent = [&](const zcm::LogEvent* evt){
-    _channels.insert(evt->channel);
-  };
-
-  if (processInputLog(filepath, processEvent) != 0) {
-    return false;
-  }
-
   _ui->listWidgetChannels->clear();
-  for (auto& c : _channels) {
+  for (auto& c : _all_channels) {
     auto chan = QString::fromStdString(c);
     _ui->listWidgetChannels->addItem(chan);
   }
@@ -142,11 +150,10 @@ bool DataLoadZcm::launchDialog(const string& filepath)
   auto selected_channels = settings.value("DataLoadZcm.selected_channels").toStringList();
   for (int row = 0; row<_ui->listWidgetChannels->count(); row++) {
     auto item = _ui->listWidgetChannels->item(row);
-    if(selected_channels.contains(item->text())) {
-        item->setSelected(true);
+    if (selected_channels.contains(item->text())) {
+      item->setSelected(true);
     }
   }
-  _channels.clear();
   selected_channels.clear();
 
   int res = _dialog->exec();
@@ -156,10 +163,12 @@ bool DataLoadZcm::launchDialog(const string& filepath)
     return false;
   }
 
+  _selected_channels.clear();
+
   QModelIndexList indexes = _ui->listWidgetChannels->selectionModel()->selectedRows();
   for (auto& i : indexes) {
     auto item = _ui->listWidgetChannels->item(i.row());
-    _channels.insert(item->text().toStdString());
+    _selected_channels.insert(item->text().toStdString());
     selected_channels.push_back(item->text());
   }
 
@@ -179,6 +188,9 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
 
   if (info->plugin_config.hasChildNodes()) {
     xmlLoadState(info->plugin_config.firstChildElement());
+  }
+  if (filepath != _all_channels_filepath) {
+    refreshChannels(filepath);
   }
   if (!launchDialog(filepath)) {
     return false;
@@ -210,7 +222,7 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   };
 
   auto processEvent = [&](const zcm::LogEvent* evt){
-      if (_channels.find(evt->channel) == _channels.end()) return;
+      if (_selected_channels.find(evt->channel) == _selected_channels.end()) return;
       zcm::Introspection::processEncodedType(evt->channel,
                                              evt->data, evt->datalen,
                                              "/",
@@ -273,21 +285,27 @@ static unordered_set<string> deserialize(const QDomElement& elt)
 
 bool DataLoadZcm::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const
 {
-  QDomElement elem = doc.createElement("default");
-  parent_element.appendChild(serialize(_channels, doc, "channels"));
+  parent_element.appendChild(serialize(_selected_channels, doc, "selected_channels"));
+  auto all_channels = serialize(_all_channels, doc, "all_channels");
+  all_channels.setAttribute("filepath", QString::fromStdString(_all_channels_filepath));
+  parent_element.appendChild(all_channels);
   return true;
 }
 
 bool DataLoadZcm::xmlLoadState(const QDomElement& parent_element)
 {
-  QDomElement elem = parent_element.firstChildElement("default");
-  if (!elem.isNull())
-  {
-    QDomElement channels = parent_element.firstChildElement("channels");
-    if (!channels.isNull())
-    {
-      _channels = deserialize(channels);
+  QDomElement all_channels = parent_element.firstChildElement("all_channels");
+  if (!all_channels.isNull()) {
+    _all_channels = deserialize(all_channels);
+    if (all_channels.hasAttribute("filepath")) {
+      _all_channels_filepath = all_channels.attribute("filepath").toStdString();
     }
   }
+
+  QDomElement selected_channels = parent_element.firstChildElement("selected_channels");
+  if (!selected_channels.isNull()) {
+    _selected_channels = deserialize(selected_channels);
+  }
+
   return true;
 }
