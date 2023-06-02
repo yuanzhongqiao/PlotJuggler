@@ -117,15 +117,15 @@ static int processInputLog(const string& logpath,
     return 0;
 }
 
-bool DataLoadZcm::launchDialog(const string& filepath, unordered_set<string>& channels)
+bool DataLoadZcm::launchDialog(const string& filepath)
 {
   QSettings settings;
   _dialog->restoreGeometry(settings.value("DataLoadZcm.geometry").toByteArray());
 
 
-  channels.clear();
-  auto processEvent = [&channels](const zcm::LogEvent* evt){
-    channels.insert(evt->channel);
+  _channels.clear();
+  auto processEvent = [&](const zcm::LogEvent* evt){
+    _channels.insert(evt->channel);
   };
 
   if (processInputLog(filepath, processEvent) != 0) {
@@ -133,7 +133,7 @@ bool DataLoadZcm::launchDialog(const string& filepath, unordered_set<string>& ch
   }
 
   _ui->listWidgetChannels->clear();
-  for (auto& c : channels) {
+  for (auto& c : _channels) {
     auto chan = QString::fromStdString(c);
     _ui->listWidgetChannels->addItem(chan);
   }
@@ -146,7 +146,7 @@ bool DataLoadZcm::launchDialog(const string& filepath, unordered_set<string>& ch
         item->setSelected(true);
     }
   }
-  channels.clear();
+  _channels.clear();
   selected_channels.clear();
 
   int res = _dialog->exec();
@@ -159,7 +159,7 @@ bool DataLoadZcm::launchDialog(const string& filepath, unordered_set<string>& ch
   QModelIndexList indexes = _ui->listWidgetChannels->selectionModel()->selectedRows();
   for (auto& i : indexes) {
     auto item = _ui->listWidgetChannels->item(i.row());
-    channels.insert(item->text().toStdString());
+    _channels.insert(item->text().toStdString());
     selected_channels.push_back(item->text());
   }
 
@@ -176,14 +176,12 @@ double toDouble(const void* data) {
 bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data)
 {
   string filepath = info->filename.toStdString();
-  unordered_set<string> channels;
 
   if (info->plugin_config.hasChildNodes()) {
     xmlLoadState(info->plugin_config.firstChildElement());
-  } else {
-    if (!launchDialog(filepath, channels)) {
-      return false;
-    }
+  }
+  if (!launchDialog(filepath)) {
+    return false;
   }
 
   zcm::TypeDb types(_config_widget->getLibraries().toStdString());
@@ -212,7 +210,7 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   };
 
   auto processEvent = [&](const zcm::LogEvent* evt){
-      if (channels.find(evt->channel) == channels.end()) return;
+      if (_channels.find(evt->channel) == _channels.end()) return;
       zcm::Introspection::processEncodedType(evt->channel,
                                              evt->data, evt->datalen,
                                              "/",
@@ -238,12 +236,58 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   return true;
 }
 
+static QDomElement serialize(const unordered_set<string>& input,
+                             QDomDocument& doc, const string& name)
+{
+  QDomElement ret = doc.createElement(QString::fromStdString(name));
+
+  for (const auto& item : input) {
+    QDomElement stringElement = doc.createElement("String");
+    QDomText textNode = doc.createTextNode(QString::fromStdString(item));
+    stringElement.appendChild(textNode);
+    ret.appendChild(stringElement);
+  }
+
+  return ret;
+}
+
+static unordered_set<string> deserialize(const QDomElement& elt)
+{
+    unordered_set<string> ret;
+
+    QDomNodeList childNodes = elt.childNodes();
+    for (int i = 0; i < childNodes.size(); ++i) {
+        QDomNode node = childNodes.item(i);
+        if (node.isElement()) {
+            QDomElement element = node.toElement();
+            if (element.tagName() == "String") {
+                QString stringValue = element.text();
+                ret.insert(stringValue.toStdString());
+            }
+        }
+    }
+
+    return ret;
+}
+
+
 bool DataLoadZcm::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const
 {
+  QDomElement elem = doc.createElement("default");
+  parent_element.appendChild(serialize(_channels, doc, "channels"));
   return true;
 }
 
-bool DataLoadZcm::xmlLoadState(const QDomElement&)
+bool DataLoadZcm::xmlLoadState(const QDomElement& parent_element)
 {
+  QDomElement elem = parent_element.firstChildElement("default");
+  if (!elem.isNull())
+  {
+    QDomElement channels = parent_element.firstChildElement("channels");
+    if (!channels.isNull())
+    {
+      _channels = deserialize(channels);
+    }
+  }
   return true;
 }

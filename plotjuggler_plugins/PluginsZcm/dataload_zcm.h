@@ -40,5 +40,7 @@ private:
   ConfigZCM* _config_widget;
   Ui::DialogZcm* _ui;
 
-  bool launchDialog(const std::string& filepath, std::unordered_set<std::string>& channels);
+  std::unordered_set<std::string> _channels;
+
+  bool launchDialog(const std::string& filepath);
 };
