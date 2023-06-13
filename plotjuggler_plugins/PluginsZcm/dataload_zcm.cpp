@@ -305,6 +305,13 @@ bool DataLoadZcm::xmlLoadState(const QDomElement& parent_element)
   QDomElement selected_channels = parent_element.firstChildElement("selected_channels");
   if (!selected_channels.isNull()) {
     _selected_channels = deserialize(selected_channels);
+
+    QStringList selected_channels;
+    for (auto& c : _selected_channels)
+        selected_channels.push_back(QString::fromStdString(c));
+
+    QSettings settings;
+    settings.setValue("DataLoadZcm.selected_channels", selected_channels);
   }
 
   return true;
