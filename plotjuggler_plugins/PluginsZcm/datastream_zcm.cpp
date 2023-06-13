@@ -23,21 +23,6 @@ double toDouble(const void* data) {
 
 DataStreamZcm::DataStreamZcm(): _subs(nullptr), _running(false)
 {
-  _processData = [&](const string& name, zcm_field_type_t type, const void* data){
-    switch (type) {
-    case ZCM_FIELD_INT8_T: _numerics.emplace_back(name, toDouble<int8_t>(data)); break;
-      case ZCM_FIELD_INT16_T: _numerics.emplace_back(name, toDouble<int16_t>(data)); break;
-      case ZCM_FIELD_INT32_T: _numerics.emplace_back(name, toDouble<int32_t>(data)); break;
-      case ZCM_FIELD_INT64_T: _numerics.emplace_back(name, toDouble<int64_t>(data)); break;
-      case ZCM_FIELD_BYTE: _numerics.emplace_back(name, toDouble<uint8_t>(data)); break;
-      case ZCM_FIELD_FLOAT: _numerics.emplace_back(name, toDouble<float>(data)); break;
-      case ZCM_FIELD_DOUBLE: _numerics.emplace_back(name, toDouble<double>(data)); break;
-      case ZCM_FIELD_BOOLEAN: _numerics.emplace_back(name, toDouble<bool>(data)); break;
-      case ZCM_FIELD_STRING: _strings.emplace_back(name, string((const char*)data)); break;
-      case ZCM_FIELD_USER_TYPE: assert(false && "Should not be possble");
-    }
-  };
-
   _dialog = new QDialog;
   _ui = new Ui::DialogZcm;
   _ui->setupUi(_dialog);
@@ -187,12 +172,32 @@ bool DataStreamZcm::xmlLoadState(const QDomElement& parent_element)
   return true;
 }
 
+
+void DataStreamZcm::processData(const string& name, zcm_field_type_t type,
+                                const void* data, void* usr)
+{
+  DataStreamZcm *me = (DataStreamZcm*)usr;
+  switch (type) {
+    case ZCM_FIELD_INT8_T: me->_numerics.emplace_back(name, toDouble<int8_t>(data)); break;
+    case ZCM_FIELD_INT16_T: me->_numerics.emplace_back(name, toDouble<int16_t>(data)); break;
+    case ZCM_FIELD_INT32_T: me->_numerics.emplace_back(name, toDouble<int32_t>(data)); break;
+    case ZCM_FIELD_INT64_T: me->_numerics.emplace_back(name, toDouble<int64_t>(data)); break;
+    case ZCM_FIELD_BYTE: me->_numerics.emplace_back(name, toDouble<uint8_t>(data)); break;
+    case ZCM_FIELD_FLOAT: me->_numerics.emplace_back(name, toDouble<float>(data)); break;
+    case ZCM_FIELD_DOUBLE: me->_numerics.emplace_back(name, toDouble<double>(data)); break;
+    case ZCM_FIELD_BOOLEAN: me->_numerics.emplace_back(name, toDouble<bool>(data)); break;
+    case ZCM_FIELD_STRING: me->_strings.emplace_back(name, string((const char*)data)); break;
+    case ZCM_FIELD_USER_TYPE: assert(false && "Should not be possble");
+  }
+};
+
+
 void DataStreamZcm::handler(const zcm::ReceiveBuffer* rbuf, const string& channel)
 {
   zcm::Introspection::processEncodedType(channel,
                                          rbuf->data, rbuf->data_size,
                                          "/",
-                                         *_types.get(), _processData);
+                                         *_types.get(), processData, this);
   {
     std::lock_guard<std::mutex> lock(mutex());
 
