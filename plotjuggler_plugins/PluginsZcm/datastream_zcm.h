@@ -39,14 +39,16 @@ public:
   private slots:
   void on_pushButtonUrl_clicked();
 
-  private:
+private:
   std::unique_ptr<zcm::TypeDb> _types;
 
   std::unique_ptr<zcm::ZCM> _zcm;
 
   zcm::Subscription* _subs = nullptr;
 
-  zcm::Introspection::ProcessFn _processData;
+  static void processData(const std::string& name,
+                          zcm_field_type_t type,
+                          const void* data, void* usr);
 
   std::vector<std::pair<std::string, double>> _numerics;
   std::vector<std::pair<std::string, std::string>> _strings;

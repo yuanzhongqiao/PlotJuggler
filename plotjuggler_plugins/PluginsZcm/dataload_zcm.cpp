@@ -182,6 +182,29 @@ double toDouble(const void* data) {
   return static_cast<double>(*reinterpret_cast<const T*>(data));
 }
 
+struct ProcessUsr
+{
+  vector<pair<string, double>>& numerics;
+  vector<pair<string, string>>& strings;
+};
+static void processData(const string& name, zcm_field_type_t type,
+                        const void* data, void* usr)
+{
+  ProcessUsr* v = (ProcessUsr*)usr;
+  switch (type) {
+    case ZCM_FIELD_INT8_T: v->numerics.emplace_back(name, toDouble<int8_t>(data)); break;
+    case ZCM_FIELD_INT16_T: v->numerics.emplace_back(name, toDouble<int16_t>(data)); break;
+    case ZCM_FIELD_INT32_T: v->numerics.emplace_back(name, toDouble<int32_t>(data)); break;
+    case ZCM_FIELD_INT64_T: v->numerics.emplace_back(name, toDouble<int64_t>(data)); break;
+    case ZCM_FIELD_BYTE: v->numerics.emplace_back(name, toDouble<uint8_t>(data)); break;
+    case ZCM_FIELD_FLOAT: v->numerics.emplace_back(name, toDouble<float>(data)); break;
+    case ZCM_FIELD_DOUBLE: v->numerics.emplace_back(name, toDouble<double>(data)); break;
+    case ZCM_FIELD_BOOLEAN: v->numerics.emplace_back(name, toDouble<bool>(data)); break;
+    case ZCM_FIELD_STRING: v->strings.emplace_back(name, string((const char*)data)); break;
+    case ZCM_FIELD_USER_TYPE: assert(false && "Should not be possble");
+  }
+};
+
 bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data)
 {
   string filepath = info->filename.toStdString();
@@ -205,45 +228,31 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
 
   vector<pair<string, double>> numerics;
   vector<pair<string, string>> strings;
-
-  auto processData = [&](const string& name, zcm_field_type_t type, const void* data){
-    switch (type) {
-    case ZCM_FIELD_INT8_T: numerics.emplace_back(name, toDouble<int8_t>(data)); break;
-    case ZCM_FIELD_INT16_T: numerics.emplace_back(name, toDouble<int16_t>(data)); break;
-    case ZCM_FIELD_INT32_T: numerics.emplace_back(name, toDouble<int32_t>(data)); break;
-    case ZCM_FIELD_INT64_T: numerics.emplace_back(name, toDouble<int64_t>(data)); break;
-    case ZCM_FIELD_BYTE: numerics.emplace_back(name, toDouble<uint8_t>(data)); break;
-    case ZCM_FIELD_FLOAT: numerics.emplace_back(name, toDouble<float>(data)); break;
-    case ZCM_FIELD_DOUBLE: numerics.emplace_back(name, toDouble<double>(data)); break;
-    case ZCM_FIELD_BOOLEAN: numerics.emplace_back(name, toDouble<bool>(data)); break;
-    case ZCM_FIELD_STRING: strings.emplace_back(name, string((const char*)data)); break;
-    case ZCM_FIELD_USER_TYPE: assert(false && "Should not be possble");
-    }
-  };
+  ProcessUsr usr = { numerics, strings };
 
   auto processEvent = [&](const zcm::LogEvent* evt){
-      if (_selected_channels.find(evt->channel) == _selected_channels.end()) return;
-      zcm::Introspection::processEncodedType(evt->channel,
-                                             evt->data, evt->datalen,
-                                             "/",
-                                             types, processData);
-      for (auto& n : numerics) {
-          auto itr = plot_data.numeric.find(n.first);
-          if (itr == plot_data.numeric.end()) itr = plot_data.addNumeric(n.first);
-          itr->second.pushBack({ (double)evt->timestamp / 1e6, n.second });
-      }
-      for (auto& s : strings) {
-          auto itr = plot_data.strings.find(s.first);
-          if (itr == plot_data.strings.end()) itr = plot_data.addStringSeries(s.first);
-          itr->second.pushBack({ (double)evt->timestamp / 1e6, s.second });
-      }
+    if (_selected_channels.find(evt->channel) == _selected_channels.end()) return;
+    zcm::Introspection::processEncodedType(evt->channel,
+                                           evt->data, evt->datalen,
+                                           "/",
+                                           types, processData, &usr);
+    for (auto& n : usr.numerics) {
+      auto itr = plot_data.numeric.find(n.first);
+      if (itr == plot_data.numeric.end()) itr = plot_data.addNumeric(n.first);
+      itr->second.pushBack({ (double)evt->timestamp / 1e6, n.second });
+    }
+    for (auto& s : usr.strings) {
+      auto itr = plot_data.strings.find(s.first);
+      if (itr == plot_data.strings.end()) itr = plot_data.addStringSeries(s.first);
+      itr->second.pushBack({ (double)evt->timestamp / 1e6, s.second });
+    }
 
-      numerics.clear();
-      strings.clear();
+    usr.numerics.clear();
+    usr.strings.clear();
   };
 
   if (processInputLog(filepath, processEvent) != 0)
-      return false;
+    return false;
 
   return true;
 }
@@ -305,6 +314,13 @@ bool DataLoadZcm::xmlLoadState(const QDomElement& parent_element)
   QDomElement selected_channels = parent_element.firstChildElement("selected_channels");
   if (!selected_channels.isNull()) {
     _selected_channels = deserialize(selected_channels);
+
+    QStringList selected_channels;
+    for (auto& c : _selected_channels)
+      selected_channels.push_back(QString::fromStdString(c));
+
+    QSettings settings;
+    settings.setValue("DataLoadZcm.selected_channels", selected_channels);
   }
 
   return true;
