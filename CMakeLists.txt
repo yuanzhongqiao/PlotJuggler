@@ -42,8 +42,11 @@ if(VCPKG_TOOLCHAIN)
     message(STATUS "BUILDING_WITH_VCPKG")
 endif()
 
+find_package(ament_cmake QUIET)
+find_package(catkin QUIET)
+
 # http://answers.ros.org/question/230877/optionally-build-a-package-with-catkin/
-if( CATKIN_DEVEL_PREFIX OR catkin_FOUND OR CATKIN_BUILD_BINARY_PACKAGE)
+if(catkin_FOUND)
     set(COMPILING_WITH_CATKIN 1)
 
     message(STATUS "--------------------------------------------------")
@@ -63,7 +66,7 @@ message(STATUS ${catkin_INCLUDE_DIRS})
     include_directories(${catkin_INCLUDE_DIRS})
     add_definitions(-DCOMPILED_WITH_CATKIN)
 
-elseif( DEFINED ENV{AMENT_PREFIX_PATH})
+elseif(ament_cmake_FOUND)
     set(COMPILING_WITH_AMENT 1)
 
     find_package(ament_cmake REQUIRED)
