@@ -165,7 +165,6 @@ parts:
       - ros-foxy-ackermann-msgs
       - ros-foxy-action-msgs
       - ros-foxy-actionlib-msgs
-      - ros-foxy-astuff-sensor-msgs
       - ros-foxy-automotive-autonomy-msgs
       - ros-foxy-automotive-navigation-msgs
       - ros-foxy-automotive-platform-msgs
