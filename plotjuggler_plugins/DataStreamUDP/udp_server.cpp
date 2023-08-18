@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <QMessageBox>
 #include <chrono>
 #include <QNetworkDatagram>
+#include <QNetworkInterface>
 
 #include "ui_udp_server.h"
 
@@ -158,7 +159,18 @@ bool UDP_Server::start(QStringList*)
   {
     success &= _udp_socket->bind(
         address, port, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint);
-    success &= _udp_socket->joinMulticastGroup(address);
+
+    // Add multicast group membership to all interfaces which support multicast.
+    for (const auto& interface : QNetworkInterface::allInterfaces())
+    {
+      QNetworkInterface::InterfaceFlags iflags = interface.flags();
+      if (interface.isValid() && !iflags.testFlag(QNetworkInterface::IsLoopBack) &&
+          iflags.testFlag(QNetworkInterface::CanMulticast) &&
+          iflags.testFlag(QNetworkInterface::IsRunning))
+      {
+        success &= _udp_socket->joinMulticastGroup(address, interface);
+      }
+    }
   }
 
   _running = true;
