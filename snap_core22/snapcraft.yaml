@@ -31,7 +31,7 @@ parts:
     source: .
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
-      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
+      - "-DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf(\"%s/usr/lib/$CRAFT_ARCH_TRIPLET/cmake/Qt5\", $2)}')"
     build-packages:
       - distro-info-data
       - libpulse0
@@ -56,8 +56,8 @@ parts:
 
         version="$(git describe --always --tags| sed -e 's/^v//;s/-/+git/;y/-/./')"
         [ -n "$(echo $version | grep "+git")" ] && grade=devel || grade=stable
-        snapcraftctl set-version "$version"
-        snapcraftctl set-grade "$grade"
+        craftctl set version="$version"
+        craftctl set grade="$grade"
 
         # Necessary to bypass XDG desktop portals because ROS 2 bags metadata.yaml are refering db3 files relatively
         sed -i '/QApplication app(new_argc, new_argv.data());/a QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);' plotjuggler_app/main.cpp
@@ -71,7 +71,7 @@ parts:
       - -DBUILD_TESTING=OFF
       - -DBUILD_DOCS=OFF
       # point to previously build plotjuggler
-      - -Dplotjuggler_DIR:PATH=$SNAPCRAFT_STAGE/usr/local/lib/cmake/plotjuggler
+      - -Dplotjuggler_DIR:PATH=$CRAFT_STAGE/usr/local/lib/cmake/plotjuggler
       # Due to https://github.com/ament/ament_cmake/issues/189 implicity OpenSSL link breaks. So we change CMAKE_PREFIX_PATH and not CMAKE_FIND_ROOT_PATH
       - -DCMAKE_PREFIX_PATH=$(echo $SNAPCRAFT_CMAKE_ARGS | awk -F= '{printf("%s/usr/lib/x86_64-linux-gnu/cmake/Qt5", $2)}')
       - --event-handlers=console_direct+
@@ -83,7 +83,6 @@ parts:
     stage-packages:
       # ROS 2 plugin need to source messages to plot them
       # No custom message is going to be support for now
-      - ros-humble-geometry-msgs
       - ros-humble-ackermann-msgs
       - ros-humble-action-msgs
       - ros-humble-actionlib-msgs
@@ -234,14 +233,7 @@ parts:
       - ros-humble-webots-ros2-msgs
       - ros-humble-wiimote-msgs
       - ros-humble-wireless-msgs
-#      - ros-humble-astuff-sensor-msgs  # new ppa, should we add it? https://github.com/astuff/pacmod3/commit/ff0f8f1bb1a1ba88f495a3294725207309c739ae
-#      - ros-humble-clearpath-msgs  # not yet released
-#      - ros-humble-clober-msgs  # not yet released
-#      - ros-humble-mocap-msgs  # not yet in humble, not sure why
-#      - ros-humble-pacmod3-msgs  # new ppa, should we add it? https://github.com/astuff/pacmod3/commit/ff0f8f1bb1a1ba88f495a3294725207309c739ae
-#      - ros-humble-raptor-dbw-msgs  # https://github.com/NewEagleRaptor/raptor-dbw-ros/commit/7feaf35d996addac469a0816ab0d7ab9037ca6dd
-#      - ros-humble-raptor-pdu-msgs  # https://github.com/NewEagleRaptor/raptor-dbw-ros/commit/7feaf35d996addac469a0816ab0d7ab9037ca6dd
-#      - ros-humble-rover-msgs  # not yet released
+
       # Additional DDS vendors
       - ros-humble-rmw-cyclonedds-cpp
       - ros-humble-rmw-fastrtps-cpp
