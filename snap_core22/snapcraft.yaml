@@ -53,7 +53,7 @@ parts:
       - libfreetype6
     override-pull: |
         craftctl default
-
+        git config --global --add safe.directory '*'
         version="$(git describe --always --tags| sed -e 's/^v//;s/-/+git/;y/-/./')"
         [ -n "$(echo $version | grep "+git")" ] && grade=devel || grade=stable
         craftctl set version="$version"
