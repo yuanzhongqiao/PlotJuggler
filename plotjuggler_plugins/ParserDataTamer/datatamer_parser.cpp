@@ -61,7 +61,7 @@ class DataTamerParser: public MessageParser
 {
   public:
   DataTamerParser(const std::string &topic_name,
-                  const std::string &type_name,
+                  const std::string &/*type_name*/,
                   const std::string &schema,
                   PJ::PlotDataMapRef &data):
             MessageParser(topic_name, data),

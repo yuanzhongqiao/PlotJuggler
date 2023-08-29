@@ -231,7 +231,10 @@ bool DataLoadZcm::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   ProcessUsr usr = { numerics, strings };
 
   auto processEvent = [&](const zcm::LogEvent* evt){
-    if (_selected_channels.find(evt->channel) == _selected_channels.end()) return;
+    if (_selected_channels.find(evt->channel) == _selected_channels.end()){
+      return;
+    }
+
     zcm::Introspection::processEncodedType(evt->channel,
                                            evt->data, evt->datalen,
                                            "/",
