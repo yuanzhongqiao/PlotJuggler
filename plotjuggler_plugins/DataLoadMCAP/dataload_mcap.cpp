@@ -70,7 +70,7 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
     schemas.insert( {schema_id, shema_ptr} );
   }
 
-  std::unordered_set<QString> notified_encoding_problem;
+  std::set<QString> notified_encoding_problem;
 
   for (const auto& [channel_id, channel_ptr] : reader.channels())
   {
