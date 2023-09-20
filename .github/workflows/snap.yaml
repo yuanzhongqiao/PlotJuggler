@@ -83,5 +83,5 @@ jobs:
       env:
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.STORE_LOGIN }}
       with:
-        snap: ${{needs.build.outputs.snap-file}}
+        snap: ${{needs.build22.outputs.snap-file}}
         release: humble/${{ startsWith(github.ref, 'refs/tags/') && 'candidate' || 'edge'}}
