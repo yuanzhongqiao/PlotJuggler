@@ -110,7 +110,7 @@ static int processInputLog(const string& logpath,
         if (verbose) {
             if (lastPrintPercent != 100 && !interrupted)
                 cout << "\r" << "Percent Complete: 100" << flush;
-            cout << endl;
+            cout << Qt::endl;
         }
 
         if (interrupted) progress_dialog.cancel();
