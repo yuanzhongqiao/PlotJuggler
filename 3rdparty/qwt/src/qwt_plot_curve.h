@@ -97,6 +97,8 @@ class QWT_EXPORT QwtPlotCurve
          */
         Dots,
 
+        LinesAndDots,
+
         /*!
            Styles >= QwtPlotCurve::UserCurve are reserved for derived
            classes of QwtPlotCurve that overload drawCurve() with
@@ -271,6 +273,9 @@ class QWT_EXPORT QwtPlotCurve
     void setSamples( QwtSeriesData< QPointF >* );
 
     virtual int closestPoint( const QPointF& pos, double* dist = NULL ) const;
+    virtual int adjacentPoint( Qt::Orientation orientation, qreal value ) const;
+
+    qreal interpolatedValueAt( Qt::Orientation, double ) const;
 
     double minXValue() const;
     double maxXValue() const;
