@@ -51,11 +51,7 @@ static double qwtIntervalWidth( const QDateTime& minDate,
     {
         case QwtDate::Millisecond:
         {
-            const double secsTo = minDate.secsTo( maxDate );
-            const double msecs = maxDate.time().msec() -
-                minDate.time().msec();
-
-            return secsTo * 1000 + msecs;
+            return minDate.msecsTo( maxDate );
         }
         case QwtDate::Second:
         {
@@ -422,7 +418,7 @@ static QList< double > qwtDstTicks( const QDateTime& dateTime,
     int secondsMajor, int secondsMinor )
 {
     if ( secondsMinor <= 0 )
-        QList< double >();
+        return QList< double >();
 
     QDateTime minDate = dateTime.addSecs( -secondsMajor );
     minDate = QwtDate::floor( minDate, QwtDate::Hour );

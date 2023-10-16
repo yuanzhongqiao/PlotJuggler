@@ -19,6 +19,7 @@
 #include <qpainterpath.h>
 #include <qcursor.h>
 #include <qpointer.h>
+#include <qmath.h>
 
 static inline QRegion qwtMaskRegion( const QRect& r, int penWidth )
 {
@@ -540,6 +541,9 @@ QRegion QwtPicker::rubberBandMask() const
     if ( m_data->stateMachine )
         selectionType = m_data->stateMachine->selectionType();
 
+    const int pw = qCeil( rubberBandPen().widthF()
+        * QwtPainter::devicePixelRatio( parentWidget() ) );
+
     switch ( selectionType )
     {
         case QwtPickerMachine::NoSelection:
@@ -549,7 +553,6 @@ QRegion QwtPicker::rubberBandMask() const
                 return mask;
 
             const QPoint pos = pa[0];
-            const int pw = rubberBandPen().width();
 
             const QRect pRect = pickArea().boundingRect().toRect();
             switch ( rubberBand() )
@@ -584,8 +587,6 @@ QRegion QwtPicker::rubberBandMask() const
             if ( pa.count() < 2 )
                 return mask;
 
-            const int pw = rubberBandPen().width();
-
             switch ( rubberBand() )
             {
                 case RectRubberBand:
@@ -607,7 +608,6 @@ QRegion QwtPicker::rubberBandMask() const
         }
         case QwtPickerMachine::PolygonSelection:
         {
-            const int pw = rubberBandPen().width();
             if ( pw <= 1 )
             {
                 // because of the join style we better

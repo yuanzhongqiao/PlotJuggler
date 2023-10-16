@@ -23,6 +23,8 @@
 #include <qpainter.h>
 #include <qpainterpath.h>
 
+#include <climits>
+
 static inline QRectF qwtIntersectedClipRect( const QRectF& rect, QPainter* painter )
 {
     QRectF clipRect = rect;
@@ -451,22 +453,6 @@ void QwtPlotCurve::drawCurve( QPainter* painter, int style,
         case Dots:
             drawDots( painter, xMap, yMap, canvasRect, from, to );
             break;
-        case LinesAndDots: {
-          if (testCurveAttribute(Fitted)) {
-            from = 0;
-            to = dataSize() - 1;
-          }
-          drawLines(painter, xMap, yMap, canvasRect, from, to);
-
-          QPen prev_pen = painter->pen();
-          QPen new_pen = prev_pen;
-          new_pen.setWidth(prev_pen.width() * 3);
-
-          painter->setPen(new_pen);
-          drawDots(painter, xMap, yMap, canvasRect, from, to);
-          painter->setPen(prev_pen);
-        } break;
-
         case NoCurve:
         default:
             break;
@@ -685,7 +671,7 @@ void QwtPlotCurve::drawDots( QPainter* painter,
     {
         mapper.setFlag( QwtPointMapper::WeedOutPoints, false );
 
-        QPolygonF points = mapper.toPointsF(
+        QPolygonF points = mapper.toPolygonF(
             xMap, yMap, data(), from, to );
 
         QwtPainter::drawPoints( painter, points );
@@ -959,7 +945,7 @@ void QwtPlotCurve::closePolyline( QPainter* painter,
             baseline = yMap.transformation()->bounded( baseline );
 
         double refY = yMap.transform( baseline );
-        if ( doAlign )
+        if ( doAlign && qAbs( refY ) < std::numeric_limits< int >::max() )
             refY = qRound( refY );
 
         polygon += QPointF( polygon.last().x(), refY );
@@ -971,7 +957,7 @@ void QwtPlotCurve::closePolyline( QPainter* painter,
             baseline = xMap.transformation()->bounded( baseline );
 
         double refX = xMap.transform( baseline );
-        if ( doAlign )
+        if ( doAlign && qAbs( refX ) < std::numeric_limits< int >::max() )
             refX = qRound( refX );
 
         polygon += QPointF( refX, polygon.last().y() );
@@ -1064,17 +1050,21 @@ double QwtPlotCurve::baseline() const
    \note closestPoint() implements a dumb algorithm, that iterates
         over all points
  */
-int QwtPlotCurve::closestPoint( const QPoint& pos, double* dist ) const
+int QwtPlotCurve::closestPoint( const QPointF& pos, double* dist ) const
 {
-    const size_t numSamples = dataSize();
+    const QwtPlot* plot = this->plot();
 
-    if ( plot() == NULL || numSamples <= 0 )
+    if ( ( plot == NULL ) || !plot->isAxisValid( xAxis() ) || !plot->isAxisValid( yAxis() ) )
+        return -1;
+
+    const size_t numSamples = dataSize();
+    if ( numSamples <= 0 )
         return -1;
 
     const QwtSeriesData< QPointF >* series = data();
 
-    const QwtScaleMap xMap = plot()->canvasMap( xAxis() );
-    const QwtScaleMap yMap = plot()->canvasMap( yAxis() );
+    const QwtScaleMap xMap = plot->canvasMap( xAxis() );
+    const QwtScaleMap yMap = plot->canvasMap( yAxis() );
 
     int index = -1;
     double dmin = 1.0e10;
