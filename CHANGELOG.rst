@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.8.0 (2023-11-12)
+------------------
 * data_tamer updated
   This reverts commit 4ba24c591a9a84fbfb6c0329b787d73f98a2b23b.
 * CI updated
