@@ -10,6 +10,10 @@ namespace DataTamer
 {
 enum class ValueType
 {
+  BOOL,
+  BYTE,
+  CHAR,
+
   UINT8,
   UINT16,
   UINT32,
@@ -28,20 +32,39 @@ enum class ValueType
 
 ValueType FromStr(std::string const& str) {
 
-  static std::unordered_map<std::string, ValueType> names = {
-      { "UINT8", ValueType::UINT8 },
-      { "UINT16", ValueType::UINT16 },
-      { "UINT32", ValueType::UINT32 },
-      { "UINT64", ValueType::UINT64 },
+  static std::unordered_map<std::string, ValueType> names =
+      {
+        { "UINT8", ValueType::UINT8 },
+        { "uint8", ValueType::UINT8 },
 
-      { "INT8", ValueType::INT8 },
-      { "INT16", ValueType::INT16 },
-      { "INT32", ValueType::INT32 },
-      { "INT64", ValueType::INT64 },
+        { "UINT16", ValueType::UINT16 },
+        { "uint16", ValueType::UINT8 },
 
-      { "FLOAT", ValueType::FLOAT },
-      { "DOUBLE", ValueType::DOUBLE }
-  };
+        { "UINT32", ValueType::UINT32 },
+        { "uint32", ValueType::UINT32 },
+
+        { "UINT64", ValueType::UINT64 },
+        { "uint64", ValueType::UINT64 },
+
+        { "INT8", ValueType::INT8 },
+        { "int8", ValueType::INT8 },
+        { "INT16", ValueType::INT16 },
+        { "int16", ValueType::INT16 },
+        { "INT32", ValueType::INT32 },
+        { "int32", ValueType::INT32 },
+        { "INT64", ValueType::INT64 },
+        { "int64", ValueType::INT64 },
+
+        { "FLOAT", ValueType::FLOAT },
+        { "float32", ValueType::FLOAT },
+        { "DOUBLE", ValueType::DOUBLE },
+        { "float64", ValueType::DOUBLE },
+
+        { "bool", ValueType::BOOL },
+        { "byte", ValueType::BYTE },
+        { "char", ValueType::CHAR }
+
+      };
   auto const it = names.find(str);
   return it == names.end() ? ValueType::OTHER : it->second;
 }
@@ -61,7 +84,7 @@ class DataTamerParser: public MessageParser
 {
   public:
   DataTamerParser(const std::string &topic_name,
-                  const std::string &/*type_name*/,
+                  const std::string &type_name,
                   const std::string &schema,
                   PJ::PlotDataMapRef &data):
             MessageParser(topic_name, data),
@@ -93,12 +116,12 @@ class DataTamerParser: public MessageParser
     std::memcpy(enable_vector.data(), msg_ptr + offset, flags_size);
     offset += flags_size;
 
-    const uint32_t remaining_bytes = Deserialize<uint32_t>(msg_ptr, offset);
+//    const uint32_t remaining_bytes = Deserialize<uint32_t>(msg_ptr, offset);
 
-    if(remaining_bytes + offset != serialized_msg.size())
-    {
-      throw std::runtime_error("DataTamerParser: corrupted size");
-    }
+//    if(remaining_bytes + offset != serialized_msg.size())
+//    {
+//      throw std::runtime_error("DataTamerParser: corrupted size");
+//    }
 
     for(size_t i=0; i<timeseries_.size(); i++)
     {
@@ -109,40 +132,43 @@ class DataTamerParser: public MessageParser
         double val = 0;
         switch(timeseries_[i].type)
         {
-        case DataTamer::ValueType::UINT8:
-          val = static_cast<double>(Deserialize<uint8_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::UINT16:
-          val = static_cast<double>(Deserialize<uint16_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::UINT32:
-          val = static_cast<double>(Deserialize<uint32_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::UINT64:
-          val = static_cast<double>(Deserialize<uint64_t>(msg_ptr, offset));
-          break;
+          case DataTamer::ValueType::BOOL:
+          case DataTamer::ValueType::BYTE:
+          case DataTamer::ValueType::UINT8:
+            val = static_cast<double>(Deserialize<uint8_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::UINT16:
+            val = static_cast<double>(Deserialize<uint16_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::UINT32:
+            val = static_cast<double>(Deserialize<uint32_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::UINT64:
+            val = static_cast<double>(Deserialize<uint64_t>(msg_ptr, offset));
+            break;
 
-        case DataTamer::ValueType::INT8:
-          val = static_cast<double>(Deserialize<int8_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::INT16:
-          val = static_cast<double>(Deserialize<int16_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::INT32:
-          val = static_cast<double>(Deserialize<int32_t>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::INT64:
-          val = static_cast<double>(Deserialize<int64_t>(msg_ptr, offset));
-          break;
+          case DataTamer::ValueType::CHAR:
+          case DataTamer::ValueType::INT8:
+            val = static_cast<double>(Deserialize<int8_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::INT16:
+            val = static_cast<double>(Deserialize<int16_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::INT32:
+            val = static_cast<double>(Deserialize<int32_t>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::INT64:
+            val = static_cast<double>(Deserialize<int64_t>(msg_ptr, offset));
+            break;
 
-        case DataTamer::ValueType::FLOAT:
-          val = static_cast<double>(Deserialize<float>(msg_ptr, offset));
-          break;
-        case DataTamer::ValueType::DOUBLE:
-          val = Deserialize<double>(msg_ptr, offset);
-          break;
-        default:
-          break;
+          case DataTamer::ValueType::FLOAT:
+            val = static_cast<double>(Deserialize<float>(msg_ptr, offset));
+            break;
+          case DataTamer::ValueType::DOUBLE:
+            val = Deserialize<double>(msg_ptr, offset);
+            break;
+          default:
+            break;
         }
         auto& ts = timeseries_[i];
         if(!ts.plot_data)
