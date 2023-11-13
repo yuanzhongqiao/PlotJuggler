@@ -110,18 +110,21 @@ class DataTamerParser: public MessageParser
 
     const auto* msg_ptr = serialized_msg.data();
     uint32_t flags_size = Deserialize<uint32_t>(msg_ptr, offset);
+    if(offset + flags_size > serialized_msg.size())
+    {
+      throw std::runtime_error("DataTamerParser: corrupted size");
+    }
 
     thread_local std::vector<uint8_t> enable_vector;
     enable_vector.resize(flags_size);
     std::memcpy(enable_vector.data(), msg_ptr + offset, flags_size);
     offset += flags_size;
 
-//    const uint32_t remaining_bytes = Deserialize<uint32_t>(msg_ptr, offset);
-
-//    if(remaining_bytes + offset != serialized_msg.size())
-//    {
-//      throw std::runtime_error("DataTamerParser: corrupted size");
-//    }
+    uint32_t payload_size = Deserialize<uint32_t>(msg_ptr, offset);
+    if(offset + payload_size != serialized_msg.size())
+    {
+      throw std::runtime_error("DataTamerParser: corrupted size");
+    }
 
     for(size_t i=0; i<timeseries_.size(); i++)
     {
