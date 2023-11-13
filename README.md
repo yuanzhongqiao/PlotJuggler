@@ -122,8 +122,8 @@ sudo snap install plotjuggler
 
 When launching you have two options available:
 
-- `plotjuggler.ros` to load the ROS1 plugins
-- `plotjuggler.ros2` to load the ROS2 plugins
+- `plotjuggler.ros` to load the ROS1 plugins.
+- `plotjuggler.ros2` to load the ROS2 plugins.
 
 In addition, the command `plotjuggler` is an alias to `plotjuggler.ros`.
 If you'd prefer to alias `plotjuggler.ros2` instead,
