@@ -16,7 +16,7 @@
 
 namespace DataTamerParser {
 
-constexpr int SCHEMA_VERSION = 2;
+constexpr int SCHEMA_VERSION = 3;
 
 enum class BasicType
 {
@@ -70,6 +70,7 @@ struct Schema
     BasicType type = BasicType::OTHER;
     bool is_vector = 0;
     uint16_t array_size = 0;
+    std::string custom_type_name;
 
     bool operator==(const Field &other) const;
 
@@ -113,14 +114,19 @@ struct SnapshotView {
 
 bool GetBit(BufferSpan mask, size_t index);
 
+
+constexpr auto NullCustomCallback = [](const std::string&, const BufferSpan, const std::string&){};
 // Callback must be a std::function or lambda with signature:
 //
 // void(const std::string& name_field, const VarNumber& value)
 //
-template <typename Callback>
+// void(const std::string& name_field, const BufferSpan payload, const std::string& type_name)
+//
+template <typename NumberCallback, typename CustomCallback = decltype(NullCustomCallback)>
 bool ParseSnapshot(const Schema& schema,
                    SnapshotView snapshot,
-                   Callback& callback);
+                   const NumberCallback& callback_number,
+                   const CustomCallback& callback_custom = NullCustomCallback);
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -223,10 +229,19 @@ inline bool GetBit(BufferSpan mask, size_t index)
   const std::hash<bool> bool_hasher;
   const std::hash<uint16_t> uint_hasher;
 
-  hash ^= str_hasher(field.name) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-  hash ^= type_hasher(field.type) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-  hash ^= bool_hasher(field.is_vector) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
-  hash ^= uint_hasher(field.array_size) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+  auto combine = [&hash](const auto& hasher, const auto& val)
+  {
+    hash ^= hasher(val) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+  };
+
+  combine(str_hasher, field.name);
+  combine(type_hasher, field.type);
+  if(field.type == BasicType::OTHER)
+  {
+    combine(str_hasher, field.custom_type_name);
+  }
+  combine(bool_hasher, field.is_vector);
+  combine(uint_hasher, field.array_size);
   return hash;
 }
 
@@ -267,6 +282,11 @@ inline Schema BuilSchemaFromText(const std::string& txt)
     {
       continue;
     }
+    if(line == "---------")
+    {
+      // we are not interested to this section of the schema
+      break;
+    }
     if(line.find("__version__:") != std::string::npos)
     {
       // check compatibility
@@ -306,12 +326,13 @@ inline Schema BuilSchemaFromText(const std::string& txt)
         break;
       }
     }
+
+    auto offset = line.find_first_of(" [");
     if(field.type == BasicType::OTHER)
     {
-      throw std::runtime_error(std::string("Unrecognize line: ")+line);
+      field.custom_type_name = line.substr(0, offset);
     }
 
-    auto offset = ToStr(field.type).size();
     if(line[offset]=='[')
     {
       field.is_vector = true;
@@ -320,7 +341,7 @@ inline Schema BuilSchemaFromText(const std::string& txt)
       {
         // get number
         std::string sub_string = line.substr(offset+1, pos - offset);
-        field.array_size = std::stoi(sub_string);
+        field.array_size = static_cast<uint16_t>(std::stoi(sub_string));
       }
     }
     offset = line.find(' ', offset);
@@ -339,10 +360,11 @@ inline Schema BuilSchemaFromText(const std::string& txt)
   return schema;
 }
 
-template <typename Callback> inline
+template <typename NumberCallback, typename CustomCallback> inline
 bool ParseSnapshot(const Schema& schema,
                    SnapshotView snapshot,
-                   Callback& callback)
+                   const NumberCallback& callback_number,
+                   const CustomCallback& callback_custom)
 {
   if(schema.hash != snapshot.schema_hash)
   {
@@ -354,12 +376,18 @@ bool ParseSnapshot(const Schema& schema,
   {
     const auto& field = schema.fields[i];
     if(GetBit(snapshot.active_mask, i))
-    {
+    {     
       if(!field.is_vector)
       {
         // regular field, not vector/array
-        const auto var = DeserializeToVarNumber(field.type, buffer);
-        callback(field.name, var);
+        if(field.type == BasicType::OTHER)
+        {
+          callback_custom(field.name, snapshot.payload, field.custom_type_name);
+        }
+        else {
+          const auto var = DeserializeToVarNumber(field.type, buffer);
+          callback_number(field.name, var);
+        }
       }
       else
       {
@@ -373,8 +401,14 @@ bool ParseSnapshot(const Schema& schema,
           thread_local std::string tmp_name;
           tmp_name = field.name + "[" + std::to_string(a) + "]";
 
-          const auto var = DeserializeToVarNumber(field.type, buffer);
-          callback(tmp_name, var);
+          if(field.type == BasicType::OTHER)
+          {
+            callback_custom(tmp_name, snapshot.payload, field.custom_type_name);
+          }
+          else {
+            const auto var = DeserializeToVarNumber(field.type, buffer);
+            callback_number(tmp_name, var);
+          }
         }
       }
     }
