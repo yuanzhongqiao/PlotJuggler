@@ -2,6 +2,11 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* data_tamer added to rosx_introspection
+* Contributors: Davide Faconti
+
 3.8.0 (2023-11-12)
 ------------------
 * data_tamer updated
