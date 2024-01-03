@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.8.5 (2024-01-03)
+------------------
 * fix issue `#901 <https://github.com/facontidavide/PlotJuggler/issues/901>`_
 * Contributors: Davide Faconti
 
