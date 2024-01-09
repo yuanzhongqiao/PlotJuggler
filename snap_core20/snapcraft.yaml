@@ -28,7 +28,7 @@ package-repositories:
     url: http://packages.ros.org/ros/ubuntu
 
 apps:
-  plotjuggler:
+  plotjuggler-ros:
     command: usr/bin/launcher-plotjuggler-ros
     plugs: [network, network-bind, home, removable-media]
     extensions: [kde-neon]

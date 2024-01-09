@@ -1,14 +1,14 @@
-name: plotjuggler-ros2
-adopt-info: plotjuggler-ros2 # parse metadata from the plotjuggler part
+name: plotjuggler
+adopt-info: plotjuggler # parse metadata from the plotjuggler part
 summary: The timeseries visualization tool that you deserve
 description: |
   QT5 based application to display time series in plots,
   using an intuitive "drag and drop" interface.
 
   The snap comes with only ROS 2 plugins.
-  You can launch it with
+  You can launch it with:
 
-    $ plotjuggler-ros2
+    $ plotjuggler
 
 
 issues: https://github.com/facontidavide/plotjuggler/issues
@@ -19,7 +19,7 @@ confinement: strict
 base: core22
 
 apps:
-  plotjuggler-ros2:
+  plotjuggler:
     command: usr/bin/launcher-plotjuggler-ros2
     plugs: [network, network-bind, home, removable-media]
     extensions: [kde-neon, ros2-humble]
