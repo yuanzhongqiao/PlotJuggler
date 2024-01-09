@@ -508,12 +508,11 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
   bool parse_date_format = _ui->checkBoxDateFormat->isChecked();
   QString format_string = _ui->lineEditDateFormat->text();
 
-  auto ParseNumber = [&](QString str, bool& is_number, bool maybe_timestamp = false) {
-    QString str_trimmed = str.trimmed();
-    double val = 0.0;
-    // Support the case where the timestamp is in nanoseconds / microseconds
-    if(maybe_timestamp)
-    {
+  auto ParseTimestamp = [&](QString str, bool& is_number) {
+      QString str_trimmed = str.trimmed();
+      double val = 0.0;
+      is_number = false;
+      // Support the case where the timestamp is in nanoseconds / microseconds
       uint64_t ts = str_trimmed.toULong(&is_number);
       uint64_t first_ts = 1400000000; //May 13, 2014
       uint64_t last_ts  = 2000000000; // May 18, 2033
@@ -528,14 +527,32 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
           val = double(ts) * 1e-6;
         }
       }
-      else {
+      // Try a double value (seconds)
+      if (!is_number) {
         val = str_trimmed.toDouble(&is_number);
       }
-    }
-    else {
-      val = str_trimmed.toDouble(&is_number);
-    }
 
+      // handle numbers with comma instead of point as decimal separator
+      if (!is_number)
+      {
+          static QLocale locale_with_comma(QLocale::German);
+          val = locale_with_comma.toDouble(str_trimmed, &is_number);
+      }
+      if (!is_number && parse_date_format && !format_string.isEmpty())
+      {
+          QDateTime ts = QDateTime::fromString(str_trimmed, format_string);
+          is_number = ts.isValid();
+          if (is_number)
+          {
+              val = ts.toMSecsSinceEpoch() / 1000.0;
+          }
+      }
+      return val;
+  };
+
+  auto ParseNumber = [&](QString str, bool& is_number) {
+    QString str_trimmed = str.trimmed();
+    double val = val = str_trimmed.toDouble(&is_number);
     // handle numbers with comma instead of point as decimal separator
     if (!is_number)
     {
@@ -620,7 +637,7 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data
     {
       bool is_number = false;
       t_str = string_items[time_index];
-      timestamp = ParseNumber(t_str, is_number, true);
+      timestamp = ParseTimestamp(t_str, is_number);
       time_header_str = header_string_items[time_index];
 
       if (!is_number)
