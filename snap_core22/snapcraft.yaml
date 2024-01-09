@@ -1,5 +1,5 @@
-name: plotjuggler
-adopt-info: plotjuggler # parse metadata from the plotjuggler part
+name: plotjuggler-ros2
+adopt-info: plotjuggler-ros2 # parse metadata from the plotjuggler part
 summary: The timeseries visualization tool that you deserve
 description: |
   QT5 based application to display time series in plots,
@@ -8,7 +8,7 @@ description: |
   The snap comes with only ROS 2 plugins.
   You can launch it with
 
-    $ plotjuggler
+    $ plotjuggler-ros2
 
 
 issues: https://github.com/facontidavide/plotjuggler/issues
@@ -19,7 +19,7 @@ confinement: strict
 base: core22
 
 apps:
-  plotjuggler:
+  plotjuggler-ros2:
     command: usr/bin/launcher-plotjuggler-ros2
     plugs: [network, network-bind, home, removable-media]
     extensions: [kde-neon, ros2-humble]
