@@ -6,7 +6,6 @@
 
 #include <functional>
 #include <stdio.h>
-#include <numeric>
 
 #include <QApplication>
 #include <QActionGroup>
@@ -42,7 +41,6 @@
 #include "curvelist_panel.h"
 #include "tabbedplotwidget.h"
 #include "PlotJuggler/plotdata.h"
-#include "qwt_plot_canvas.h"
 #include "transforms/function_editor.h"
 #include "transforms/lua_custom_function.h"
 #include "utils.h"
@@ -1369,7 +1367,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   filenames.sort();
   std::map<QString, QString> filename_prefix;
 
-  if (filenames.size() > 1)
+  if (filenames.size() > 1 || ui->checkBoxAddPrefixAndMerge->isChecked())
   {
     DialogMultifilePrefix dialog(filenames, this);
     int ret = dialog.exec();
@@ -1409,7 +1407,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   {
     data_replaced_entirely = true;
   }
-  else
+  else if(!ui->checkBoxAddPrefixAndMerge->isChecked())
   {
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(
