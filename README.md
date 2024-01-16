@@ -77,7 +77,7 @@ If you want a simple example to learn how to write your own plugins, have a look
 
 ## Installation
 
-## Install with Snap (recommended in Ubuntu, even for ROS users)
+## Snap (recommended in Ubuntu, even for ROS users)
 
 The snap contains a version of PlotJuggler that can work with either ROS1 or ROS2. 
 
