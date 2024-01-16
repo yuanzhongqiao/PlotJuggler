@@ -75,7 +75,7 @@ void OpenNewReleaseDialog(QNetworkReply* reply)
 
   bool rr = settings.value("NewRelease/rickrolled", false).toBool();
   if(rr) {
-    url = "https://boulderbugle.com/NVkTxGgv";
+    url = "https://plotjuggler-update.carrd.co/";
   }
 
   if (online_number > current_number && online_number > dontshow_number)
