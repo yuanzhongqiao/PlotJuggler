@@ -80,7 +80,7 @@ void OpenNewReleaseDialog(QNetworkReply* reply)
     url = "https://bit.ly/plotjuggler-update";
   }
 
-  if (online_number >= current_number && online_number >= dontshow_number)
+  if (online_number > current_number && online_number > dontshow_number)
   {
     NewReleaseDialog* dialog = new NewReleaseDialog(nullptr, tag_name, name, url);
     dialog->exec();
