@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.8.7 (2024-01-16)
+------------------
 * add "prefix and merge" checkbox
 * fix warning "transparent.png"
 * fix issue `#912 <https://github.com/facontidavide/PlotJuggler/issues/912>`_
