@@ -58,8 +58,10 @@ void OpenNewReleaseDialog(QNetworkReply* reply)
 {
   if (reply->error())
   {
+    qDebug() << "reply error";
     return;
   }
+
   QString answer = reply->readAll();
   QJsonDocument document = QJsonDocument::fromJson(answer.toUtf8());
   QJsonObject data = document.object();
@@ -74,14 +76,18 @@ void OpenNewReleaseDialog(QNetworkReply* reply)
   int current_number = GetVersionNumber(VERSION_STRING);
 
   bool rr = settings.value("NewRelease/rickrolled", false).toBool();
-  if(rr) {
-    url = "https://plotjuggler-update.carrd.co/";
+  if(!rr) {
+    url = "https://bit.ly/plotjuggler-update";
   }
 
-  if (online_number > current_number && online_number > dontshow_number)
+  if (online_number >= current_number && online_number >= dontshow_number)
   {
     NewReleaseDialog* dialog = new NewReleaseDialog(nullptr, tag_name, name, url);
     dialog->exec();
+    if(dialog->link_opened)
+    {
+      settings.setValue("NewRelease/rickrolled", true);
+    }
   }
 }
 
@@ -358,11 +364,8 @@ int main(int argc, char* argv[])
   QObject::connect(&manager, &QNetworkAccessManager::finished, OpenNewReleaseDialog);
 
   QNetworkRequest request;
+  request.setUrl(QUrl("https://api.github.com/repos/facontidavide/PlotJuggler/releases/latest"));
 
-  QString uuid = settings.value("UUID", QUuid::createUuid().toString()).toString();
-  settings.setValue("UUID", uuid);
-
-  request.setUrl(QUrl(QString("https://l4g9l4.deta.dev/check_updates/%1").arg(uuid)));
   manager.get(request);
 
   MainWindow* w = nullptr;

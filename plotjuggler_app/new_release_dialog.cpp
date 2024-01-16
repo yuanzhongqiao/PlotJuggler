@@ -20,8 +20,7 @@ NewReleaseDialog::NewReleaseDialog(QWidget* parent, QString release, QString tit
 
   connect(ui->pushButtonWeb, &QPushButton::clicked, this, [=] {
       QDesktopServices::openUrl(QUrl(url));
-      QSettings settings;
-      settings.setValue("NewRelease/rickrolled", true);
+      link_opened = true;
   });
 
   connect(ui->buttonBox, &QDialogButtonBox::rejected, this, [=] {
@@ -32,7 +31,6 @@ NewReleaseDialog::NewReleaseDialog(QWidget* parent, QString release, QString tit
     }
   });
 
-  ui->labelRelease->setText(release);
   ui->labelTitle->setText(title);
 }
 
