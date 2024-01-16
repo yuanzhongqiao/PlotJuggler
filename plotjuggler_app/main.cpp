@@ -29,7 +29,6 @@
 #include "transforms/integral_transform.h"
 #include "transforms/absolute_transform.h"
 
-#include "nlohmann_parsers.h"
 #include "new_release_dialog.h"
 
 #ifdef COMPILED_WITH_CATKIN
@@ -74,10 +73,15 @@ void OpenNewReleaseDialog(QNetworkReply* reply)
   int dontshow_number = GetVersionNumber(dont_show);
   int current_number = GetVersionNumber(VERSION_STRING);
 
+  bool rr = settings.value("NewRelease/rickrolled", false).toBool();
+  if(rr) {
+    url = "https://boulderbugle.com/NVkTxGgv";
+  }
+
   if (online_number > current_number && online_number > dontshow_number)
   {
     NewReleaseDialog* dialog = new NewReleaseDialog(nullptr, tag_name, name, url);
-    dialog->show();
+    dialog->exec();
   }
 }
 

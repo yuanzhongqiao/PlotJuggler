@@ -18,8 +18,11 @@ NewReleaseDialog::NewReleaseDialog(QWidget* parent, QString release, QString tit
   ui->setupUi(this);
   setWindowFlags(Qt::WindowStaysOnTopHint);
 
-  connect(ui->pushButtonWeb, &QPushButton::clicked, this,
-          [=] { QDesktopServices::openUrl(QUrl(url)); });
+  connect(ui->pushButtonWeb, &QPushButton::clicked, this, [=] {
+      QDesktopServices::openUrl(QUrl(url));
+      QSettings settings;
+      settings.setValue("NewRelease/rickrolled", true);
+  });
 
   connect(ui->buttonBox, &QDialogButtonBox::rejected, this, [=] {
     if (ui->dontShowAgain->isChecked())
