@@ -758,8 +758,12 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       }
       else if (message_parser)
       {
-        _parser_factories.insert(
-            std::make_pair(message_parser->encoding(), message_parser));
+        QStringList encodings = QString(message_parser->encoding()).split(";");
+        auto parser_ptr = std::shared_ptr<ParserFactoryPlugin>(message_parser);
+        for(const QString& encoding: encodings)
+        {
+          _parser_factories[encoding] = parser_ptr;
+        }
       }
       else if (streamer)
       {
