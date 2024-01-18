@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.8.8 (2024-01-18)
+------------------
 * new update screen
 * Update README.md
 * dig diagnostic messages
