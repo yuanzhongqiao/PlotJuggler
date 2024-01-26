@@ -9,6 +9,7 @@
 #include <QInputDialog>
 #include <QPushButton>
 #include "QSyntaxStyle"
+#include <array>
 #include "datetimehelp.h"
 
 #include <QStandardItemModel>
@@ -353,7 +354,7 @@ int DataLoadCSV::launchDialog(QFile& file, std::vector<std::string>* column_name
   QObject* context = pcontext.get();
   QObject::connect(_ui->comboBox, qOverload<int>(&QComboBox::currentIndexChanged),
                    context, [&](int index) {
-                     constexpr std::array<char,4> delimiters = {',', ';', ' ', '\t'};
+                     const std::array<char,4> delimiters = {',', ';', ' ', '\t'};
                      _delimiter = delimiters[std::clamp(index, 0, 3)];
                      _csvHighlighter.delimiter = _delimiter;
                      parseHeader(file, *column_names);
