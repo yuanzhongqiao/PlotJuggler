@@ -152,7 +152,7 @@ bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timest
       if(msg == "Floating point truncated")
       {
         msg += ".\n\nYou can disable this check in:\n"
-               "Preferences->Behavior->Parsing";
+               "App -> Preferences... -> Behavior -> Parsing";
       }
       throw std::runtime_error(msg);
     }
