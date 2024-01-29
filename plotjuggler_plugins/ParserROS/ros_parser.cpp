@@ -128,7 +128,34 @@ bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timest
   {
     key.toStr(series_name);
     PlotData& data = getSeries(series_name);
-    data.pushBack({ timestamp, value.convert<double>() });
+
+    if(!_strict_truncation_check)
+    {
+      // bypass the truncation check
+      if(value.getTypeID() == BuiltinType::INT64)
+      {
+        data.pushBack({ timestamp, double(value.convert<int64_t>()) });
+        continue;
+      }
+      if(value.getTypeID() == BuiltinType::UINT64)
+      {
+        data.pushBack({ timestamp, double(value.convert<uint64_t>()) });
+        continue;
+      }
+    }
+    try{
+      data.pushBack({ timestamp, value.convert<double>() });
+    }
+    catch(RangeException& ex)
+    {
+      std::string msg = std::string(ex.what());
+      if(msg == "Floating point truncated")
+      {
+        msg += ".\n\nYou can disable this check in:\n"
+               "Preferences->Behavior->Parsing";
+      }
+      throw std::runtime_error(msg);
+    }
   }
   return true;
 }
