@@ -46,7 +46,7 @@ bool DataLoadULog::readDataFromFile(FileLoadInfo* fileload_info,
   ULogParser parser(datastream);
 
   const auto& timeseries_map = parser.getTimeseriesMap();
-
+  auto min_msg_time = std::numeric_limits<double>::max();
   for (const auto& it : timeseries_map)
   {
     const std::string& sucsctiption_name = it.first;
@@ -61,9 +61,25 @@ bool DataLoadULog::readDataFromFile(FileLoadInfo* fileload_info,
       for (size_t i = 0; i < data.second.size(); i++)
       {
         double msg_time = static_cast<double>(timeseries.timestamps[i]) * 0.000001;
+        min_msg_time = std::min(min_msg_time, msg_time);
         PlotData::Point point(msg_time, data.second[i]);
         series->second.pushBack(point);
       }
+    }
+  }
+
+  for (const auto& param : parser.getParameters())
+  {
+    if (param.val_type == ULogParser::FLOAT ||
+        param.val_type == ULogParser::DOUBLE)
+    {
+      auto series = plot_data.addNumeric("_parameters/" + param.name);
+      series->second.pushBack({min_msg_time, param.value.val_real});
+    }
+    else if(param.val_type != ULogParser::OTHER)
+    {
+      auto series = plot_data.addNumeric("_parameters/" + param.name);
+      series->second.pushBack({min_msg_time, double(param.value.val_int)});
     }
   }
 
