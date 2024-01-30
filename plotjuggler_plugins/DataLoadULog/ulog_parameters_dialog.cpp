@@ -29,11 +29,9 @@ ULogParametersDialog::ULogParametersDialog(const ULogParser& parser, QWidget* pa
   {
     table_params->setItem(row, 0,
                           new QTableWidgetItem(QString::fromStdString(param.name)));
-    QString value_str = QString::number(param.value.val_int);
-    if (param.val_type == ULogParser::FLOAT || param.val_type == ULogParser::DOUBLE)
-    {
-      value_str = QString::number(param.value.val_real);
-    }
+    QString value_str = (param.val_type == ULogParser::FLOAT) ?
+                            QString::number(param.value.val_real) :
+                            QString::number(param.value.val_int);
     table_params->setItem(row, 1, new QTableWidgetItem(value_str));
     row++;
   }

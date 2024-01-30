@@ -68,19 +68,14 @@ bool DataLoadULog::readDataFromFile(FileLoadInfo* fileload_info,
     }
   }
 
+  // store parameters as a timeseries with a single point
   for (const auto& param : parser.getParameters())
   {
-    if (param.val_type == ULogParser::FLOAT ||
-        param.val_type == ULogParser::DOUBLE)
-    {
-      auto series = plot_data.addNumeric("_parameters/" + param.name);
-      series->second.pushBack({min_msg_time, param.value.val_real});
-    }
-    else if(param.val_type != ULogParser::OTHER)
-    {
-      auto series = plot_data.addNumeric("_parameters/" + param.name);
-      series->second.pushBack({min_msg_time, double(param.value.val_int)});
-    }
+    auto series = plot_data.addNumeric("_parameters/" + param.name);
+    double value = (param.val_type == ULogParser::FLOAT) ?
+                       double(param.value.val_real) :
+                       double(param.value.val_int);
+    series->second.pushBack({min_msg_time, value});
   }
 
   ULogParametersDialog* dialog = new ULogParametersDialog(parser, _main_win);
