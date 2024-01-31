@@ -9,7 +9,6 @@
 
 #include <QFile>
 
-#include <functional>
 #include "PlotJuggler/plotdata.h"
 #include "PlotJuggler/pj_plugin.h"
 #include "PlotJuggler/messageparser_base.h"

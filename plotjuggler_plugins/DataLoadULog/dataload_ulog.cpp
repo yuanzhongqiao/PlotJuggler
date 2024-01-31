@@ -5,9 +5,8 @@
 #include <QDebug>
 #include <QWidget>
 #include <QSettings>
-#include <QProgressDialog>
 #include <QMainWindow>
-#include "selectlistdialog.h"
+
 #include "ulog_parser.h"
 #include "ulog_parameters_dialog.h"
 
