@@ -113,7 +113,7 @@ QPixmap getFunnySplashscreen()
   srand(time(nullptr));
 
   auto getNum = []() {
-    const int last_image_num = 89;
+    const int last_image_num = 93;
     int n = rand() % (last_image_num + 2);
     if (n > last_image_num)
     {
