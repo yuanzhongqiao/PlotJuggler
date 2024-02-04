@@ -5,12 +5,15 @@ if(BUILDING_WITH_VCPKG)
     set(MOSQUITTO_FOUND ON)
 elseif(BUILDING_WITH_CONAN)
     message(STATUS "Finding MOSQUITTO with conan")
-    find_package(mosquitto CONFIG REQUIRED)
+    find_package(mosquitto REQUIRED)
     set(MOSQUITTO_FOUND ON)
+    set(MOSQUITTO_LIBS mosquitto::mosquitto)
 else()
     message(STATUS "Finding MOSQUITTO without package managers")
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
     find_package(Mosquitto REQUIRED)
+    set(MOSQUITTO_LIBS ${MOSQUITTO_LIBRARIES})
+    include_directories( ${MOSQUITTO_INCLUDE_DIR} )
 endif()
 
 if(MOSQUITTO_FOUND)
@@ -36,11 +39,9 @@ if(MOSQUITTO_FOUND)
         ${Qt5Widgets_LIBRARIES}
         Qt5::Network
         Qt5::Svg
-        ${MOSQUITTO_LIBRARIES}
+        ${MOSQUITTO_LIBS}
         plotjuggler_base
         )
-    target_include_directories(DataStreamMQTT_Mosquitto
-        PUBLIC ${MOSQUITTO_INCLUDE_DIR})
 
     install(TARGETS DataStreamMQTT_Mosquitto
         DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY}  )
