@@ -186,7 +186,7 @@
             <number>4</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1,0">
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1,0,0">
              <item>
               <widget class="QLabel" name="label_4">
                <property name="text">
@@ -195,7 +195,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButtonLoadDatafile">
+              <widget class="QPushButton" name="buttonLoadDatafile">
                <property name="minimumSize">
                 <size>
                  <width>26</width>
@@ -240,6 +240,32 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="buttonReloadData">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Quick Reload&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Reload the last file, keeping exactly the same configuration.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resource.qrc">
+                 <normaloff>:/resources/svg/reload.svg</normaloff>:/resources/svg/reload.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>22</width>
+                 <height>22</height>
+                </size>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QPushButton" name="buttonRecentData">
@@ -310,7 +336,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButtonLoadLayout">
+              <widget class="QPushButton" name="buttonLoadLayout">
                <property name="minimumSize">
                 <size>
                  <width>26</width>
@@ -344,7 +370,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButtonSaveLayout">
+              <widget class="QPushButton" name="buttonSaveLayout">
                <property name="minimumSize">
                 <size>
                  <width>26</width>
@@ -1121,7 +1147,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonZoomOut">
+                <widget class="QPushButton" name="buttonZoomOut">
                  <property name="minimumSize">
                   <size>
                    <width>28</width>
@@ -1155,7 +1181,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonTimeTracker">
+                <widget class="QPushButton" name="buttonTimeTracker">
                  <property name="minimumSize">
                   <size>
                    <width>28</width>
@@ -1196,7 +1222,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonLegend">
+                <widget class="QPushButton" name="buttonLegend">
                  <property name="minimumSize">
                   <size>
                    <width>28</width>
@@ -1230,7 +1256,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonUseDateTime">
+                <widget class="QPushButton" name="buttonUseDateTime">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1277,7 +1303,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonActivateGrid">
+                <widget class="QPushButton" name="buttonActivateGrid">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -1327,7 +1353,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonLink">
+                <widget class="QPushButton" name="buttonLink">
                  <property name="minimumSize">
                   <size>
                    <width>28</width>
@@ -1367,7 +1393,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonRemoveTimeOffset">
+                <widget class="QPushButton" name="buttonRemoveTimeOffset">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1417,7 +1443,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="pushButtonRatio">
+                <widget class="QPushButton" name="buttonRatio">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -1593,7 +1619,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButtonPlay">
+                   <widget class="QPushButton" name="buttonPlay">
                     <property name="minimumSize">
                      <size>
                       <width>28</width>

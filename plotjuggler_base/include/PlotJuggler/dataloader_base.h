@@ -22,7 +22,7 @@ struct FileLoadInfo
   /// prefix to be added to the name of the series (optional)
   QString prefix;
   /// Optional list of pre-selected datasource
-  QStringList selected_datasources;
+  [[deprecated]] QStringList selected_datasources;
   /// Saved configuration from a previous run or a Layout file
   QDomDocument plugin_config;
 };
