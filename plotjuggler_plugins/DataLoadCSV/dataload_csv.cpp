@@ -16,7 +16,7 @@
 
 static constexpr int TIME_INDEX_NOT_DEFINED = -2;
 static constexpr int TIME_INDEX_GENERATED = -1;
-static constexpr char* INDEX_AS_TIME = "__TIME_INDEX_GENERATED__";
+static constexpr const char* INDEX_AS_TIME = "__TIME_INDEX_GENERATED__";
 
 void SplitLine(const QString& line, QChar separator, QStringList& parts)
 {
