@@ -147,6 +147,8 @@ MainWindow::MainWindow(const QCommandLineParser& commandline_parser, QWidget* pa
   ui->buttonRemoveTimeOffset->setText("");
   ui->buttonLegend->setText("");
 
+  ui->widgetStatusBar->setHidden(true);
+
   if (commandline_parser.isSet("buffer_size"))
   {
     int buffer_size = std::max(10, commandline_parser.value("buffer_size").toInt());
@@ -1778,6 +1780,13 @@ void MainWindow::enableStreamingNotificationsButton(bool enabled)
     ui->buttonStreamingNotifications->setIcon(
         LoadSvg(":/resources/svg/alarm-bell.svg", theme));
   }
+}
+
+void MainWindow::setStatusBarMessage(QString message)
+{
+  ui->statusLabel->setText(message);
+  ui->widgetStatusBar->setHidden(message.isEmpty());
+  QTimer::singleShot( 5000, this, [this]() { ui->widgetStatusBar->setHidden(true); } );
 }
 
 void MainWindow::loadStyleSheet(QString file_path)
@@ -3506,5 +3515,11 @@ void MainWindow::on_buttonReloadData_clicked()
     loadDataFromFile(info);
   }
   ui->buttonReloadData->setEnabled(!_loaded_datafiles_previous.empty());
+}
+
+
+void MainWindow::on_buttonCloseStatus_clicked()
+{
+  ui->widgetStatusBar->hide();
 }
 

@@ -52,6 +52,8 @@ public:
   void startStreamingPlugin(QString streamer_name);
   void enableStreamingNotificationsButton(bool enabled);
 
+  void setStatusBarMessage(QString message);
+
 public slots:
 
   void resizeEvent(QResizeEvent*);
@@ -285,6 +287,8 @@ private slots:
   void on_actionColorMap_Editor_triggered();
 
   void on_buttonReloadData_clicked();
+
+  void on_buttonCloseStatus_clicked();
 
 private:
   QStringList readAllCurvesFromXML(QDomElement root_node);
