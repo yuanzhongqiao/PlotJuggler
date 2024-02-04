@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.9.0 (2024-02-04)
+------------------
 * new status bar with messages from the internet
 * Merge branch 'ulog_improvement'
 * new memes
