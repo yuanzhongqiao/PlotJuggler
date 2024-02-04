@@ -467,7 +467,6 @@ int main(int argc, char* argv[])
                    {
                      if (reply->error())
                      {
-                       qDebug() << "reply error";
                        return;
                      }
                      QString answer = reply->readAll();
@@ -481,7 +480,6 @@ int main(int argc, char* argv[])
   request_message.setUrl(QUrl("https://fastapi-example-7kz3.onrender.com"));
   manager_message.get(request_message);
 
-  window->setStatusBarMessage("Email dfaconti@gmail.com");
 
   return app.exec();
 }
