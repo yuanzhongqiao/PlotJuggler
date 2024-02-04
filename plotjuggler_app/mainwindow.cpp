@@ -1786,7 +1786,7 @@ void MainWindow::setStatusBarMessage(QString message)
 {
   ui->statusLabel->setText(message);
   ui->widgetStatusBar->setHidden(message.isEmpty());
-  QTimer::singleShot( 5000, this, [this]() { ui->widgetStatusBar->setHidden(true); } );
+  QTimer::singleShot( 10000, this, [this]() { ui->widgetStatusBar->setHidden(true); } );
 }
 
 void MainWindow::loadStyleSheet(QString file_path)
