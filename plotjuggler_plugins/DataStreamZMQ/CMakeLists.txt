@@ -4,7 +4,6 @@ elseif(BUILDING_WITH_CONAN)
     message(STATUS "Finding ZeroMQ with conan")
 else()
     message(STATUS "Finding ZeroMQ without package managers")
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
     set(ZeroMQ_LIBS ${ZeroMQ_LIBRARIES})
 endif()
 
