@@ -2,8 +2,8 @@
 Changelog for package plotjuggler
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.9.1 (2024-02-20)
+------------------
 * embed zstd 1.5.5
 * updated lz4 1.9.4
 * PlotJuggler with Fast-CDR-2.x.x (`#932 <https://github.com/facontidavide/PlotJuggler/issues/932>`_)
