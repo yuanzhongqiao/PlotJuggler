@@ -51,22 +51,10 @@ std::optional<PJ::PlotData::Point> SamplesCountFilter::calculateNextPoint(size_t
     if(dataSource()->size() == 0) {
         return std::nullopt;
     }
-    const double delta = 0.001 * double(ui->spinBoxMilliseconds->value());
-    const auto& point = dataSource()->at(index);
-    if(index == 0) {
-        interval_end_ = point.x + delta;
-        count_ = 0;
-    }
-    count_++;
 
-    if(point.x > interval_end_ || index == (dataSource()->size() - 1))
-    {
-        auto out = PJ::PlotData::Point{ interval_end_, double(count_) };
-        while(point.x > interval_end_) {
-            interval_end_ += delta;
-        }
-        count_ = 0;
-        return out;
-    }
-    return std::nullopt;
+    const auto& point = dataSource()->at(index);
+    const double delta = 0.001 * double(ui->spinBoxMilliseconds->value());
+    const double min_time = point.x - delta;
+    auto min_index = dataSource()->getIndexFromX(min_time);
+    return PJ::PlotData::Point{ point.x, double(index - min_index) };
 }
