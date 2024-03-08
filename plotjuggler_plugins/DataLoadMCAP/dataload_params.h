@@ -2,7 +2,8 @@
 
 #include <QStringList>
 
-namespace mcap {
+namespace mcap
+{
 
 struct LoadParams
 {
@@ -12,6 +13,4 @@ struct LoadParams
   bool use_timestamp = false;
 };
 
-}
-
-
+}  // namespace mcap

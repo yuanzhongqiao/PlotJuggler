@@ -215,7 +215,7 @@ Changelog for package plotjuggler
 3.6.0 (2022-08-13)
 ------------------
 * More memes
-* Refactoring of the MessageParser plugins 
+* Refactoring of the MessageParser plugins
 * Mcap support (`#722 <https://github.com/facontidavide/PlotJuggler/issues/722>`_)
 * Improve CSV loader error handling (`#721 <https://github.com/facontidavide/PlotJuggler/issues/721>`_)
 * Fix plotwidget drag and drop bug (Issue `#716 <https://github.com/facontidavide/PlotJuggler/issues/716>`_) (`#717 <https://github.com/facontidavide/PlotJuggler/issues/717>`_)
@@ -1527,7 +1527,7 @@ Changelog for package plotjuggler
 0.10.0 (2017-02-12)
 -------------------
 * auto loading of streamer based on saved layout
-* refactoring of the ROS plugins 
+* refactoring of the ROS plugins
 * REFACTORING to allow future improvements of drag&drop
 * trying to fix a compilation problem
 * Update README.md

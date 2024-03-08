@@ -148,8 +148,7 @@ const std::vector<const char*>& DataLoadCSV::compatibleFileExtensions() const
   return _extensions;
 }
 
-void DataLoadCSV::parseHeader(QFile& file,
-                              std::vector<std::string>& column_names)
+void DataLoadCSV::parseHeader(QFile& file, std::vector<std::string>& column_names)
 {
   file.open(QFile::ReadOnly);
 
@@ -356,7 +355,7 @@ int DataLoadCSV::launchDialog(QFile& file, std::vector<std::string>* column_name
   QObject* context = pcontext.get();
   QObject::connect(_ui->comboBox, qOverload<int>(&QComboBox::currentIndexChanged),
                    context, [&](int index) {
-                     const std::array<char,4> delimiters = {',', ';', ' ', '\t'};
+                     const std::array<char, 4> delimiters = { ',', ';', ' ', '\t' };
                      _delimiter = delimiters[std::clamp(index, 0, 3)];
                      _csvHighlighter.delimiter = _delimiter;
                      parseHeader(file, *column_names);
@@ -404,8 +403,7 @@ int DataLoadCSV::launchDialog(QFile& file, std::vector<std::string>* column_name
   return TIME_INDEX_NOT_DEFINED;
 }
 
-bool DataLoadCSV::readDataFromFile(FileLoadInfo* info,
-                                   PlotDataMapRef& plot_data)
+bool DataLoadCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data)
 {
   multiple_columns_warning_ = true;
 
@@ -499,25 +497,29 @@ bool DataLoadCSV::readDataFromFile(FileLoadInfo* info,
     is_number = false;
     // Support the case where the timestamp is in nanoseconds / microseconds
     int64_t ts = str_trimmed.toLong(&is_number);
-    const int64_t first_ts = 1400000000; // July 14, 2017
-    const int64_t last_ts  = 2000000000; // May 18, 2033
-    if(is_number)
+    const int64_t first_ts = 1400000000;  // July 14, 2017
+    const int64_t last_ts = 2000000000;   // May 18, 2033
+    if (is_number)
     {
       // check if it is an absolute time in nanoseconds.
       // convert to seconds if it is
-      if(ts > first_ts*1e9 && ts < last_ts*1e9) {
+      if (ts > first_ts * 1e9 && ts < last_ts * 1e9)
+      {
         val = double(ts) * 1e-9;
       }
-      else if(ts > first_ts*1e6 && ts < last_ts*1e6) {
+      else if (ts > first_ts * 1e6 && ts < last_ts * 1e6)
+      {
         // check if it is an absolute time in microseconds.
         // convert to seconds if it is
         val = double(ts) * 1e-6;
       }
-      else {
+      else
+      {
         val = double(ts);
       }
     }
-    else {
+    else
+    {
       // Try a double value (seconds)
       val = str_trimmed.toDouble(&is_number);
     }

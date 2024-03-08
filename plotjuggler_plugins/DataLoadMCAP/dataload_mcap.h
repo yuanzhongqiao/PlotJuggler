@@ -30,8 +30,7 @@ public:
     return "DataLoad MCAP";
   }
 
-  bool xmlSaveState(QDomDocument& doc,
-                    QDomElement& parent_element) const override;
+  bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
 
   bool xmlLoadState(const QDomElement& parent_element) override;
 

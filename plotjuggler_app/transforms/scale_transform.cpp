@@ -6,9 +6,9 @@ ScaleTransform::ScaleTransform() : _widget(new QWidget()), ui(new Ui::ScaleTrans
 {
   ui->setupUi(_widget);
 
-  ui->lineEditTimeOffset->setValidator( new QDoubleValidator() );
-  ui->lineEditValueOffset->setValidator( new QDoubleValidator() );
-  ui->lineEditValueScale->setValidator( new QDoubleValidator() );
+  ui->lineEditTimeOffset->setValidator(new QDoubleValidator());
+  ui->lineEditValueOffset->setValidator(new QDoubleValidator());
+  ui->lineEditValueScale->setValidator(new QDoubleValidator());
 
   connect(ui->buttonDegRad, &QPushButton::clicked, this, [=]() {
     const double deg_rad = 3.14159265359 / 180;
@@ -55,7 +55,7 @@ bool ScaleTransform::xmlSaveState(QDomDocument& doc, QDomElement& parent_element
 bool ScaleTransform::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement widget_el = parent_element.firstChildElement("options");
-  if(widget_el.isNull())
+  if (widget_el.isNull())
   {
     return false;
   }

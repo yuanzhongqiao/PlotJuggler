@@ -27,9 +27,10 @@ DataLoadMCAP::~DataLoadMCAP()
 {
 }
 
-bool DataLoadMCAP::xmlSaveState(QDomDocument &doc, QDomElement &parent_element) const
+bool DataLoadMCAP::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const
 {
-  if(!_dialog_parameters) {
+  if (!_dialog_parameters)
+  {
     return false;
   }
   QDomElement elem = doc.createElement("parameters");
@@ -43,7 +44,7 @@ bool DataLoadMCAP::xmlSaveState(QDomDocument &doc, QDomElement &parent_element) 
   return true;
 }
 
-bool DataLoadMCAP::xmlLoadState(const QDomElement &parent_element)
+bool DataLoadMCAP::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement elem = parent_element.firstChildElement("parameters");
   if (elem.isNull())
@@ -170,7 +171,7 @@ bool DataLoadMCAP::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_dat
   }
 
   // don't show the dialog if we already loaded the parameters with xmlLoadState
-  if(!_dialog_parameters)
+  if (!_dialog_parameters)
   {
     DialogMCAP dialog(channels, mcap_schemas, _dialog_parameters);
     auto ret = dialog.exec();

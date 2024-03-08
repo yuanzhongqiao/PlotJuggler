@@ -30,8 +30,7 @@
 //-------------------------------------------------
 
 CurveListPanel::CurveListPanel(PlotDataMapRef& mapped_plot_data,
-			       const TransformsMap& mapped_math_plots,
-			       QWidget* parent)
+                               const TransformsMap& mapped_math_plots, QWidget* parent)
   : QWidget(parent)
   , ui(new Ui::CurveListPanel)
   , _plot_data(mapped_plot_data)
@@ -562,10 +561,12 @@ void CurveListPanel::on_pushButtonTrash_clicked(bool)
   QSettings settings;
   QString theme = settings.value("StyleSheet::theme", "light").toString();
 
-  QPushButton* buttonAll = msgBox.addButton(tr("Delete All"), QMessageBox::DestructiveRole);
+  QPushButton* buttonAll =
+      msgBox.addButton(tr("Delete All"), QMessageBox::DestructiveRole);
   buttonAll->setIcon(LoadSvg(":/resources/svg/clear.svg"));
 
-  QPushButton* buttonPoints = msgBox.addButton(tr("Delete Points"), QMessageBox::DestructiveRole);
+  QPushButton* buttonPoints =
+      msgBox.addButton(tr("Delete Points"), QMessageBox::DestructiveRole);
   buttonPoints->setIcon(LoadSvg(":/resources/svg/point_chart.svg"));
 
   msgBox.addButton(QMessageBox::Cancel);

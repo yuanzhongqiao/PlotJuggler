@@ -77,24 +77,25 @@ bool DataStreamZMQ::start(QStringList*)
 
   QString previous_address = address;
 
-  connect(dialog->ui->radioConnect, &QRadioButton::toggled, dialog, [&](bool toggled)
-          {
-            dialog->ui->lineEditAddress->setEnabled(toggled);
-            if(toggled)
-            {
-              dialog->ui->lineEditAddress->setText(previous_address);
-            }
-            else {
-              previous_address = dialog->ui->lineEditAddress->text();
-              dialog->ui->lineEditAddress->setText("*");
-            }
-          });
+  connect(dialog->ui->radioConnect, &QRadioButton::toggled, dialog, [&](bool toggled) {
+    dialog->ui->lineEditAddress->setEnabled(toggled);
+    if (toggled)
+    {
+      dialog->ui->lineEditAddress->setText(previous_address);
+    }
+    else
+    {
+      previous_address = dialog->ui->lineEditAddress->text();
+      dialog->ui->lineEditAddress->setText("*");
+    }
+  });
 
-  if(is_connect)
+  if (is_connect)
   {
     dialog->ui->radioConnect->setChecked(true);
   }
-  else {
+  else
+  {
     dialog->ui->radioBind->setChecked(true);
   }
 
@@ -148,9 +149,10 @@ bool DataStreamZMQ::start(QStringList*)
   settings.setValue("ZMQ_Subscriber::topics", topics);
   settings.setValue("ZMQ_Subscriber::is_connect", is_connect);
 
-  QString addr = dialog->ui->comboBox->currentText() + address + ":" + QString::number(port);
+  QString addr =
+      dialog->ui->comboBox->currentText() + address + ":" + QString::number(port);
   _socket_address = addr.toStdString();
-  if(is_connect)
+  if (is_connect)
   {
     _zmq_socket.connect(_socket_address.c_str());
   }

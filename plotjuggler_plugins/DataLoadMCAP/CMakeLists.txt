@@ -17,4 +17,3 @@ target_link_libraries(DataLoadMCAP
     plotjuggler_base )
 
 install(TARGETS DataLoadMCAP DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY}  )
-

@@ -142,7 +142,7 @@ public:
   {
     const std::string name = T::transformName();
     instance()->names_.insert(name);
-    auto doc_it = instance()->default_params_.insert( {name, {}} ).first;
+    auto doc_it = instance()->default_params_.insert({ name, {} }).first;
     QDomDocument* document = &(doc_it->second);
     instance()->creators_[name] = [document]() {
       auto trans = std::make_shared<T>();
@@ -156,7 +156,7 @@ public:
                 transform->xmlSaveState(*document, root);
               });
       auto root = document->firstChildElement("root");
-      if(!root.isNull())
+      if (!root.isNull())
       {
         QSignalBlocker block(trans.get());
         trans->xmlLoadState(root);

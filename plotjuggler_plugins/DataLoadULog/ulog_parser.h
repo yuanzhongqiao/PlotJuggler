@@ -74,7 +74,7 @@ public:
     } value;
     FormatType val_type;
 
-    bool readFromBuffer(const char *message);
+    bool readFromBuffer(const char* message);
   };
 
   struct Format

@@ -13,33 +13,32 @@ class SamplesCount;
 class SamplesCountFilter : public TransformFunction_SISO
 {
 public:
-    explicit SamplesCountFilter();
+  explicit SamplesCountFilter();
 
-    ~SamplesCountFilter() override;
+  ~SamplesCountFilter() override;
 
-    static const char* transformName()
-    {
-        return "Samples Counter";
-    }
+  static const char* transformName()
+  {
+    return "Samples Counter";
+  }
 
-    const char* name() const override
-    {
-        return transformName();
-    }
+  const char* name() const override
+  {
+    return transformName();
+  }
 
-    QWidget* optionsWidget() override;
+  QWidget* optionsWidget() override;
 
-    bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
+  bool xmlSaveState(QDomDocument& doc, QDomElement& parent_element) const override;
 
-    bool xmlLoadState(const QDomElement& parent_element) override;
+  bool xmlLoadState(const QDomElement& parent_element) override;
 
 private:
-    Ui::SamplesCount* ui;
-    QWidget* _widget;
+  Ui::SamplesCount* ui;
+  QWidget* _widget;
 
-    int count_ = 0;
-    double interval_end_ = 0;
+  int count_ = 0;
+  double interval_end_ = 0;
 
-    std::optional<PlotData::Point> calculateNextPoint(size_t index) override;
+  std::optional<PlotData::Point> calculateNextPoint(size_t index) override;
 };
-

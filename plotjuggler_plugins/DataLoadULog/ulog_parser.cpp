@@ -107,16 +107,16 @@ ULogParser::ULogParser(DataStream& datastream) : _file_start_time(0)
         Parameter new_param;
         new_param.readFromBuffer(message);
         bool found = false;
-        for(auto& prev_param: _parameters)
+        for (auto& prev_param : _parameters)
         {
-          if(prev_param.name == new_param.name)
+          if (prev_param.name == new_param.name)
           {
             prev_param = std::move(new_param);
             found = true;
             break;
           }
         }
-        if(!found)
+        if (!found)
         {
           _parameters.push_back(new_param);
         }

@@ -36,10 +36,11 @@ public:
     std::string msg_type =
         QString::fromStdString(type_name).replace("/msg/", "/").toStdString();
 
-    auto parser = std::make_shared<ParserROS>(topic_name, msg_type, schema,
-                                              new RosMsgParser::ROS2_Deserializer(), data);
+    auto parser = std::make_shared<ParserROS>(
+        topic_name, msg_type, schema, new RosMsgParser::ROS2_Deserializer(), data);
     QSettings settings;
-    parser->enableTruncationCheck(settings.value("Preferences::truncation_check", true).toBool());
+    parser->enableTruncationCheck(
+        settings.value("Preferences::truncation_check", true).toBool());
     return parser;
   }
 };

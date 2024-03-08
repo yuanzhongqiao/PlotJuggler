@@ -38,4 +38,3 @@ target_link_libraries(rosx_introspection
 target_include_directories(rosx_introspection PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
-

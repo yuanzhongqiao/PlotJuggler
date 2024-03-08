@@ -4,7 +4,7 @@
 #include <QSpinBox>
 #include <QWidget>
 #include "PlotJuggler/transform_function.h"
-#include "PlotJuggler/ring_span.hpp"
+#include "PlotJuggler/contrib/ring_span.hpp"
 
 namespace Ui
 {

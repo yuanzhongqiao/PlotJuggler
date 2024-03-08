@@ -94,7 +94,7 @@ bool FirstDerivative::xmlSaveState(QDomDocument& doc, QDomElement& parent_elemen
 bool FirstDerivative::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement widget_el = parent_element.firstChildElement("options");
-  if(widget_el.isNull())
+  if (widget_el.isNull())
   {
     return false;
   }

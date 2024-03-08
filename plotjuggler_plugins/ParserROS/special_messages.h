@@ -1,7 +1,7 @@
 #ifndef SPECIAL_MESSAGES_H
 #define SPECIAL_MESSAGES_H
 
-//These messages are exact equivalents of ROS messages
+// These messages are exact equivalents of ROS messages
 
 #include <array>
 #include <vector>
@@ -18,7 +18,7 @@ struct Time
 
   double toSec() const
   {
-    return double(sec) + double(nanosec)*1e-9;
+    return double(sec) + double(nanosec) * 1e-9;
   }
 };
 
@@ -31,7 +31,10 @@ struct Header
 
 struct Empty
 {
-  static const char* id() { return "std_msgs/Empty"; }
+  static const char* id()
+  {
+    return "std_msgs/Empty";
+  }
 };
 
 //--------------------
@@ -43,7 +46,10 @@ struct DiagnosticStatus
   std::string hardware_id;
   std::vector<std::pair<std::string, std::string>> key_value;
 
-  static const char* id() { return "diagnostic_msgs/DiagnosticStatus"; }
+  static const char* id()
+  {
+    return "diagnostic_msgs/DiagnosticStatus";
+  }
 };
 
 struct DiagnosticArray
@@ -51,7 +57,10 @@ struct DiagnosticArray
   Header header;
   std::vector<DiagnosticStatus> status;
 
-  static const char* id() { return "diagnostic_msgs/DiagnosticArray"; }
+  static const char* id()
+  {
+    return "diagnostic_msgs/DiagnosticArray";
+  }
 };
 
 //--------------------
@@ -61,7 +70,10 @@ struct Vector3
   double y;
   double z;
 
-  static const char* id() { return "geometry_msgs/Vector3"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Vector3";
+  }
 };
 
 struct Point
@@ -70,7 +82,10 @@ struct Point
   double y;
   double z;
 
-  static const char* id() { return "geometry_msgs/Point"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Point";
+  }
 };
 
 struct Quaternion
@@ -80,7 +95,10 @@ struct Quaternion
   double z;
   double w;
 
-  static const char* id() { return "geometry_msgs/Quaternion"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Quaternion";
+  }
 };
 
 struct RPY
@@ -97,7 +115,10 @@ struct Transform
   Point translation;
   Quaternion rotation;
 
-  static const char* id() { return "geometry_msgs/Transform"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Transform";
+  }
 };
 
 struct TransformStamped
@@ -106,7 +127,10 @@ struct TransformStamped
   std::string child_frame_id;
   Transform transform;
 
-  static const char* id() { return "geometry_msgs/TransformStamped"; }
+  static const char* id()
+  {
+    return "geometry_msgs/TransformStamped";
+  }
 };
 
 struct Pose
@@ -114,7 +138,10 @@ struct Pose
   Vector3 position;
   Quaternion orientation;
 
-  static const char* id() { return "geometry_msgs/Pose"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Pose";
+  }
 };
 
 struct PoseStamped
@@ -122,7 +149,10 @@ struct PoseStamped
   Header header;
   Pose pose;
 
-  static const char* id() { return "geometry_msgs/PoseStamped"; }
+  static const char* id()
+  {
+    return "geometry_msgs/PoseStamped";
+  }
 };
 
 struct PoseWithCovariance
@@ -130,15 +160,21 @@ struct PoseWithCovariance
   Pose pose;
   std::array<double, 36> covariance;
 
-  static const char* id() { return "geometry_msgs/PoseWithCovariance"; }
+  static const char* id()
+  {
+    return "geometry_msgs/PoseWithCovariance";
+  }
 };
 
 struct Twist
 {
-  Vector3  linear;
-  Vector3  angular;
+  Vector3 linear;
+  Vector3 angular;
 
-  static const char* id() { return "geometry_msgs/Twist"; }
+  static const char* id()
+  {
+    return "geometry_msgs/Twist";
+  }
 };
 
 struct TwistWithCovariance
@@ -146,14 +182,20 @@ struct TwistWithCovariance
   Twist twist;
   std::array<double, 36> covariance;
 
-  static const char* id() { return "geometry_msgs/TwistWithCovariance"; }
+  static const char* id()
+  {
+    return "geometry_msgs/TwistWithCovariance";
+  }
 };
 
 struct TFMessage
 {
   std::vector<TransformStamped> transforms;
 
-  static const char* id() { return "tf2_msgs/TFMessage"; }
+  static const char* id()
+  {
+    return "tf2_msgs/TFMessage";
+  }
 };
 //--------------------
 
@@ -167,7 +209,10 @@ struct Imu
   Vector3 linear_acceleration;
   std::array<double, 9> linear_acceleration_covariance;
 
-  static const char* id() { return "sensor_msgs/Imu"; }
+  static const char* id()
+  {
+    return "sensor_msgs/Imu";
+  }
 };
 //--------------------
 struct Odometry
@@ -176,7 +221,10 @@ struct Odometry
   PoseWithCovariance pose;
   TwistWithCovariance twist;
 
-  static const char* id() { return "nav_msgs/Odometry"; }
+  static const char* id()
+  {
+    return "nav_msgs/Odometry";
+  }
 };
 
 //--------------------
@@ -189,7 +237,10 @@ struct JointState
   std::vector<double> velocity;
   std::vector<double> effort;
 
-  static const char* id() { return "sensor_msgs/JointState"; }
+  static const char* id()
+  {
+    return "sensor_msgs/JointState";
+  }
 };
 
 //--------------------
@@ -198,7 +249,10 @@ struct DataTamerSchemas
 {
   // no need to save any additional information
 
-  static const char* id() { return "data_tamer_msgs/Schemas"; }
+  static const char* id()
+  {
+    return "data_tamer_msgs/Schemas";
+  }
 };
 
 struct DataTamerSnapshot
@@ -209,7 +263,10 @@ struct DataTamerSnapshot
   std::vector<uint8_t> active_mask;
   std::vector<uint8_t> payload;
 
-  static const char* id() { return "data_tamer_msgs/Snapshot"; }
+  static const char* id()
+  {
+    return "data_tamer_msgs/Snapshot";
+  }
 };
 
 //--------------------
@@ -220,7 +277,10 @@ struct PalStatisticsNames
   std::vector<std::string> names;
   uint32_t names_version;
 
-  static const char* id() { return "pal_statistics_msgs/StatisticsNames"; }
+  static const char* id()
+  {
+    return "pal_statistics_msgs/StatisticsNames";
+  }
 };
 
 struct PalStatisticsValues
@@ -229,8 +289,11 @@ struct PalStatisticsValues
   std::vector<double> names;
   uint32_t names_version;
 
-  static const char* id() { return "pal_statistics_msgs/StatisticsValues"; }
+  static const char* id()
+  {
+    return "pal_statistics_msgs/StatisticsValues";
+  }
 };
-}
+}  // namespace PJ::Msg
 
-#endif // SPECIAL_MESSAGES_H
+#endif  // SPECIAL_MESSAGES_H

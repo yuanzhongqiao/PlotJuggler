@@ -1,6 +1,6 @@
 #include "ros_parser.h"
 #include "data_tamer_parser/data_tamer_parser.hpp"
-#include "PlotJuggler/fmt/core.h"
+#include "PlotJuggler/contrib/fmt/core.h"
 
 using namespace PJ;
 using namespace RosMsgParser;
@@ -24,11 +24,13 @@ ParserROS::ParserROS(const std::string& topic_name, const std::string& type_name
   _parser.setMaxArrayPolicy(policy, maxArraySize());
 
   const auto& root_fields = _parser.getSchema()->root_msg->fields();
-  _has_header = !root_fields.empty() && root_fields.front().type().baseName() == "std_msgs/Header";
+  _has_header = !root_fields.empty() && root_fields.front().type().baseName() == "std_"
+                                                                                 "msgs/"
+                                                                                 "Header";
 
   using std::placeholders::_1;
   using std::placeholders::_2;
-  if(Msg::Empty::id() == type_name)
+  if (Msg::Empty::id() == type_name)
   {
     _customized_parser = std::bind(&ParserROS::parseEmpty, this, _1, _2);
   }
@@ -76,13 +78,13 @@ ParserROS::ParserROS(const std::string& topic_name, const std::string& type_name
   {
     _customized_parser = std::bind(&ParserROS::parseTransformStamped, this, _1, _2);
   }
-  else if (Msg::PalStatisticsNames::id() == type_name ||
-           type_name == "plotjuggler_msgs/StatisticsNames")
+  else if (Msg::PalStatisticsNames::id() == type_name || type_name == "plotjuggler_msgs/"
+                                                                      "StatisticsNames")
   {
     _customized_parser = std::bind(&ParserROS::parsePalStatisticsNames, this, _1, _2);
   }
-  else if (Msg::PalStatisticsValues::id() == type_name  ||
-           type_name == "plotjuggler_msgs/StatisticsValues")
+  else if (Msg::PalStatisticsValues::id() == type_name || type_name == "plotjuggler_msgs/"
+                                                                       "StatisticsValues")
   {
     _customized_parser = std::bind(&ParserROS::parsePalStatisticsValues, this, _1, _2);
   }
@@ -100,16 +102,17 @@ bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timest
 
   _parser.deserialize(serialized_msg, &_flat_msg, _deserializer.get());
 
-  if(_has_header && this->useEmbeddedTimestamp())
+  if (_has_header && this->useEmbeddedTimestamp())
   {
     double ts = 0;
-    if(_deserializer->isROS2())
+    if (_deserializer->isROS2())
     {
       auto sec = _flat_msg.value[0].second.convert<double>();
       auto nsec = _flat_msg.value[1].second.convert<double>();
-      ts = sec + 1e-9*nsec;
+      ts = sec + 1e-9 * nsec;
     }
-    else {
+    else
+    {
       ts = _flat_msg.value[1].second.convert<RosMsgParser::Time>().toSec();
     }
     timestamp = (ts > 0) ? ts : timestamp;
@@ -129,27 +132,28 @@ bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timest
     key.toStr(series_name);
     PlotData& data = getSeries(series_name);
 
-    if(!_strict_truncation_check)
+    if (!_strict_truncation_check)
     {
       // bypass the truncation check
-      if(value.getTypeID() == BuiltinType::INT64)
+      if (value.getTypeID() == BuiltinType::INT64)
       {
         data.pushBack({ timestamp, double(value.convert<int64_t>()) });
         continue;
       }
-      if(value.getTypeID() == BuiltinType::UINT64)
+      if (value.getTypeID() == BuiltinType::UINT64)
       {
         data.pushBack({ timestamp, double(value.convert<uint64_t>()) });
         continue;
       }
     }
-    try{
+    try
+    {
       data.pushBack({ timestamp, value.convert<double>() });
     }
-    catch(RangeException& ex)
+    catch (RangeException& ex)
     {
       std::string msg = std::string(ex.what());
-      if(msg == "Floating point truncated")
+      if (msg == "Floating point truncated")
       {
         msg += ".\n\nYou can disable this check in:\n"
                "App -> Preferences... -> Behavior -> Parsing";
@@ -205,11 +209,10 @@ void ParserROS::parseHeader(const std::string& prefix, double& timestamp)
   }
 }
 
-void ParserROS::parseEmpty(const std::string &prefix, double &timestamp)
+void ParserROS::parseEmpty(const std::string& prefix, double& timestamp)
 {
   getSeries(prefix).pushBack({ timestamp, 0 });
 }
-
 
 void ParserROS::parseVector3(const std::string& prefix, double& timestamp)
 {
@@ -536,13 +539,13 @@ void ParserROS::parseDataTamerSnapshot(const std::string& prefix, double& timest
 
 static std::unordered_map<uint32_t, std::vector<std::string>> _pal_statistics_names;
 
-void ParserROS::parsePalStatisticsNames(const std::string &prefix, double &timestamp)
+void ParserROS::parsePalStatisticsNames(const std::string& prefix, double& timestamp)
 {
   const auto header = readHeader(timestamp);
   std::vector<std::string> names;
   const size_t vector_size = _deserializer->deserializeUInt32();
   names.resize(vector_size);
-  for(auto& name: names)
+  for (auto& name : names)
   {
     _deserializer->deserializeString(name);
   }
@@ -550,27 +553,27 @@ void ParserROS::parsePalStatisticsNames(const std::string &prefix, double &times
   _pal_statistics_names[names_version] = std::move(names);
 }
 
-void ParserROS::parsePalStatisticsValues(const std::string &prefix, double &timestamp)
+void ParserROS::parsePalStatisticsValues(const std::string& prefix, double& timestamp)
 {
   const auto header = readHeader(timestamp);
   std::vector<double> values;
   const size_t vector_size = _deserializer->deserializeUInt32();
   values.resize(vector_size);
 
-  for(auto& value: values)
+  for (auto& value : values)
   {
     value = _deserializer->deserialize(BuiltinType::FLOAT64).convert<double>();
   }
   uint32_t names_version = _deserializer->deserializeUInt32();
   auto it = _pal_statistics_names.find(names_version);
-  if( it != _pal_statistics_names.end() )
+  if (it != _pal_statistics_names.end())
   {
     const auto& names = it->second;
     const size_t N = std::min(names.size(), values.size());
-    for(size_t i=0; i<N; i++)
+    for (size_t i = 0; i < N; i++)
     {
       auto& series = getSeries(fmt::format("{}/{}", prefix, names[i]));
-      series.pushBack({timestamp, values[i]});
+      series.pushBack({ timestamp, values[i] });
     }
   }
 }

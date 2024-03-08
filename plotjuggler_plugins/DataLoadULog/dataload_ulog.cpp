@@ -71,10 +71,9 @@ bool DataLoadULog::readDataFromFile(FileLoadInfo* fileload_info,
   for (const auto& param : parser.getParameters())
   {
     auto series = plot_data.addNumeric("_parameters/" + param.name);
-    double value = (param.val_type == ULogParser::FLOAT) ?
-                       double(param.value.val_real) :
-                       double(param.value.val_int);
-    series->second.pushBack({min_msg_time, value});
+    double value = (param.val_type == ULogParser::FLOAT) ? double(param.value.val_real) :
+                                                           double(param.value.val_int);
+    series->second.pushBack({ min_msg_time, value });
   }
 
   ULogParametersDialog* dialog = new ULogParametersDialog(parser, _main_win);

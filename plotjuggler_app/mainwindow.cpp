@@ -623,7 +623,9 @@ QStringList MainWindow::initializePlugins(QString directory_name)
     }
     catch (std::runtime_error& err)
     {
-      qDebug() << QString("%1: skipping, because it threw the following exception: %2").arg(filename).arg(err.what());
+      qDebug() << QString("%1: skipping, because it threw the following exception: %2")
+                      .arg(filename)
+                      .arg(err.what());
       continue;
     }
     if (plugin && dynamic_cast<PlotJugglerPlugin*>(plugin))
@@ -760,7 +762,7 @@ QStringList MainWindow::initializePlugins(QString directory_name)
       {
         QStringList encodings = QString(message_parser->encoding()).split(";");
         auto parser_ptr = std::shared_ptr<ParserFactoryPlugin>(message_parser);
-        for(const QString& encoding: encodings)
+        for (const QString& encoding : encodings)
         {
           _parser_factories[encoding] = parser_ptr;
         }
@@ -826,18 +828,19 @@ QStringList MainWindow::initializePlugins(QString directory_name)
                   updateDataAndReplot(true);
                 });
 
-        connect(toolbox, &ToolboxPlugin::plotCreated, this, [=](std::string name, bool is_custom) {
-          if (is_custom)
-          {
-            _curvelist_widget->addCustom(QString::fromStdString(name));
-          }
-          else
-          {
-            _curvelist_widget->addCurve(name);
-          }
-          _curvelist_widget->updateAppearance();
-          _curvelist_widget->clearSelections();
-        });
+        connect(toolbox, &ToolboxPlugin::plotCreated, this,
+                [=](std::string name, bool is_custom) {
+                  if (is_custom)
+                  {
+                    _curvelist_widget->addCustom(QString::fromStdString(name));
+                  }
+                  else
+                  {
+                    _curvelist_widget->addCurve(name);
+                  }
+                  _curvelist_widget->updateAppearance();
+                  _curvelist_widget->clearSelections();
+                });
       }
     }
     else
@@ -1412,7 +1415,7 @@ bool MainWindow::loadDataFromFiles(QStringList filenames)
   {
     data_replaced_entirely = true;
   }
-  else if(!ui->checkBoxAddPrefixAndMerge->isChecked())
+  else if (!ui->checkBoxAddPrefixAndMerge->isChecked())
   {
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(
@@ -1505,7 +1508,8 @@ std::unordered_set<std::string> MainWindow::loadDataFromFile(const FileLoadInfo&
     QString plugin_name =
         QInputDialog::getItem(this, tr("QInputDialog::getItem()"),
                               tr("Select the loader to use:"), names, 0, false, &ok);
-    if (ok && !plugin_name.isEmpty() && (_enabled_plugins.size() == 0 || _enabled_plugins.contains(plugin_name)))
+    if (ok && !plugin_name.isEmpty() &&
+        (_enabled_plugins.size() == 0 || _enabled_plugins.contains(plugin_name)))
     {
       dataloader = _data_loader[plugin_name];
       last_plugin_name_used = plugin_name;
@@ -1786,7 +1790,7 @@ void MainWindow::setStatusBarMessage(QString message)
 {
   ui->statusLabel->setText(message);
   ui->widgetStatusBar->setHidden(message.isEmpty());
-  QTimer::singleShot( 7000, this, [this]() { ui->widgetStatusBar->setHidden(true); } );
+  QTimer::singleShot(7000, this, [this]() { ui->widgetStatusBar->setHidden(true); });
 }
 
 void MainWindow::loadStyleSheet(QString file_path)
@@ -3510,16 +3514,14 @@ void MainWindow::on_buttonReloadData_clicked()
 {
   const auto prev_infos = std::move(_loaded_datafiles_previous);
   _loaded_datafiles_previous.clear();
-  for(const auto& info: prev_infos)
+  for (const auto& info : prev_infos)
   {
     loadDataFromFile(info);
   }
   ui->buttonReloadData->setEnabled(!_loaded_datafiles_previous.empty());
 }
 
-
 void MainWindow::on_buttonCloseStatus_clicked()
 {
   ui->widgetStatusBar->hide();
 }
-

@@ -44,7 +44,7 @@ public:
   virtual bool readDataFromFile(FileLoadInfo* fileload_info,
                                 PlotDataMapRef& destination) = 0;
 
-  void setParserFactories(ParserFactories *parsers)
+  void setParserFactories(ParserFactories* parsers)
   {
     _parser_factories = parsers;
   }

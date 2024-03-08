@@ -31,4 +31,3 @@ if(ZeroMQ_FOUND)
 else()
     message("[ZeroMQ] not found. Skipping plugin DataStreamZMQ.")
 endif()
-

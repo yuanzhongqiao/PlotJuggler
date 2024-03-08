@@ -100,7 +100,7 @@ bool IntegralTransform::xmlSaveState(QDomDocument& doc, QDomElement& parent_elem
 bool IntegralTransform::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement widget_el = parent_element.firstChildElement("options");
-  if(widget_el.isNull())
+  if (widget_el.isNull())
   {
     return false;
   }

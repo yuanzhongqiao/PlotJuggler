@@ -12,7 +12,7 @@ DialogMCAP::DialogMCAP(const std::unordered_map<int, mcap::ChannelPtr>& channels
                        const std::unordered_map<int, mcap::SchemaPtr>& schemas,
                        std::optional<mcap::LoadParams> default_parameters,
                        QWidget* parent)
-    : QDialog(parent), ui(new Ui::dialog_mcap)
+  : QDialog(parent), ui(new Ui::dialog_mcap)
 {
   ui->setupUi(this);
 
@@ -28,14 +28,15 @@ DialogMCAP::DialogMCAP(const std::unordered_map<int, mcap::ChannelPtr>& channels
   restoreGeometry(settings.value(prefix + "geometry").toByteArray());
 
   mcap::LoadParams params;
-  if(!default_parameters)
+  if (!default_parameters)
   {
     params.selected_topics = settings.value(prefix + "selected").toStringList();
     params.clamp_large_arrays = settings.value(prefix + "clamp", true).toBool();
     params.max_array_size = settings.value(prefix + "max_array", 500).toInt();
     params.use_timestamp = settings.value(prefix + "use_timestamp", false).toBool();
   }
-  else {
+  else
+  {
     params = *default_parameters;
   }
 

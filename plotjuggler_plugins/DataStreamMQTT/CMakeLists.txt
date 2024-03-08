@@ -49,5 +49,3 @@ if(MOSQUITTO_FOUND)
 else()
   message("[MOSQUITTO] not found. Skipping plugin DataStreamMQTT.")
 endif()
-
-

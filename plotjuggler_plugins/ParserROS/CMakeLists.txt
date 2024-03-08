@@ -33,4 +33,3 @@ target_link_libraries(ParserROS2
 
 install(TARGETS ParserROS1 ParserROS2
     DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY}  )
-

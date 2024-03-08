@@ -83,7 +83,7 @@ bool MovingAverageFilter::xmlSaveState(QDomDocument& doc,
 bool MovingAverageFilter::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement widget_el = parent_element.firstChildElement("options");
-  if(widget_el.isNull())
+  if (widget_el.isNull())
   {
     return false;
   }

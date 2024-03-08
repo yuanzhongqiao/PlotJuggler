@@ -41,7 +41,7 @@ bool MovingRMS::xmlSaveState(QDomDocument& doc, QDomElement& parent_element) con
 bool MovingRMS::xmlLoadState(const QDomElement& parent_element)
 {
   QDomElement widget_el = parent_element.firstChildElement("options");
-  if(widget_el.isNull())
+  if (widget_el.isNull())
   {
     return false;
   }

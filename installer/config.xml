@@ -9,4 +9,3 @@
   <DependsOnLocalInstallerBinary>true</DependsOnLocalInstallerBinary>
   <RunProgram>@TargetDir@/PlotJuggler</RunProgram>
 </Installer>
-

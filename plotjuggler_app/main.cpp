@@ -61,23 +61,22 @@ inline int GetVersionNumber(QString str)
 
 void ShowChangelogDialog()
 {
-    QDialog* dialog = new QDialog();
-    auto ui = new Ui::ChangelogDialog();
-    ui->setupUi(dialog);
+  QDialog* dialog = new QDialog();
+  auto ui = new Ui::ChangelogDialog();
+  ui->setupUi(dialog);
 
-    QObject::connect(ui->buttonChangelog, &QPushButton::clicked, dialog, [](bool) {
-        QDesktopServices::openUrl(QUrl("https://bit.ly/plotjuggler-update"));
-        QSettings settings;
-        settings.setValue("Changelog/first", false);
-    });
+  QObject::connect(ui->buttonChangelog, &QPushButton::clicked, dialog, [](bool) {
+    QDesktopServices::openUrl(QUrl("https://bit.ly/plotjuggler-update"));
+    QSettings settings;
+    settings.setValue("Changelog/first", false);
+  });
 
+  QObject::connect(ui->checkBox, &QCheckBox::toggled, dialog, [](bool toggle) {
+    QSettings settings;
+    settings.setValue("Changelog/dont", toggle);
+  });
 
-    QObject::connect(ui->checkBox, &QCheckBox::toggled, dialog, [](bool toggle) {
-        QSettings settings;
-        settings.setValue("Changelog/dont", toggle);
-    });
-
-    dialog->exec();
+  dialog->exec();
 }
 
 void OpenNewReleaseDialog(QNetworkReply* reply)
@@ -337,11 +336,10 @@ int main(int argc, char* argv[])
                                     "file_name (no extension)");
   parser.addOption(start_streamer);
 
-  QCommandLineOption window_title(QStringList() << "window_title",
-                                  "Set the window title",
+  QCommandLineOption window_title(QStringList() << "window_title", "Set the window title",
                                   "window_title");
   parser.addOption(window_title);
-  
+
   parser.process(*qApp);
 
   if (parser.isSet(publish_option) && !parser.isSet(layout_option))
@@ -379,10 +377,12 @@ int main(int argc, char* argv[])
   QApplication::setWindowIcon(app_icon);
 
   QNetworkAccessManager manager_new_release;
-  QObject::connect(&manager_new_release, &QNetworkAccessManager::finished, OpenNewReleaseDialog);
+  QObject::connect(&manager_new_release, &QNetworkAccessManager::finished,
+                   OpenNewReleaseDialog);
 
   QNetworkRequest request_new_release;
-  request_new_release.setUrl(QUrl("https://api.github.com/repos/facontidavide/PlotJuggler/releases/latest"));
+  request_new_release.setUrl(QUrl("https://api.github.com/repos/facontidavide/"
+                                  "PlotJuggler/releases/latest"));
   manager_new_release.get(request_new_release);
 
   MainWindow* window = nullptr;
@@ -403,8 +403,9 @@ int main(int argc, char* argv[])
   bool first_changelog = settings.value("Changelog/first", true).toBool();
   bool dont_changelog = settings.value("Changelog/dont", false).toBool();
 
-  if(first_changelog && !dont_changelog) {
-      ShowChangelogDialog();
+  if (first_changelog && !dont_changelog)
+  {
+    ShowChangelogDialog();
   }
   else if (!parser.isSet(nosplash_option) &&
            !(parser.isSet(loadfile_option) || parser.isSet(layout_option)))
@@ -439,7 +440,7 @@ int main(int argc, char* argv[])
     auto deadline = QDateTime::currentDateTime().addMSecs(500);
     while (QDateTime::currentDateTime() < deadline)
     {
-        app.processEvents();
+      app.processEvents();
     }
 
     window = new MainWindow(parser);
@@ -451,7 +452,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  if(!window)
+  if (!window)
   {
     window = new MainWindow(parser);
   }
@@ -465,8 +466,7 @@ int main(int argc, char* argv[])
 
   QNetworkAccessManager manager_message;
   QObject::connect(&manager_message, &QNetworkAccessManager::finished,
-                   [window](QNetworkReply* reply)
-                   {
+                   [window](QNetworkReply* reply) {
                      if (reply->error())
                      {
                        return;
@@ -481,7 +481,6 @@ int main(int argc, char* argv[])
   QNetworkRequest request_message;
   request_message.setUrl(QUrl("https://fastapi-example-7kz3.onrender.com"));
   manager_message.get(request_message);
-
 
   return app.exec();
 }
