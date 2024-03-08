@@ -662,7 +662,7 @@ bool ULogParser::readInfo(DataStream& datastream, uint16_t msg_size)
 
   std::string key = key_parts[1].to_string();
   std::string value;
-  
+
   if (key_parts[0].starts_with("char["))
   {
     value = raw_value;
