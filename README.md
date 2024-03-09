@@ -19,7 +19,7 @@
 <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用简单的编辑器转换您的数据：导数、移动平均值、积分等……</font></font></li>
 <li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 可以使用</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">插件</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">轻松扩展。</font></font></li>
 </ul>
-<p dir="auto"><animated-image data-catalyst=""><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" data-target="animated-image.originalLink"><img src="/facontidavide/PlotJuggler/raw/main/docs/plotjuggler3.gif" alt="阴谋魔术师" style="max-width: 100%; display: inline-block;" data-target="animated-image.originalImage"></a>
+<p dir="auto"><animated-image data-catalyst=""><a target="_blank" rel="noopener noreferrer" href="https://github.com/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" data-target="animated-image.originalLink"><img src="https://github.com/facontidavide/PlotJuggler/raw/main/docs/plotjuggler3.gif" alt="阴谋魔术师" style="max-width: 100%; display: inline-block;" data-target="animated-image.originalImage"></a>
       <span class="AnimatedImagePlayer" data-target="animated-image.player" hidden="">
         <a data-target="animated-image.replacedLink" class="AnimatedImagePlayer-images" href="https://github.com/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" target="_blank">
           
