@@ -1,161 +1,182 @@
-![PlotJuggler](docs/plotjuggler3_banner.svg)
-
-[![windows](https://github.com/facontidavide/PlotJuggler/actions/workflows/windows.yaml/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions/workflows/windows.yaml)
-[![ubuntu](https://github.com/facontidavide/PlotJuggler/actions/workflows/ubuntu.yaml/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions/workflows/ubuntu.yaml)
-[![macos](https://github.com/facontidavide/PlotJuggler/actions/workflows/macos.yaml/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions/workflows/macos.yaml)
-[![ROS1](https://github.com/facontidavide/PlotJuggler/workflows/ros1/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions?query=workflow%3Aros1)
-[![ROS2](https://github.com/facontidavide/PlotJuggler/workflows/ros2/badge.svg)](https://github.com/facontidavide/PlotJuggler/actions?query=workflow%3Aros2)
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=I%20use%20PlotJuggler%20and%20it%20is%20amazing%0D%0A&url=https://github.com/facontidavide/PlotJuggler&via=facontidavide&hashtags=dataviz,plotjuggler,GoROS,PX4)
-
-**Gold Sponsor**: [Greenzie](https://www.greenzie.com/)
-
-# PlotJuggler 3.9
-
-PlotJuggler is a tool to visualize time series that is **fast**, **powerful** and  **intuitive**.
-
-Noteworthy features:
-
-- Simple Drag & Drop user interface.
-- Load __data from file__.
-- Connect to live __streaming__ of data.
-- Save the visualization layout and configurations to re-use them later.
-- Fast **OpenGL** visualization.
-- Can handle **thousands** of timeseries and **millions** of data points.
-- Transform your data using a simple editor: derivative, moving average, integral, etc…
-- PlotJuggler can be easily extended using __plugins__.
-
-![PlotJuggler](docs/plotjuggler3.gif)
-
-
-## Data sources (file and streaming)
-
-- Load CSV files.
-- Load [ULog](https://dev.px4.io/v1.9.0/en/log/ulog_file_format.html) (PX4).
-- Subscribe to many different streaming sources: MQTT, WebSockets, ZeroMQ, UDP, etc.
-- Understand data formats such as JSON, CBOR, BSON, Message Pack, etc.
-- Well integrated with [ROS](https://www.ros.org/): open *rosbags* and/or subscribe to ROS *topics* (both ROS1 and ROS2).
-- Supports the [Lab Streaming Layer](https://labstreaminglayer.readthedocs.io/info/intro.html), that is used by [many devices](https://labstreaminglayer.readthedocs.io/info/supported_devices.html).
-- Easily add your custom data source and/or formats...
-
-![](docs/data_sources.svg)
-
-## Transform and analyze your data
-PlotJuggler makes it easy to visualize data but also to analyze it.
-You can manipulate your time series using a simple and extendable Transform Editor.
-
-![](docs/function_editor.png)
-
-Alternatively, you may use the Custom Function Editor, which allows you to create Multi-input / Single-output functions
-using a scripting language based on [Lua](https://www.tutorialspoint.com/lua/index.htm).
-
-If you are not familiar with Lua, don't be afraid, you won't need more than 5 minutes to learn it ;)
-
-![](docs/custom_editor.png)
-
-## Tutorials
-
-To learn how to use PlotJuggler, check the tutorials here:
-
-| Tutorial 1   |  Tutorial 2 | Tutorial 3 |
-:-------------------------:|:-------------------------:|:-------------------------:
-| [![](docs/tutorial_1.png)](https://slides.com/davidefaconti/introduction-to-plotjuggler) | [![](docs/tutorial_2.png)](https://slides.com/davidefaconti/plotjuggler-data) | [![](docs/tutorial_3.png)](https://slides.com/davidefaconti/plotjuggler-transforms) |
-
-## Supported plugins
-
-Some plugins can be found in a different repository. The individual README files
-*should* include all the information needed to compile and use the plugin.
-
-Please submit specific issues, Pull Requests and questions on the related Github repository:
-
-- [MQTT DataStreamer](https://github.com/PlotJuggler/plotjuggler-mqtt).
-- [Lab Streaming Layer DataStreamer](https://github.com/PlotJuggler/plotjuggler-lsl).
-- [ROS plugins](https://github.com/PlotJuggler/plotjuggler-ros-plugins).
-- [CAN .dbg DataLoader](https://github.com/PlotJuggler/plotjuggler-CAN-dbs).
-
-If you want a simple example to learn how to write your own plugins, have a look at
-[PlotJuggler/plotjuggler-sample-plugins](https://github.com/PlotJuggler/plotjuggler-sample-plugins)
-
-## Installation
-
-## Snap (recommended in Ubuntu, to ROS users too)
-
-The snap contains a version of PlotJuggler that can work with either ROS1 or ROS2.
-
-![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)
-
-To install it in Ubuntu 22.04, with ROS2 support, run:
-
-```
-sudo snap install plotjuggler
-```
-
-If you are still using ROS1 (Ubuntu 20.04), install instead:
-
-```
-sudo snap install plotjuggler-ros
-```
-
-### Windows Binary installer
-
-This installer does __not__ include ROS plugins.
-
-**Windows Installer**:
-[PlotJuggler-Windows-3.9.0-installer](https://github.com/facontidavide/PlotJuggler/releases/download/3.9.0/PlotJuggler-Windows-3.9.0-installer.exe)
-
-### Debian packages for ROS User
-
-Install the ROS packages with:
-
-```
-sudo apt install ros-$ROS_DISTRO-plotjuggler-ros
-```
-To launch PlotJuggler on ROS, use the command:
-
-```
-rosrun plotjuggler plotjuggler
-```
-
-or, if are using ROS2:
-
-```
-ros2 run plotjuggler plotjuggler
-```
-
-ROS plugins are available in a separate repository: https://github.com/PlotJuggler/plotjuggler-ros-plugins
-
-Please take a look at the instructions in that repository if you want to compile PJ and its ROS plugins from source.
-
-
-## Compile from source
-
-You can find the detailed instructions here: [COMPILE.md](COMPILE.md).
-
-# Sponsorship and commercial support
-
-PlotJuggler required a lot of work to develop and maintain; my goal is to build the most
-intuitive and powerful tool to visualize data and timeseries.
-
-If you find PlotJuggler useful, consider donating [PayPal](https://www.paypal.me/facontidavide) or becoming a
-[Github Sponsor](https://github.com/sponsors/facontidavide).
-
-If you need to extend any of the functionalities of PlotJuggler to cover a specific
-need or to parse your custom data formats, you can receive commercial
-support from the main author, [Davide Faconti](mailto:davide.faconti@gmail.com).
-
-# License
-
-PlotJuggler is released under the [Mozilla Public License Version 2.0](LICENSE.md),
-which allows users to develop closed-source plugins.
-
-Please note that some third-party dependencies (including Qt) use the
-**GNU Lesser General Public License**.
-
-# Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=facontidavide/PlotJuggler&type=Date)](https://star-history.com/#facontidavide/PlotJuggler&Date)
-
-# Contributors
-
+<div class="Box-sc-g0xbh4-0 bJMeLZ js-snippet-clipboard-copy-unpositioned" data-hpc="true"><article class="markdown-body entry-content container-lg" itemprop="text"><p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3_banner.svg"><img src="/facontidavide/PlotJuggler/raw/main/docs/plotjuggler3_banner.svg" alt="阴谋魔术师" style="max-width: 100%;"></a></p>
+<p dir="auto"><a href="https://github.com/facontidavide/PlotJuggler/actions/workflows/windows.yaml"><img src="https://github.com/facontidavide/PlotJuggler/actions/workflows/windows.yaml/badge.svg" alt="视窗" style="max-width: 100%;"></a>
+<a href="https://github.com/facontidavide/PlotJuggler/actions/workflows/ubuntu.yaml"><img src="https://github.com/facontidavide/PlotJuggler/actions/workflows/ubuntu.yaml/badge.svg" alt="乌班图" style="max-width: 100%;"></a>
+<a href="https://github.com/facontidavide/PlotJuggler/actions/workflows/macos.yaml"><img src="https://github.com/facontidavide/PlotJuggler/actions/workflows/macos.yaml/badge.svg" alt="苹果系统" style="max-width: 100%;"></a>
+<a href="https://github.com/facontidavide/PlotJuggler/actions?query=workflow%3Aros1"><img src="https://github.com/facontidavide/PlotJuggler/workflows/ros1/badge.svg" alt="活性氧1" style="max-width: 100%;"></a>
+<a href="https://github.com/facontidavide/PlotJuggler/actions?query=workflow%3Aros2"><img src="https://github.com/facontidavide/PlotJuggler/workflows/ros2/badge.svg" alt="活性氧2" style="max-width: 100%;"></a>
+<a href="https://twitter.com/intent/tweet?text=I%20use%20PlotJuggler%20and%20it%20is%20amazing%0D%0A&amp;url=https://github.com/facontidavide/PlotJuggler&amp;via=facontidavide&amp;hashtags=dataviz,plotjuggler,GoROS,PX4" rel="nofollow"><img src="https://camo.githubusercontent.com/a00d957c85627f2862ae61b59289e25f875e9ae40a716efdf5c3e032d6b8f863/68747470733a2f2f696d672e736869656c64732e696f2f747769747465722f75726c2f687474702f736869656c64732e696f2e7376673f7374796c653d736f6369616c" alt="鸣叫" data-canonical-src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" style="max-width: 100%;"></a></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">金牌赞助商</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">：</font></font><a href="https://www.greenzie.com/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Greenzie</font></font></a></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">情节杂耍者 3.9</font></font></h1><a id="user-content-plotjuggler-39" class="anchor" aria-label="永久链接：PlotJuggler 3.9" href="#plotjuggler-39"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 是一种快速</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">、</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">强大</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">且  </font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">直观的</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">时间序列可视化工具</font><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">值得注意的特点：</font></font></p>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">简单的拖放用户界面。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从文件加载</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">数据</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">连接到实时</font><font style="vertical-align: inherit;">数据</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">流。</font></font></strong><font style="vertical-align: inherit;"></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">保存可视化布局和配置以便稍后重复使用。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">快速</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">OpenGL</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可视化。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">可以处理</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">数千个</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">时间序列和数</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">百万</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">个数据点。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">使用简单的编辑器转换您的数据：导数、移动平均值、积分等……</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 可以使用</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">插件</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">轻松扩展。</font></font></li>
+</ul>
+<p dir="auto"><animated-image data-catalyst=""><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" data-target="animated-image.originalLink"><img src="/facontidavide/PlotJuggler/raw/main/docs/plotjuggler3.gif" alt="阴谋魔术师" style="max-width: 100%; display: inline-block;" data-target="animated-image.originalImage"></a>
+      <span class="AnimatedImagePlayer" data-target="animated-image.player" hidden="">
+        <a data-target="animated-image.replacedLink" class="AnimatedImagePlayer-images" href="https://github.com/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" target="_blank">
+          
+        <span data-target="animated-image.imageContainer">
+            <img data-target="animated-image.replacedImage" alt="PlotJuggler" class="AnimatedImagePlayer-animatedImage" src="https://github.com/facontidavide/PlotJuggler/raw/main/docs/plotjuggler3.gif" style="display: block; opacity: 1;">
+          <canvas class="AnimatedImagePlayer-stillImage" aria-hidden="true" width="800" height="570"></canvas></span></a>
+        <button data-target="animated-image.imageButton" class="AnimatedImagePlayer-images" tabindex="-1" aria-label="Play PlotJuggler" hidden=""></button>
+        <span class="AnimatedImagePlayer-controls" data-target="animated-image.controls" hidden="">
+          <button data-target="animated-image.playButton" class="AnimatedImagePlayer-button" aria-label="Play PlotJuggler">
+            <svg aria-hidden="true" focusable="false" class="octicon icon-play" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 13.5427V2.45734C4 1.82607 4.69692 1.4435 5.2295 1.78241L13.9394 7.32507C14.4334 7.63943 14.4334 8.36057 13.9394 8.67493L5.2295 14.2176C4.69692 14.5565 4 14.1739 4 13.5427Z">
+            </path></svg>
+            <svg aria-hidden="true" focusable="false" class="octicon icon-pause" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="2" width="3" height="12" rx="1"></rect>
+              <rect x="9" y="2" width="3" height="12" rx="1"></rect>
+            </svg>
+          </button>
+          <a data-target="animated-image.openButton" aria-label="Open PlotJuggler in new window" class="AnimatedImagePlayer-button" href="https://github.com/facontidavide/PlotJuggler/blob/main/docs/plotjuggler3.gif" target="_blank">
+            <svg aria-hidden="true" class="octicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+              <path fill-rule="evenodd" d="M10.604 1h4.146a.25.25 0 01.25.25v4.146a.25.25 0 01-.427.177L13.03 4.03 9.28 7.78a.75.75 0 01-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0110.604 1zM3.75 2A1.75 1.75 0 002 3.75v8.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 12.25v-3.5a.75.75 0 00-1.5 0v3.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-8.5a.25.25 0 01.25-.25h3.5a.75.75 0 000-1.5h-3.5z"></path>
+            </svg>
+          </a>
+        </span>
+      </span></animated-image></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">数据源（文件和流）</font></font></h2><a id="user-content-data-sources-file-and-streaming" class="anchor" aria-label="永久链接：数据源（文件和流）" href="#data-sources-file-and-streaming"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<ul dir="auto">
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">加载 CSV 文件。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">加载</font></font><a href="https://dev.px4.io/v1.9.0/en/log/ulog_file_format.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ULog</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"> (PX4)。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">订阅许多不同的流媒体源：MQTT、WebSockets、ZeroMQ、UDP 等。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">了解JSON、CBOR、BSON、Message Pack等数据格式。</font></font></li>
+<li><font style="vertical-align: inherit;"></font><a href="https://www.ros.org/" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">与ROS</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">良好集成</font><font style="vertical-align: inherit;">：打开</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">rosbags</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">和/或订阅 ROS</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">主题</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">（ROS1 和 ROS2）。</font></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">支持</font><a href="https://labstreaminglayer.readthedocs.io/info/supported_devices.html" rel="nofollow"><font style="vertical-align: inherit;">许多设备</font></a><font style="vertical-align: inherit;">使用的</font></font><a href="https://labstreaminglayer.readthedocs.io/info/intro.html" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">实验室流层</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font><a href="https://labstreaminglayer.readthedocs.io/info/supported_devices.html" rel="nofollow"><font style="vertical-align: inherit;"></font></a><font style="vertical-align: inherit;"></font></li>
+<li><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">轻松添加您的自定义数据源和/或格式...</font></font></li>
+</ul>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/data_sources.svg"><img src="/facontidavide/PlotJuggler/raw/main/docs/data_sources.svg" alt="" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">转换和分析您的数据</font></font></h2><a id="user-content-transform-and-analyze-your-data" class="anchor" aria-label="永久链接：转换和分析您的数据" href="#transform-and-analyze-your-data"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 可以轻松可视化数据，也可以轻松分析数据。</font><font style="vertical-align: inherit;">您可以使用简单且可扩展的变换编辑器来操纵时间序列。</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/function_editor.png"><img src="/facontidavide/PlotJuggler/raw/main/docs/function_editor.png" alt="" style="max-width: 100%;"></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="https://www.tutorialspoint.com/lua/index.htm" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">或者，您可以使用自定义函数编辑器，它允许您使用基于Lua 的</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">脚本语言创建多输入/单输出函数</font><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果你不熟悉 Lua，不要害怕，你不需要超过 5 分钟就能学会它；）</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer" href="/facontidavide/PlotJuggler/blob/main/docs/custom_editor.png"><img src="/facontidavide/PlotJuggler/raw/main/docs/custom_editor.png" alt="" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">教程</font></font></h2><a id="user-content-tutorials" class="anchor" aria-label="永久链接：教程" href="#tutorials"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要了解如何使用 PlotJuggler，请查看此处的教程：</font></font></p>
+<table>
+<thead>
+<tr>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">教程1</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">教程2</font></font></th>
+<th align="center"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">教程3</font></font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><a href="https://slides.com/davidefaconti/introduction-to-plotjuggler" rel="nofollow"><img src="/facontidavide/PlotJuggler/raw/main/docs/tutorial_1.png" alt="" style="max-width: 100%;"></a></td>
+<td align="center"><a href="https://slides.com/davidefaconti/plotjuggler-data" rel="nofollow"><img src="/facontidavide/PlotJuggler/raw/main/docs/tutorial_2.png" alt="" style="max-width: 100%;"></a></td>
+<td align="center"><a href="https://slides.com/davidefaconti/plotjuggler-transforms" rel="nofollow"><img src="/facontidavide/PlotJuggler/raw/main/docs/tutorial_3.png" alt="" style="max-width: 100%;"></a></td>
+</tr>
+</tbody>
+</table>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">支持的插件</font></font></h2><a id="user-content-supported-plugins" class="anchor" aria-label="永久链接：支持的插件" href="#supported-plugins"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">某些插件可以在不同的存储库中找到。</font><font style="vertical-align: inherit;">各个自述文件
+</font></font><em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">应</font></font></em><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">包含编译和使用插件所需的所有信息。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请在相关的 Github 存储库上提交具体问题、Pull Request 和问题：</font></font></p>
+<ul dir="auto">
+<li><a href="https://github.com/PlotJuggler/plotjuggler-mqtt"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">MQTT 数据流</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><a href="https://github.com/PlotJuggler/plotjuggler-lsl"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">实验室流层 DataStreamer</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><a href="https://github.com/PlotJuggler/plotjuggler-ros-plugins"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS 插件</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+<li><a href="https://github.com/PlotJuggler/plotjuggler-CAN-dbs"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">CAN .dbg 数据加载器</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></li>
+</ul>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您想要一个简单的示例来学习如何编写自己的插件，请查看
+</font></font><a href="https://github.com/PlotJuggler/plotjuggler-sample-plugins"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler/plotjuggler-sample-plugins</font></font></a></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装</font></font></h2><a id="user-content-installation" class="anchor" aria-label="永久链接：安装" href="#installation"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Snap（在 Ubuntu 中推荐，也推荐给 ROS 用户）</font></font></h2><a id="user-content-snap-recommended-in-ubuntu-to-ros-users-too" class="anchor" aria-label="永久链接：Snap（在 Ubuntu 中推荐，也推荐给 ROS 用户）" href="#snap-recommended-in-ubuntu-to-ros-users-too"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">该 snap 包包含可与 ROS1 或 ROS2 配合使用的 PlotJuggler 版本。</font></font></p>
+<p dir="auto"><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/46aa03c94aa80f6545e01f2ce3966a1d7ae73552495f177b9b71f411408ce325/68747470733a2f2f736e617063726166742e696f2f7374617469632f696d616765732f6261646765732f656e2f736e61702d73746f72652d626c61636b2e737667"><img src="https://camo.githubusercontent.com/46aa03c94aa80f6545e01f2ce3966a1d7ae73552495f177b9b71f411408ce325/68747470733a2f2f736e617063726166742e696f2f7374617469632f696d616765732f6261646765732f656e2f736e61702d73746f72652d626c61636b2e737667" alt="从 Snap 商店获取" data-canonical-src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg" style="max-width: 100%;"></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要在支持 ROS2 的 Ubuntu 22.04 中安装它，请运行：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>sudo snap install plotjuggler
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="sudo snap install plotjuggler" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您仍在使用 ROS1 (Ubuntu 20.04)，请安装：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>sudo snap install plotjuggler-ros
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="sudo snap install plotjuggler-ros" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Windows 二进制安装程序</font></font></h3><a id="user-content-windows-binary-installer" class="anchor" aria-label="永久链接：Windows 二进制安装程序" href="#windows-binary-installer"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">此安装程序不</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">包含</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS 插件。</font></font></p>
+<p dir="auto"><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Windows 安装程序</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">：
+ </font></font><a href="https://github.com/facontidavide/PlotJuggler/releases/download/3.9.0/PlotJuggler-Windows-3.9.0-installer.exe"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler-Windows-3.9.0-installer</font></font></a></p>
+<div class="markdown-heading" dir="auto"><h3 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS 用户的 Debian 软件包</font></font></h3><a id="user-content-debian-packages-for-ros-user" class="anchor" aria-label="永久链接：适用于 ROS 用户的 Debian 软件包" href="#debian-packages-for-ros-user"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">安装 ROS 软件包：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>sudo apt install ros-$ROS_DISTRO-plotjuggler-ros
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="sudo apt install ros-$ROS_DISTRO-plotjuggler-ros" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">要在 ROS 上启动 PlotJuggler，请使用以下命令：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>rosrun plotjuggler plotjuggler
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="rosrun plotjuggler plotjuggler" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">或者，如果使用 ROS2：</font></font></p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto"><pre class="notranslate"><code>ros2 run plotjuggler plotjuggler
+</code></pre><div class="zeroclipboard-container">
+    <clipboard-copy aria-label="Copy" class="ClipboardButton btn btn-invisible js-clipboard-copy m-2 p-0 tooltipped-no-delay d-flex flex-justify-center flex-items-center" data-copy-feedback="Copied!" data-tooltip-direction="w" value="ros2 run plotjuggler plotjuggler" tabindex="0" role="button">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-copy js-clipboard-copy-icon">
+    <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+</svg>
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check js-clipboard-check-icon color-fg-success d-none">
+    <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+</svg>
+    </clipboard-copy>
+  </div></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">ROS 插件可在单独的存储库中找到：</font></font><a href="https://github.com/PlotJuggler/plotjuggler-ros-plugins"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">https ://github.com/PlotJuggler/plotjuggler-ros-plugins</font></font></a></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您想从源代码编译 PJ 及其 ROS 插件，请查看该存储库中的说明。</font></font></p>
+<div class="markdown-heading" dir="auto"><h2 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">从源代码编译</font></font></h2><a id="user-content-compile-from-source" class="anchor" aria-label="永久链接：从源代码编译" href="#compile-from-source"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">您可以在这里找到详细说明：</font></font><a href="/facontidavide/PlotJuggler/blob/main/COMPILE.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">COMPILE.md</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">赞助和商业支持</font></font></h1><a id="user-content-sponsorship-and-commercial-support" class="anchor" aria-label="永久链接：赞助和商业支持" href="#sponsorship-and-commercial-support"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 需要大量的开发和维护工作；</font><font style="vertical-align: inherit;">我的目标是构建最直观、最强大的工具来可视化数据和时间序列。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您发现 PlotJuggler 有用，请考虑捐赠</font></font><a href="https://www.paypal.me/facontidavide" rel="nofollow"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PayPal</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">或成为
+</font></font><a href="https://github.com/sponsors/facontidavide"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Github 赞助商</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">如果您需要扩展 PlotJuggler 的任何功能以满足特定需求或解析您的自定义数据格式，您可以从主要作者</font></font><a href="mailto:davide.faconti@gmail.com"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Davide Faconti</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">获得商业支持。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">执照</font></font></h1><a id="user-content-license" class="anchor" aria-label="永久链接：许可证" href="#license"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><font style="vertical-align: inherit;"></font><a href="/facontidavide/PlotJuggler/blob/main/LICENSE.md"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">PlotJuggler 在Mozilla 公共许可证版本 2.0</font></font></a><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">下发布</font><font style="vertical-align: inherit;">，允许用户开发闭源插件。</font></font></p>
+<p dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">请注意，某些第三方依赖项（包括 Qt）使用
+</font></font><strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">GNU Lesser General Public License</font></font></strong><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">。</font></font></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">明星历史</font></font></h1><a id="user-content-star-history" class="anchor" aria-label="永久链接：明星历史" href="#star-history"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
+<p dir="auto"><a href="https://star-history.com/#facontidavide/PlotJuggler&amp;Date" rel="nofollow"><img src="https://camo.githubusercontent.com/27c62d54e0a49e3cebd4a8579fcc9472edc0b47d84910f2446edde6b3cd40b62/68747470733a2f2f6170692e737461722d686973746f72792e636f6d2f7376673f7265706f733d6661636f6e74696461766964652f506c6f744a7567676c657226747970653d44617465" alt="明星历史图" data-canonical-src="https://api.star-history.com/svg?repos=facontidavide/PlotJuggler&amp;type=Date" style="max-width: 100%;"></a></p>
+<div class="markdown-heading" dir="auto"><h1 tabindex="-1" class="heading-element" dir="auto"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">贡献者</font></font></h1><a id="user-content-contributors" class="anchor" aria-label="永久链接：贡献者" href="#contributors"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg></a></div>
 <a href="https://github.com/facontidavide/plotjuggler/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=facontidavide/plotjuggler" />
+  <img src="https://camo.githubusercontent.com/e6ec4db5be0568ad3febb19b0853d6459316e6e13312e77930375e805d430332/68747470733a2f2f636f6e747269622e726f636b732f696d6167653f7265706f3d6661636f6e74696461766964652f706c6f746a7567676c6572" data-canonical-src="https://contrib.rocks/image?repo=facontidavide/plotjuggler" style="max-width: 100%;">
 </a>
+</article></div>
